@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% block title %}Nghe & chọn — {{ topic.name_vi }}{% endblock %}
+
+{% block content %}
+{{ round_data|json_script:"round-data" }}
+
+<div x-data="listenPick()" x-init="init()">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h1 class="h5 m-0">👂 {{ child.avatar }} {{ child.name }} — {{ topic.name_vi }}</h1>
+    <a href="{% url 'games:choose' %}" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-arrow-left"></i> Thoát
+    </a>
+  </div>
+
+  {# Đang chơi #}
+  <div x-show="!finished">
+    <div class="text-muted small mb-2">Câu <span x-text="index + 1"></span> / <span x-text="questions.length"></span></div>
+
+    <div class="card child-card text-center p-4 mb-3">
+      <p class="mb-3">Nghe rồi chọn từ đúng nhé!</p>
+      <div><button class="btn btn-kid btn-lg" @click="playAudio()">
+        <i class="bi bi-volume-up-fill"></i> Nghe
+      </button></div>
+    </div>
+
+    <div class="row g-3">
+      <template x-for="choice in current.choices" :key="choice.id">
+        <div class="col-6">
+          <button class="btn btn-outline-primary w-100 p-3 fs-5"
+                  @click="pick(choice.id)" :disabled="answered">
+            <span x-text="choice.text_en"></span>
+            <div class="small text-muted" x-text="choice.text_vi"></div>
+          </button>
+        </div>
+      </template>
+    </div>
+
+    <div class="mt-3 text-center" x-show="answered" x-transition>
+      <div class="alert" :class="lastCorrect ? 'alert-success' : 'alert-warning'"
+           x-text="lastCorrect ? '🎉 Đúng rồi!' : '🙂 Nghe lại nhé!'"></div>
+    </div>
+  </div>
+
+  {# Kết thúc: hiện sao #}
+  <div x-show="finished" x-transition class="card child-card text-center p-5">
+    <div class="display-4 mb-2" x-text="starText"></div>
+    <p class="fs-5">Đúng <span x-text="score"></span> / <span x-text="questions.length"></span> câu</p>
+    <div class="d-flex justify-content-center gap-2">
+      <a href="{% url 'games:choose' %}" class="btn btn-outline-primary">Chọn game khác</a>
+      <button class="btn btn-kid" @click="location.reload()">Chơi lại</button>
+    </div>
+  </div>
+
+  <audio x-ref="player"></audio>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const CHILD_ID = {{ child.pk }};
+  const SUBMIT_URL = "{% url 'games:submit' child.pk game.code topic.slug %}";
+  function getCookie(n){const m=document.cookie.match('(^|;)\\s*'+n+'\\s*=\\s*([^;]+)');return m?m.pop():'';}
+
+  function listenPick() {
+    return {
+      questions: [], index: 0, answered: false, lastCorrect: false,
+      score: 0, finished: false, answers: [], starText: '',
+      init() {
+        const data = JSON.parse(document.getElementById('round-data').textContent);
+        this.questions = data.questions || [];
+        if (!this.questions.length) { this.finished = true; }
+      },
+      get current(){ return this.questions[this.index] || {choices: []}; },
+      // Phát audio mẫu của từ đáp án (API catalog).
+      async playAudio() {
+        try {
+          const r = await fetch(`/learn/word/${this.current.audio_word_id}/audio/`);
+          const d = await r.json();
+          if (d.ok) { this.$refs.player.src = d.url; this.$refs.player.play(); }
+        } catch(e){}
+      },
+      pick(pickedId) {
+        if (this.answered) return;
+        this.answered = true;
+        this.lastCorrect = (pickedId === this.current.answer_id);
+        if (this.lastCorrect) this.score++;
+        this.answers.push({answer_id: this.current.answer_id, picked_id: pickedId});
+        // Sang câu sau (hoặc kết thúc) sau 0.9s để bé thấy phản hồi.
+        setTimeout(() => {
+          if (this.index < this.questions.length - 1) { this.index++; this.answered = false; }
+          else { this.submit(); }
+        }, 900);
+      },
+      async submit() {
+        try {
+          const r = await fetch(SUBMIT_URL, {
+            method: 'POST',
+            headers: {'Content-Type':'application/json','X-CSRFToken':getCookie('csrftoken')},
+            body: JSON.stringify({answers: this.answers}),
+          });
+          const d = await r.json();
+          this.starText = '⭐'.repeat(d.stars || 0) || '🌱';
+        } catch(e){ this.starText = '🌱'; }
+        this.finished = true;
+      },
+    };
+  }
+</script>
+{% endblock %}

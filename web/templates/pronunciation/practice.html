@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Luyện: {{ topic.name_vi }}{% endblock %}
+
+{% block content %}
+{% if empty %}
+  <div class="card child-card text-center p-5">
+    <div class="display-6 mb-2">🐣</div>
+    <p class="mb-3">Chủ đề này chưa có từ nào để luyện.</p>
+    <div><a href="{% url 'pronunciation:choose' %}" class="btn btn-kid">Chọn chủ đề khác</a></div>
+  </div>
+{% else %}
+{# Dữ liệu các từ truyền sang Alpine dưới dạng JSON #}
+{{ words_data|json_script:"words-data" }}
+
+<div x-data="practice()" x-init="init()">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h1 class="h5 m-0">🎤 {{ child.avatar }} {{ child.name }} — {{ topic.name_vi }}</h1>
+    <a href="{% url 'pronunciation:choose' %}" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-arrow-left"></i> Đổi
+    </a>
+  </div>
+
+  {# Thanh tiến độ đơn giản #}
+  <div class="text-muted small mb-2">
+    Từ <span x-text="index + 1"></span> / <span x-text="words.length"></span>
+  </div>
+
+  <div class="card child-card text-center p-4 mb-3">
+    <div class="display-1 mb-2" x-text="current.emoji">🔤</div>
+    <div class="fs-2 fw-bold" x-text="current.text_en"></div>
+    <div class="text-muted" x-show="current.phonetic" x-text="`/${current.phonetic}/`"></div>
+    <div class="text-secondary mb-3" x-text="current.text_vi"></div>
+
+    <div class="d-flex justify-content-center gap-2 flex-wrap">
+      {# Nghe mẫu: dùng lại API audio của catalog #}
+      <button class="btn btn-kid" @click="listen()" :disabled="busy">
+        <i class="bi bi-volume-up-fill"></i> Nghe mẫu
+      </button>
+
+      {# Thu âm: bấm để bắt đầu / dừng #}
+      <button class="btn" :class="recording ? 'btn-danger' : 'btn-success'"
+              @click="toggleRecord()" :disabled="busy && !recording">
+        <span x-show="!recording"><i class="bi bi-mic-fill"></i> Thu giọng</span>
+        <span x-show="recording"><i class="bi bi-stop-fill"></i> Dừng</span>
+      </button>
+    </div>
+
+    <div class="mt-3" x-show="message" x-transition>
+      <div class="alert" :class="messageOk ? 'alert-success' : 'alert-warning'" x-text="message"></div>
+    </div>
+
+    {# Nghe lại bản ghi của bé #}
+    <audio x-ref="playback" controls class="w-100 mt-2" x-show="myRecordingUrl" :src="myRecordingUrl"></audio>
+  </div>
+
+  <div class="d-flex justify-content-between">
+    <button class="btn btn-outline-secondary" @click="prev()" :disabled="index === 0">
+      <i class="bi bi-chevron-left"></i> Trước
+    </button>
+    <button class="btn btn-outline-primary" @click="next()" x-show="index < words.length - 1">
+      Từ tiếp theo <i class="bi bi-chevron-right"></i>
+    </button>
+    <a class="btn btn-kid" href="{% url 'pronunciation:choose' %}" x-show="index === words.length - 1">
+      🎉 Xong rồi!
+    </a>
+  </div>
+
+  <audio x-ref="sample"></audio>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+{% if not empty %}
+<script>
+  const CHILD_ID = {{ child.pk }};
+  // Lấy CSRF token từ cookie để POST bản ghi.
+  function getCookie(name) {
+    const m = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+    return m ? m.pop() : '';
+  }
+
+  function practice() {
+    return {
+      words: [],
+      index: 0,
+      busy: false,
+      recording: false,
+      message: '',
+      messageOk: true,
+      myRecordingUrl: '',
+      mediaRecorder: null,
+      chunks: [],
+
+      init() {
+        this.words = JSON.parse(document.getElementById('words-data').textContent);
+      },
+      get current() { return this.words[this.index] || {}; },
+
+      // Nghe phát âm mẫu (API catalog sinh + cache).
+      async listen() {
+        this.busy = true; this.message = '';
+        try {
+          const r = await fetch(`/learn/word/${this.current.id}/audio/`);
+          const d = await r.json();
+          if (d.ok) { this.$refs.sample.src = d.url; this.$refs.sample.play(); }
+          else { this.show(d.message || 'Chưa nghe được, thử lại nhé.', false); }
+        } catch (e) { this.show('Có lỗi khi tải âm thanh.', false); }
+        finally { this.busy = false; }
+      },
+
+      // Bắt đầu / dừng thu âm bằng MediaRecorder.
+      async toggleRecord() {
+        if (this.recording) { this.mediaRecorder.stop(); return; }
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          this.chunks = [];
+          this.mediaRecorder = new MediaRecorder(stream);
+          this.mediaRecorder.ondataavailable = e => this.chunks.push(e.data);
+          this.mediaRecorder.onstop = () => {
+            stream.getTracks().forEach(t => t.stop());
+            const blob = new Blob(this.chunks, { type: 'audio/webm' });
+            this.myRecordingUrl = URL.createObjectURL(blob);
+            this.upload(blob);
+          };
+          this.mediaRecorder.start();
+          this.recording = true;
+          this.message = '';
+        } catch (e) {
+          this.show('Không bật được micro. Hãy cho phép trình duyệt dùng micro nhé.', false);
+        }
+      },
+
+      // Gửi bản ghi lên server (lưu Attempt).
+      async upload(blob) {
+        this.recording = false; this.busy = true;
+        const fd = new FormData();
+        fd.append('audio', blob, 'recording.webm');
+        try {
+          const r = await fetch(`/speak/${CHILD_ID}/word/${this.current.id}/save/`, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': getCookie('csrftoken') },
+            body: fd,
+          });
+          const d = await r.json();
+          this.show(d.message || (d.ok ? 'Đã lưu!' : 'Chưa lưu được.'), !!d.ok);
+        } catch (e) { this.show('Có lỗi khi gửi bản ghi.', false); }
+        finally { this.busy = false; }
+      },
+
+      next() { if (this.index < this.words.length - 1) { this.index++; this.reset(); } },
+      prev() { if (this.index > 0) { this.index--; this.reset(); } },
+      reset() { this.message = ''; this.myRecordingUrl = ''; },
+      show(msg, ok) { this.message = msg; this.messageOk = ok; },
+    };
+  }
+</script>
+{% endif %}
+{% endblock %}

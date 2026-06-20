@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block title %}{{ topic.name_vi }}{% endblock %}
+
+{% block content %}
+{# x-data: trạng thái client cho việc phát audio (Alpine.js) #}
+<div x-data="wordAudio()">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h1 class="h4 m-0">{{ topic.icon }} {{ topic.name_vi }} <span class="text-muted fs-6">({{ topic.name_en }})</span></h1>
+    <a href="{% url 'catalog:topic_list' %}" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-arrow-left"></i> Chủ đề
+    </a>
+  </div>
+
+  {% if words %}
+  <div class="row g-3">
+    {% for word in words %}
+    <div class="col-6 col-md-3">
+      <div class="card child-card text-center h-100">
+        <div class="card-body">
+          {% if word.image %}
+            <img src="{{ word.image.url }}" alt="{{ word.text_en }}" class="img-fluid mb-2" style="max-height:90px">
+          {% else %}
+            <div class="child-avatar mb-2">🔤</div>
+          {% endif %}
+          <div class="fw-bold fs-5">{{ word.text_en }}</div>
+          {% if word.phonetic %}<div class="text-muted small">/{{ word.phonetic }}/</div>{% endif %}
+          <div class="text-secondary">{{ word.text_vi }}</div>
+          <button class="btn btn-kid mt-2"
+                  @click="play({{ word.pk }}, $el)"
+                  :disabled="loadingId === {{ word.pk }}">
+            <span x-show="loadingId !== {{ word.pk }}"><i class="bi bi-volume-up-fill"></i> Nghe</span>
+            <span x-show="loadingId === {{ word.pk }}"><i class="bi bi-hourglass-split"></i> ...</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="card child-card text-center p-5">
+    <div class="display-6 mb-2">🐣</div>
+    <p class="mb-0">Chủ đề này chưa có từ nào.</p>
+  </div>
+  {% endif %}
+
+  {# Thẻ audio dùng chung + vùng báo lỗi nhẹ nhàng #}
+  <audio x-ref="player"></audio>
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div x-show="error" x-transition class="alert alert-warning" x-text="error"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Alpine component: gọi API lấy URL audio (sinh + cache phía server) rồi phát.
+  function wordAudio() {
+    return {
+      loadingId: null,
+      error: '',
+      async play(pk, el) {
+        this.error = '';
+        this.loadingId = pk;
+        try {
+          const resp = await fetch(`/learn/word/${pk}/audio/`);
+          const data = await resp.json();
+          if (data.ok) {
+            this.$refs.player.src = data.url;
+            this.$refs.player.play();
+          } else {
+            this.error = data.message || 'Chưa nghe được, thử lại nhé.';
+          }
+        } catch (e) {
+          this.error = 'Có lỗi khi tải âm thanh.';
+        } finally {
+          this.loadingId = null;
+        }
+      },
+    };
+  }
+</script>
+{% endblock %}

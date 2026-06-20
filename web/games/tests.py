@@ -1,0 +1,128 @@
+"""
+Test khu trò chơi:
+- Engine thuần (build_round/score_round + quy đổi sao) — không cần HTTP.
+- View: login, lọc owner, submit chấm + lưu GameResult, thiếu từ → màn báo.
+"""
+
+import json
+
+from django.contrib.auth.models import User
+from django.test import TestCase
+from django.urls import reverse
+
+from accounts.models import ChildProfile
+from catalog.models import Topic, Word
+from .engine import listen_pick, match_pairs
+from .engine.base import stars_from_ratio
+from .models import GameResult, GameType
+
+
+class EngineTests(TestCase):
+    """Test luật chơi tách rời HTTP (nhanh, đúng tinh thần khuôn+dữ liệu)."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.topic = Topic.objects.create(name_en='Animals', name_vi='Động vật', slug='animals')
+        cls.words = [Word.objects.create(topic=cls.topic, text_en=f'w{i}', text_vi=f'từ {i}')
+                     for i in range(6)]
+
+    def test_stars_thresholds(self):
+        """Quy đổi sao đúng ngưỡng."""
+        self.assertEqual(stars_from_ratio(10, 10), 3)
+        self.assertEqual(stars_from_ratio(7, 10), 2)
+        self.assertEqual(stars_from_ratio(4, 10), 1)
+        self.assertEqual(stars_from_ratio(1, 10), 0)
+        self.assertEqual(stars_from_ratio(0, 0), 0)  # không chia cho 0
+
+    def test_listen_pick_build_round(self):
+        """build_round tạo câu hỏi, mỗi câu 4 lựa chọn và có chứa đáp án."""
+        data = listen_pick.build_round(self.words, count=3)
+        self.assertEqual(len(data['questions']), 3)
+        for q in data['questions']:
+            self.assertEqual(len(q['choices']), 4)
+            ids = [c['id'] for c in q['choices']]
+            self.assertIn(q['answer_id'], ids)
+
+    def test_listen_pick_score(self):
+        """score_round chấm đúng số câu + sao."""
+        payload = {'answers': [
+            {'answer_id': 1, 'picked_id': 1},  # đúng
+            {'answer_id': 2, 'picked_id': 9},  # sai
+        ]}
+        r = listen_pick.score_round(payload)
+        self.assertEqual(r['score'], 1)
+        self.assertEqual(r['total'], 2)
+
+    def test_match_pairs_build_and_score(self):
+        """build tạo 2 thẻ/cặp; score quy ra sao."""
+        data = match_pairs.build_round(self.words, count=4)
+        self.assertEqual(len(data['pairs']), 4)
+        self.assertEqual(len(data['cards']), 8)  # 4 cặp × 2 mặt
+        r = match_pairs.score_round({'pairs_total': 4, 'pairs_matched': 4, 'mistakes': 0})
+        self.assertEqual(r['stars'], 3)
+
+
+class GamesViewTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.parent = User.objects.create_user('parent', password='pass12345')
+        cls.other = User.objects.create_user('other', password='pass12345')
+        cls.child = ChildProfile.objects.create(owner=cls.parent, name='Bi')
+        cls.other_child = ChildProfile.objects.create(owner=cls.other, name='Bo')
+        cls.topic = Topic.objects.create(name_en='Animals', name_vi='Động vật', slug='animals')
+        for i in range(6):
+            Word.objects.create(topic=cls.topic, text_en=f'w{i}', text_vi=f'từ {i}')
+        # GameType có sẵn từ migration seed.
+        cls.game = GameType.objects.get(code='listen-pick')
+
+    def test_choose_requires_login(self):
+        resp = self.client.get(reverse('games:choose'))
+        self.assertEqual(resp.status_code, 302)
+        self.assertIn(reverse('accounts:login'), resp.url)
+
+    def test_play_loads_for_own_child(self):
+        self.client.login(username='parent', password='pass12345')
+        resp = self.client.get(reverse('games:play', args=[self.child.pk, 'listen-pick', 'animals']))
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, 'round-data')
+
+    def test_round_data_is_object_not_double_encoded(self):
+        """
+        json_script phải nhúng round_data thành OBJECT, không phải chuỗi JSON lồng.
+        (Bắt lỗi double-encoding: view json.dumps + template json_script → client nhận str.)
+        """
+        import html
+        import re
+        self.client.login(username='parent', password='pass12345')
+        resp = self.client.get(reverse('games:play', args=[self.child.pk, 'listen-pick', 'animals']))
+        m = re.search(r'id="round-data"[^>]*>(.*?)</script>', resp.content.decode(), re.S)
+        data = json.loads(html.unescape(m.group(1)))
+        self.assertIsInstance(data, dict)            # phải là object, KHÔNG phải str
+        self.assertIn('questions', data)
+        self.assertTrue(all(len(q['choices']) == 4 for q in data['questions']))
+
+    def test_play_blocked_for_other_child(self):
+        self.client.login(username='parent', password='pass12345')
+        resp = self.client.get(reverse('games:play', args=[self.other_child.pk, 'listen-pick', 'animals']))
+        self.assertEqual(resp.status_code, 404)
+
+    def test_submit_saves_result(self):
+        """POST kết quả → chấm + lưu GameResult gắn đúng bé/game/chủ đề."""
+        self.client.login(username='parent', password='pass12345')
+        url = reverse('games:submit', args=[self.child.pk, 'listen-pick', 'animals'])
+        body = json.dumps({'answers': [{'answer_id': 1, 'picked_id': 1}], 'duration_sec': 12})
+        resp = self.client.post(url, body, content_type='application/json')
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue(resp.json()['ok'])
+        gr = GameResult.objects.get(child=self.child, game_type=self.game)
+        self.assertEqual(gr.topic, self.topic)
+        self.assertEqual(gr.total, 1)
+        self.assertEqual(gr.duration_sec, 12)
+
+    def test_play_empty_when_not_enough_words(self):
+        """Chủ đề thiếu từ → màn báo (không lỗi)."""
+        empty_topic = Topic.objects.create(name_en='Empty', name_vi='Rỗng', slug='empty')
+        self.client.login(username='parent', password='pass12345')
+        resp = self.client.get(reverse('games:play', args=[self.child.pk, 'listen-pick', 'empty']))
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, 'chưa đủ từ')

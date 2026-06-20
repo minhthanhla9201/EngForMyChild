@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}Trang chủ{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <h1 class="h4 m-0">👨‍👩‍👧 Hồ sơ các bé</h1>
+  <div class="d-flex gap-2">
+    <a href="{% url 'catalog:topic_list' %}" class="btn btn-kid">
+      <i class="bi bi-book"></i> Học từ vựng
+    </a>
+    <a href="{% url 'pronunciation:choose' %}" class="btn btn-kid">
+      <i class="bi bi-mic-fill"></i> Luyện phát âm
+    </a>
+    <a href="{% url 'games:choose' %}" class="btn btn-kid">
+      <i class="bi bi-controller"></i> Trò chơi
+    </a>
+    <a href="{% url 'accounts:child_add' %}" class="btn btn-outline-primary">
+      <i class="bi bi-plus-lg"></i> Thêm bé
+    </a>
+  </div>
+</div>
+
+{% if children %}
+<div class="row g-3">
+  {% for child in children %}
+  <div class="col-6 col-md-3">
+    <div class="card child-card text-center h-100">
+      <div class="card-body">
+        <div class="child-avatar mb-2">{{ child.avatar }}</div>
+        <div class="fw-bold">{{ child.name }}</div>
+        {% if child.birth_year %}<div class="text-muted small">Năm sinh {{ child.birth_year }}</div>{% endif %}
+        <a href="{% url 'accounts:child_edit' child.pk %}" class="btn btn-sm btn-outline-secondary mt-2">
+          <i class="bi bi-pencil"></i> Sửa
+        </a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card child-card text-center p-5">
+  <div class="display-6 mb-2">🐣</div>
+  <p class="mb-3">Chưa có hồ sơ bé nào. Hãy thêm bé đầu tiên!</p>
+  <div><a href="{% url 'accounts:child_add' %}" class="btn btn-kid">Thêm bé</a></div>
+</div>
+{% endif %}
+{% endblock %}

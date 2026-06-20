@@ -1,0 +1,42 @@
+# Docker Compose — EngForMyChild
+# GĐ 0: chỉ service `web` (Django + SQLite). Service `asr` mở ở GĐ 3, `db` (MySQL) khi cần.
+
+services:
+  web:
+    build: ./web
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./web:/app                # mount source để sửa code không cần build lại (dev)
+      - sqlite_data:/app          # giữ db.sqlite3 + media qua các lần chạy
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./web/.env
+
+  # --- GĐ 3: service chấm phát âm (faster-whisper) ---
+  # asr:
+  #   build: ./asr
+  #   volumes:
+  #     - asr_models:/models       # cache model Whisper, không tải lại mỗi lần build
+  #   ports:
+  #     - "9000:9000"
+
+  # --- Khi chuyển MySQL (xem docs/ThietKeDuLieu.md mục 0.1) ---
+  # db:
+  #   image: mysql:8
+  #   environment:
+  #     MYSQL_DATABASE: eng
+  #     MYSQL_USER: eng
+  #     MYSQL_PASSWORD: engpass
+  #     MYSQL_ROOT_PASSWORD: rootpass
+  #     MYSQL_CHARSET: utf8mb4
+  #     MYSQL_COLLATION: utf8mb4_unicode_ci
+  #   volumes:
+  #     - mysql_data:/var/lib/mysql
+  #   ports:
+  #     - "3306:3306"
+
+volumes:
+  sqlite_data:
+  # asr_models:
+  # mysql_data:

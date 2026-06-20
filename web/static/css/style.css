@@ -1,0 +1,43 @@
+/* Style dùng chung — màu tươi, nút to, thân thiện bé 6–7 tuổi.
+   (Đồng bộ biến màu khi tạo bản wireframe ở GĐ sau.) */
+:root {
+    --brand: #4f8cff;
+    --brand-dark: #2f6bdd;
+    --brand-soft: #eaf2ff;
+    --brand-border: #cfe0ff;
+    --accent: #ffb703;
+}
+
+body {
+    background: var(--brand-soft);
+    font-size: 1.05rem;
+}
+
+.navbar-brand-bar {
+    background: var(--brand);
+}
+.navbar-brand-bar .navbar-brand {
+    color: #fff;
+    font-size: 1.4rem;
+}
+
+/* Nút to dễ bấm cho bé */
+.btn-kid {
+    background: var(--brand);
+    color: #fff;
+    border: none;
+    border-radius: 1rem;
+    padding: .75rem 1.25rem;
+    font-weight: 600;
+}
+.btn-kid:hover { background: var(--brand-dark); color: #fff; }
+
+/* Thẻ hồ sơ bé */
+.child-card {
+    border: 2px solid var(--brand-border);
+    border-radius: 1.25rem;
+    background: #fff;
+    transition: transform .1s ease;
+}
+.child-card:hover { transform: translateY(-3px); }
+.child-avatar { font-size: 3rem; line-height: 1; }

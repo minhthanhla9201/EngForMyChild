@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}{{ game.name_vi }}{% endblock %}
+
+{% block content %}
+<div class="card child-card text-center p-5">
+  <div class="display-6 mb-2">🧩</div>
+  <p class="mb-3">Chủ đề <b>{{ topic.name_vi }}</b> chưa đủ từ để chơi
+    <b>{{ game.name_vi }}</b> (cần ít nhất {{ min_words }} từ{% if game.needs_image == 'Y' %} có hình{% endif %}).</p>
+  <div><a href="{% url 'games:choose' %}" class="btn btn-kid">Chọn lại</a></div>
+</div>
+{% endblock %}

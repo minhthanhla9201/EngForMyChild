@@ -1,0 +1,62 @@
+# Công nghệ — EngForMyChild
+
+> Website **học tiếng Anh chạy local cho bé 6–7 tuổi**. Tập trung: **Phát âm → Từ vựng → Ngữ pháp**, tất cả bọc trong **trò chơi**. Dữ liệu (từ vựng, bản ghi của bé) **thu thập dần vào local**.
+
+## 1. Nguyên tắc chọn công nghệ
+- **Miễn phí & mã nguồn mở** toàn bộ. Không phụ thuộc dịch vụ trả phí.
+- **Chạy local**, một máy là đủ; đóng gói bằng **Docker** để bật/tắt gọn.
+- **Server-rendered, KHÔNG SPA.** Trang do Django render; tương tác động dùng **HTMX** + **Alpine.js** (đủ cho game đơn giản, nhẹ, dễ bảo trì).
+- **Dữ liệu tách rời code:** thêm từ vựng / trò chơi qua dữ liệu + cấu hình, hạn chế sửa code (xem `ThietKeDuLieu.md`).
+- **Offline-first cho lúc học:** audio sinh sẵn và cache vào `media/`; khi bé học không cần internet. Internet chỉ cần lúc *sinh* audio TTS lần đầu.
+
+## 2. Stack chính
+
+| Lớp | Công nghệ | Phiên bản | Vì sao |
+|---|---|---|---|
+| Ngôn ngữ | Python | 3.11 | Ổn định, nhiều thư viện audio/ASR |
+| Web framework | Django | 5.x (hoặc 4.2 LTS) | ORM + Admin (nhập liệu nhanh) + template sẵn |
+| CSDL | SQLite (dev/local) → **MySQL 8** (về sau) | (kèm Python) / 8.x | Chạy local 1 máy bằng SQLite; **thiết kế để chuyển MySQL không sửa code** — chỉ đổi `DATABASE_URL` (xem `ThietKeDuLieu.md` mục 0.1) |
+| Template | Django Templates | — | Server-rendered |
+| CSS | Bootstrap | 5 | Bố cục nhanh, responsive, miễn phí |
+| Icon | Bootstrap Icons | — | Bé cần nhiều icon to, rõ |
+| Tương tác nhẹ | **HTMX** | 1.x | Cập nhật từng mảnh trang không cần viết nhiều JS |
+| Tương tác client | **Alpine.js** | 3.x | Trạng thái nhỏ phía client cho game (lật thẻ, đếm giờ, kéo–thả) — nhẹ ~15KB, không build tool |
+| Ghi âm | Web Audio API (`MediaRecorder`) | trình duyệt | Thu giọng bé, không cài thêm gì |
+
+## 3. Audio (phát âm mẫu) — miễn phí, offline khi học
+- **TTS sinh tự động:** [`edge-tts`](https://github.com/rany2/edge-tts) — giọng Microsoft Neural chất lượng cao, **miễn phí**. Cần internet *lúc sinh*; sinh xong **cache mp3 vào `media/audio/`**, sau đó học offline.
+  - Dự phòng hoàn toàn offline: `pyttsx3` (đọc bằng giọng hệ điều hành — chất lượng thấp hơn, dùng khi không có net).
+- **File thu sẵn (tuỳ chọn):** với từ quan trọng, có thể upload mp3 thu thật để thay TTS (model `AudioClip` cho phép nhiều nguồn/từ — xem `ThietKeDuLieu.md`).
+- **Phiên âm IPA tự động:** [`eng-to-ipa`](https://pypi.org/project/eng-to-ipa/) — sinh IPA từ từ tiếng Anh, khỏi tra tay.
+
+## 4. Chấm phát âm (ASR) — service riêng trong Docker
+- **[`faster-whisper`](https://github.com/SYSTRAN/faster-whisper)** — bản tối ưu của Whisper (OpenAI), **miễn phí, chạy local, không gửi dữ liệu ra ngoài**. Phù hợp chấm "bé đọc có đúng từ đích không".
+- Đặt trong **container `asr` riêng** (FastAPI + uvicorn), web app gọi qua HTTP nội bộ `POST /score` (gửi audio + từ đích → nhận text nhận dạng + điểm khớp).
+  - **Vì sao tách:** model Whisper nặng (vài trăm MB–GB), khởi động chậm. Tách container giúp web nhẹ, bật/tắt ASR độc lập, không kéo theo khi chỉ học từ vựng.
+- **Model mặc định:** `tiny`/`base` (đủ cho từ đơn, nhẹ, chạy CPU). Có thể nâng `small` nếu máy khoẻ.
+- **Chấm điểm:** chuẩn hoá + so khớp chuỗi (vd Levenshtein / tỉ lệ trùng) giữa text ASR và từ đích → quy ra **sao** (không phải điểm số gây áp lực).
+
+## 5. Đóng gói — Docker Compose
+
+```
+docker-compose.yml
+├─ web   : Django + Gunicorn (hoặc runserver khi dev)   port 8000
+└─ asr   : faster-whisper + FastAPI                       port 9000 (nội bộ)
+```
+
+- Volume gắn `media/` (audio cache + bản ghi của bé) và `db.sqlite3` ra ngoài host → **dữ liệu thu thập được giữ lại** khi rebuild container.
+- Model Whisper tải vào volume riêng (`asr_models`) để không tải lại mỗi lần build.
+- `.env` chứa cấu hình: `DEBUG`, `SECRET_KEY`, `DATABASE_URL`, `ASR_URL`, `TTS_VOICE`, `LOG_LEVEL`...
+- **Chuyển MySQL về sau (không sửa code):** thêm service `db` (MySQL 8, `utf8mb4`) + volume, cài `mysqlclient` trong Dockerfile `web`, đổi `DATABASE_URL` sang `mysql://...`, rồi `migrate` + nạp lại dữ liệu. Schema do Django migrations sinh ra nên chạy được trên cả SQLite lẫn MySQL.
+- Dev có thể chạy không Docker (venv + `runserver`); Docker dùng khi muốn chạy "một phát" hoặc bật kèm ASR.
+
+## 6. Thư viện Python dự kiến
+- `django`, `python-dotenv`, `dj-database-url` (đọc `DATABASE_URL`), `mysqlclient` (chỉ cần khi chạy MySQL)
+- `edge-tts` (TTS), `eng-to-ipa` (IPA), `pyttsx3` (TTS offline dự phòng)
+- Phía `asr`: `faster-whisper`, `fastapi`, `uvicorn`, `python-multipart`
+- Dev/test: dùng `django.test` sẵn có (chưa cần pytest).
+
+## 7. Những gì KHÔNG dùng (giữ đơn giản)
+- Không React/Vue/SPA — thừa với nhu cầu này.
+- Không Node build pipeline — Bootstrap/HTMX/Alpine nạp qua file tĩnh (CDN khi dev, hoặc tải về `static/` để offline).
+- Không dịch vụ cloud trả phí (TTS/ASR đều chạy local).

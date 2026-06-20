@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Luyện phát âm{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <h1 class="h4 m-0">🎤 Luyện phát âm</h1>
+  <a href="{% url 'accounts:home' %}" class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-house"></i> Trang chủ
+  </a>
+</div>
+
+{% if not children %}
+  <div class="card child-card text-center p-4 mb-3">
+    <p class="mb-2">Chưa có hồ sơ bé nào.</p>
+    <div><a href="{% url 'accounts:child_add' %}" class="btn btn-kid">Thêm bé</a></div>
+  </div>
+{% elif not topics %}
+  <div class="card child-card text-center p-4">
+    <p class="mb-0">Chưa có chủ đề từ vựng. Hãy nhập từ vựng trước (xem README).</p>
+  </div>
+{% else %}
+  {# Chọn bé rồi chọn chủ đề; link luyện ghép child_id + slug (Alpine giữ bé đang chọn) #}
+  <div x-data="{ childId: {{ children.0.pk }} }">
+    <div class="card child-card p-3 mb-3">
+      <label class="form-label fw-bold">Bé nào luyện?</label>
+      <div class="d-flex flex-wrap gap-2">
+        {% for child in children %}
+        <button type="button" class="btn"
+                :class="childId === {{ child.pk }} ? 'btn-kid' : 'btn-outline-primary'"
+                @click="childId = {{ child.pk }}">
+          {{ child.avatar }} {{ child.name }}
+        </button>
+        {% endfor %}
+      </div>
+    </div>
+
+    <label class="form-label fw-bold">Chọn chủ đề để luyện:</label>
+    <div class="row g-3">
+      {% for topic in topics %}
+      <div class="col-6 col-md-3">
+        <a class="text-decoration-none" :href="`/speak/${childId}/{{ topic.slug }}/`">
+          <div class="card child-card text-center h-100">
+            <div class="card-body">
+              <div class="child-avatar mb-2">{{ topic.icon }}</div>
+              <div class="fw-bold text-dark">{{ topic.name_vi }}</div>
+              <div class="text-muted small">{{ topic.name_en }}</div>
+            </div>
+          </div>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endif %}
+{% endblock %}
