@@ -18,12 +18,60 @@
                 🦜 Bé học tiếng Anh
             </a>
             {% if user.is_authenticated %}
-            <div class="ms-auto d-flex align-items-center gap-2">
-                <span class="text-white-50 small d-none d-sm-inline">{{ user.username }}</span>
-                <form action="{% url 'accounts:logout' %}" method="post" class="m-0">
-                    {% csrf_token %}
-                    <button class="btn btn-sm btn-light"><i class="bi bi-box-arrow-right"></i> Thoát</button>
-                </form>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                    aria-controls="mainNav" aria-expanded="false" aria-label="Mở menu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
+                {# Khu của bé: học / chơi / phát âm — tách rõ khỏi khu quản lý #}
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'catalog:topic_list' %}">
+                            <i class="bi bi-book"></i> Học từ vựng
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'pronunciation:choose' %}">
+                            <i class="bi bi-mic-fill"></i> Luyện phát âm
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'games:choose' %}">
+                            <i class="bi bi-controller"></i> Trò chơi
+                        </a>
+                    </li>
+                </ul>
+                {# Khu quản lý (phụ huynh): gom trong 1 dropdown để tách bạch khỏi khu của bé #}
+                <ul class="navbar-nav align-items-lg-center gap-lg-1">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="manageMenu" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-gear-fill"></i> Quản lý
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="manageMenu">
+                            <li><a class="dropdown-item" href="{% url 'accounts:home' %}">
+                                <i class="bi bi-speedometer2"></i> Bảng điều khiển</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'accounts:home' %}#children">
+                                <i class="bi bi-people"></i> Hồ sơ bé</a></li>
+                            <li><a class="dropdown-item" href="{% url 'catalog:topic_manage' %}">
+                                <i class="bi bi-collection"></i> Chủ đề</a></li>
+                            <li><a class="dropdown-item" href="{% url 'catalog:word_manage' %}">
+                                <i class="bi bi-card-text"></i> Từ vựng</a></li>
+                            <li><a class="dropdown-item" href="{% url 'catalog:word_import' %}">
+                                <i class="bi bi-upload"></i> Nhập từ CSV</a></li>
+                            <li><a class="dropdown-item" href="{% url 'accounts:progress' %}">
+                                <i class="bi bi-graph-up"></i> Tiến độ của bé</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item d-flex align-items-center gap-2 ms-lg-2 mt-2 mt-lg-0">
+                        <span class="navbar-username small">{{ user.username }}</span>
+                        <form action="{% url 'accounts:logout' %}" method="post" class="m-0">
+                            {% csrf_token %}
+                            <button class="btn btn-sm btn-light"><i class="bi bi-box-arrow-right"></i> Thoát</button>
+                        </form>
+                    </li>
+                </ul>
             </div>
             {% endif %}
         </div>

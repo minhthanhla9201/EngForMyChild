@@ -5,27 +5,13 @@ Cách dùng:
     python manage.py import_words duong/dan/words.csv
     python manage.py import_words words.csv --no-audio   # chỉ nhập từ, không sinh audio
 
-CSV (có dòng tiêu đề), cột:
-    topic        : tên chủ đề (tiếng Anh) — tự tạo Topic nếu chưa có
-    text_en      : từ tiếng Anh (bắt buộc)
-    text_vi      : nghĩa tiếng Việt
-    topic_vi     : (tuỳ chọn) tên chủ đề tiếng Việt khi tạo mới
-    level        : (tuỳ chọn) độ khó, mặc định 1
-
-Đặc điểm:
-    - Idempotent: chạy lại không tạo trùng (dựa UniqueConstraint topic+text_en) — cập nhật nghĩa nếu đổi.
-    - Tự sinh IPA (eng-to-ipa) khi phonetic trống.
-    - Tự sinh audio TTS + cache (trừ khi --no-audio). Audio dùng được offline qua pyttsx3.
+Logic nhập nằm ở catalog/imports.py (dùng chung với màn nhập CSV qua web) —
+lệnh này chỉ lo đọc file + in thống kê.
 """
 
-import csv
-
 from django.core.management.base import BaseCommand, CommandError
-from django.utils.text import slugify
 
-from catalog import audio as audio_service
-from catalog import ipa as ipa_service
-from catalog.models import Topic, Word
+from catalog import imports as import_service
 
 
 class Command(BaseCommand):
@@ -52,69 +38,16 @@ class Command(BaseCommand):
         except OSError as e:
             raise CommandError(f'Không mở được file: {e}')
 
-        created_topics = created_words = updated_words = audio_ok = audio_fail = 0
-        with f:
-            reader = csv.DictReader(f)
-            if 'text_en' not in (reader.fieldnames or []):
-                raise CommandError("CSV thiếu cột bắt buộc 'text_en'. Tiêu đề hiện có: "
-                                   f'{reader.fieldnames}')
-
-            for i, row in enumerate(reader, start=2):  # dòng 1 là tiêu đề
-                text_en = (row.get('text_en') or '').strip()
-                if not text_en:
-                    self.stdout.write(self.style.WARNING(f'Dòng {i}: bỏ qua (text_en trống).'))
-                    continue
-
-                topic_name = (row.get('topic') or 'General').strip()
-                topic, t_created = self._get_topic(topic_name, (row.get('topic_vi') or '').strip())
-                created_topics += 1 if t_created else 0
-
-                # Idempotent: tìm theo (topic, text_en); có thì cập nhật, chưa có thì tạo.
-                word, w_created = Word.objects.get_or_create(
-                    topic=topic, text_en=text_en,
-                    defaults={'text_vi': (row.get('text_vi') or '').strip(),
-                              'level': self._to_int(row.get('level'), 1)},
+        try:
+            with f:
+                stats = import_service.import_csv_file(
+                    f, make_audio=make_audio,
+                    on_progress=lambda msg: self.stdout.write(self.style.WARNING(msg)),
                 )
-                if w_created:
-                    created_words += 1
-                else:
-                    new_vi = (row.get('text_vi') or '').strip()
-                    if new_vi and new_vi != word.text_vi:
-                        word.text_vi = new_vi
-                        word.save(update_fields=['text_vi'])
-                        updated_words += 1
-
-                # Sinh IPA nếu chưa có.
-                if not word.phonetic:
-                    phon = ipa_service.to_ipa(text_en)
-                    if phon:
-                        word.phonetic = phon
-                        word.save(update_fields=['phonetic'])
-
-                # Sinh + cache audio (nếu bật và chưa có clip).
-                if make_audio and not word.clips.exists():
-                    clip = audio_service.get_clip(word)
-                    if clip:
-                        audio_ok += 1
-                    else:
-                        audio_fail += 1
+        except import_service.ImportError_ as e:
+            raise CommandError(str(e))
 
         self.stdout.write(self.style.SUCCESS(
-            f'Xong. Chủ đề mới: {created_topics} | Từ mới: {created_words} | '
-            f'Từ cập nhật: {updated_words} | Audio OK: {audio_ok} | Audio lỗi: {audio_fail}'))
-
-    def _get_topic(self, name_en, name_vi):
-        """Lấy/ tạo Topic theo slug của tên tiếng Anh (idempotent)."""
-        slug = slugify(name_en)
-        topic, created = Topic.objects.get_or_create(
-            slug=slug,
-            defaults={'name_en': name_en, 'name_vi': name_vi or name_en},
-        )
-        return topic, created
-
-    @staticmethod
-    def _to_int(value, default):
-        try:
-            return int(str(value).strip())
-        except (TypeError, ValueError):
-            return default
+            f"Xong. Chủ đề mới: {stats['created_topics']} | Từ mới: {stats['created_words']} | "
+            f"Từ cập nhật: {stats['updated_words']} | Audio OK: {stats['audio_ok']} | "
+            f"Audio lỗi: {stats['audio_fail']}"))

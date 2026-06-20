@@ -1,0 +1,12 @@
+{% comment %}
+Partial render các field của một form (dùng chung cho màn quản lý chủ đề/từ vựng).
+Hiển thị label tiếng Việt + help_text + lỗi. Form bao ngoài tự lo <form>/csrf/nút.
+{% endcomment %}
+{% for field in form %}
+<div class="mb-3">
+  <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+  {{ field }}
+  {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+  {% for err in field.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+</div>
+{% endfor %}

@@ -337,8 +337,8 @@ Colors,red,màu đỏ,https://.../red.png
 
 ## 6. Apps Django (dự kiến)
 - `core` — AuditedModel, mixin (vd `ListReturnMixin`), templatetags dùng chung.
-- `accounts` — phụ huynh (auth) + `ChildProfile` + trang chủ.
-- `catalog` — `Topic`, `Word`, `AudioClip`, `Sentence` + lệnh `import_words` + dịch vụ TTS/IPA.
+- `accounts` — phụ huynh (auth) + `ChildProfile` + **bảng điều khiển** (tách rõ "Khu của bé" và "Khu quản lý") + màn **Tiến độ của bé**.
+- `catalog` — `Topic`, `Word`, `AudioClip`, `Sentence` + **màn quản lý CRUD chủ đề/từ + nhập CSV qua web** + service `imports` (dùng chung với lệnh `import_words`) + dịch vụ TTS/IPA.
 - `games` — `GameType`, các module khuôn game, view chơi chung, chấm điểm + sao.
 - `pronunciation` — luyện phát âm + ghi âm + gọi ASR + `Attempt`.
 - `progress` — `GameResult`, `Reward`/`Badge`, màn tiến độ cho phụ huynh.

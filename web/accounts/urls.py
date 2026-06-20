@@ -15,4 +15,6 @@ urlpatterns = [
     # CRUD hồ sơ bé (theo quy ước path tiếng Anh).
     path('children/add/', views.child_add, name='child_add'),
     path('children/<int:pk>/edit/', views.child_edit, name='child_edit'),
+    # Khu quản lý: tiến độ của bé (kết quả chơi + luyện phát âm).
+    path('progress/', views.progress, name='progress'),
 ]

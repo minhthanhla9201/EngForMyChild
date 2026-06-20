@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block title %}Quản lý từ vựng{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <h1 class="h4 m-0">🔤 Quản lý từ vựng</h1>
+  <div class="d-flex gap-2">
+    <a href="{% url 'catalog:word_add' %}" class="btn btn-kid btn-sm">
+      <i class="bi bi-plus-lg"></i> Thêm từ
+    </a>
+    <a href="{% url 'catalog:word_import' %}" class="btn btn-outline-primary btn-sm">
+      <i class="bi bi-upload"></i> Nhập CSV
+    </a>
+    <a href="{% url 'accounts:home' %}" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-house"></i> Bảng điều khiển
+    </a>
+  </div>
+</div>
+
+{# Lọc theo chủ đề + tìm từ #}
+<form method="get" class="row g-2 mb-3">
+  <div class="col-auto">
+    <select name="topic" class="form-select" onchange="this.form.submit()">
+      <option value="">— Tất cả chủ đề —</option>
+      {% for t in topics %}
+      <option value="{{ t.slug }}" {% if t.slug == topic_slug %}selected{% endif %}>{{ t.name_vi }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-auto">
+    <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Tìm từ tiếng Anh...">
+  </div>
+  <div class="col-auto">
+    <button class="btn btn-outline-secondary"><i class="bi bi-search"></i> Tìm</button>
+  </div>
+</form>
+
+{% if page_obj.object_list %}
+<div class="table-responsive">
+  <table class="table align-middle">
+    <thead>
+      <tr><th>Từ (EN)</th><th>Nghĩa (VI)</th><th>IPA</th><th>Chủ đề</th>
+        <th class="text-center">Đang dùng</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for word in page_obj.object_list %}
+      <tr>
+        <td class="fw-bold">{{ word.text_en }}</td>
+        <td>{{ word.text_vi }}</td>
+        <td class="text-muted small">{% if word.phonetic %}/{{ word.phonetic }}/{% else %}—{% endif %}</td>
+        <td><span class="badge text-bg-light">{{ word.topic.name_vi }}</span></td>
+        <td class="text-center">
+          {% if word.is_active %}<span class="badge text-bg-success">Có</span>
+          {% else %}<span class="badge text-bg-secondary">Tạm ẩn</span>{% endif %}
+        </td>
+        <td class="text-end">
+          <a href="{% url 'catalog:word_edit' word.pk %}"
+             class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i> Sửa</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{# Phân trang — chỉ gọi số trang BÊN TRONG has_previous/has_next (skill §8) #}
+{% if page_obj.has_other_pages %}
+<nav class="d-flex justify-content-center">
+  <ul class="pagination">
+    {% if page_obj.has_previous %}
+    <li class="page-item">
+      <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if topic_slug %}&topic={{ topic_slug }}{% endif %}{% if query %}&q={{ query }}{% endif %}">«</a>
+    </li>
+    {% endif %}
+    <li class="page-item disabled"><span class="page-link">Trang {{ page_obj.number }}/{{ page_obj.paginator.num_pages }}</span></li>
+    {% if page_obj.has_next %}
+    <li class="page-item">
+      <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if topic_slug %}&topic={{ topic_slug }}{% endif %}{% if query %}&q={{ query }}{% endif %}">»</a>
+    </li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
+
+{% else %}
+<div class="card child-card text-center p-5">
+  <div class="display-6 mb-2">🐣</div>
+  <p class="mb-3">Không có từ nào khớp.</p>
+  <div><a href="{% url 'catalog:word_add' %}" class="btn btn-kid">Thêm từ</a></div>
+</div>
+{% endif %}
+{% endblock %}

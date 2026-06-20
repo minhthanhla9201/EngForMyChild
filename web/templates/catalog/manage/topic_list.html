@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}Quản lý chủ đề{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <h1 class="h4 m-0">📂 Quản lý chủ đề</h1>
+  <div class="d-flex gap-2">
+    <a href="{% url 'catalog:topic_add' %}" class="btn btn-kid btn-sm">
+      <i class="bi bi-plus-lg"></i> Thêm chủ đề
+    </a>
+    <a href="{% url 'accounts:home' %}" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-house"></i> Bảng điều khiển
+    </a>
+  </div>
+</div>
+
+{% if topics %}
+<div class="table-responsive">
+  <table class="table align-middle">
+    <thead>
+      <tr>
+        <th></th><th>Tên</th><th class="text-center">Số từ</th>
+        <th class="text-center">Thứ tự</th><th class="text-center">Đang dùng</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for topic in topics %}
+      <tr>
+        <td class="fs-4">{{ topic.icon }}</td>
+        <td>
+          <div class="fw-bold">{{ topic.name_vi }}</div>
+          <div class="text-muted small">{{ topic.name_en }}</div>
+        </td>
+        <td class="text-center">{{ topic.num_words }}</td>
+        <td class="text-center">{{ topic.order }}</td>
+        <td class="text-center">
+          {% if topic.is_active %}<span class="badge text-bg-success">Có</span>
+          {% else %}<span class="badge text-bg-secondary">Tạm ẩn</span>{% endif %}
+        </td>
+        <td class="text-end">
+          <a href="{% url 'catalog:word_manage' %}?topic={{ topic.slug }}"
+             class="btn btn-sm btn-outline-primary"><i class="bi bi-card-text"></i> Từ</a>
+          <a href="{% url 'catalog:topic_edit' topic.pk %}"
+             class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i> Sửa</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card child-card text-center p-5">
+  <div class="display-6 mb-2">📭</div>
+  <p class="mb-3">Chưa có chủ đề nào.</p>
+  <div><a href="{% url 'catalog:topic_add' %}" class="btn btn-kid">Thêm chủ đề đầu tiên</a></div>
+</div>
+{% endif %}
+{% endblock %}

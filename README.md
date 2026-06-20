@@ -50,12 +50,19 @@ Khi thấy dòng `Starting development server at http://127.0.0.1:8000/`, mở t
 - Tên đăng nhập: **admin**
 - Mật khẩu: **admin123**
 
-Sau khi đăng nhập sẽ thấy trang **"Hồ sơ các bé"** → bấm **Thêm bé** để tạo hồ sơ cho con.
+Sau khi đăng nhập sẽ thấy **Bảng điều khiển**, chia rõ 2 khu:
+- **🧒 Khu của bé** — vào Học từ vựng / Luyện phát âm / Trò chơi.
+- **⚙️ Khu quản lý** (cho phụ huynh) — Hồ sơ bé, Chủ đề, Từ vựng, Nhập CSV, Tiến độ của bé.
+
+Mọi việc quản lý làm ngay trong khu này (không cần vào `/admin`): bấm **Thêm bé**,
+hoặc mở menu **⚙️ Quản lý** trên thanh trên cùng để thêm/sửa chủ đề, từ vựng,
+nhập CSV, xem tiến độ của con.
 
 **Dừng server:** quay lại cửa sổ PowerShell, bấm `Ctrl + C`.
 
-### Trang quản trị (Admin)
-Để nhập/sửa dữ liệu sâu hơn (về sau là từ vựng, chủ đề...), vào:
+### Trang quản trị nâng cao (Django Admin)
+Khu quản lý trong app đã đủ cho việc thường ngày. Khi cần thao tác sâu hơn
+(sửa từng bản ghi audio, dữ liệu hệ thống...), vẫn có thể vào:
 
 > **http://127.0.0.1:8000/admin** — đăng nhập cùng tài khoản admin ở trên.
 
@@ -102,7 +109,12 @@ topic,topic_vi,text_en,text_vi,level
 Animals,Động vật,cat,con mèo,1
 Colors,Màu sắc,red,màu đỏ,1
 ```
-Rồi chạy lệnh `import_words` (xem bảng trên). Hệ thống tự tạo chủ đề, tự sinh phiên âm IPA và **tự sinh audio** cho từng từ.
+Có **2 cách nhập**:
+1. **Qua web (dễ nhất):** menu **⚙️ Quản lý → Nhập từ CSV**, chọn file rồi bấm Nhập.
+2. **Qua dòng lệnh:** chạy lệnh `import_words` (xem bảng trên).
+
+Cả 2 cách dùng chung một bộ xử lý: tự tạo chủ đề, tự sinh phiên âm IPA và (tuỳ chọn) **tự sinh audio** cho từng từ.
+- Thêm/sửa thủ công từng chủ đề, từng từ cũng làm ngay trong menu **⚙️ Quản lý**.
 - File mẫu có sẵn: `web\sample_words.csv`.
 - **Mạng yếu/không có mạng:** thêm `--no-audio` để chỉ nhập từ (audio sẽ được tạo sau, ngay khi bé bấm "Nghe" lần đầu — lúc đó cần mạng một lần; nếu vẫn không có mạng, hệ thống tự đọc bằng giọng máy của Windows).
 - Chạy lại lệnh nhiều lần **không tạo trùng** (an toàn).
@@ -111,7 +123,7 @@ Rồi chạy lệnh `import_words` (xem bảng trên). Hệ thống tự tạo c
 Sau khi đăng nhập, bấm **Học từ vựng** ở trang chủ → chọn chủ đề → bấm 🔊 **Nghe** ở mỗi từ. Lần đầu nghe một từ, hệ thống sinh audio rồi lưu lại; các lần sau phát ngay.
 
 ### Luyện phát âm (ghi âm)
-Bấm **Luyện phát âm** ở trang chủ → chọn bé → chọn chủ đề. Ở mỗi từ: bé bấm **Nghe mẫu**, rồi bấm **Thu giọng** để đọc theo (bấm lần nữa để dừng). Bản ghi được lưu lại để phụ huynh nghe lại trong trang quản trị.
+Bấm **Luyện phát âm** ở trang chủ → chọn bé → chọn chủ đề. Ở mỗi từ: bé bấm **Nghe mẫu**, rồi bấm **Thu giọng** để đọc theo (bấm lần nữa để dừng). Bản ghi được lưu lại; phụ huynh xem ở **⚙️ Quản lý → Tiến độ của bé** (chi tiết bản ghi xem trong Django Admin).
 - **Lưu ý:** trình duyệt sẽ hỏi quyền dùng **micro** — hãy bấm Cho phép. Ghi âm chạy được trên `localhost` (Chrome/Edge/Firefox).
 - Phần **chấm điểm tự động** (máy nghe bé đọc đúng chưa) sẽ có ở Giai đoạn 3 (dùng Faster-Whisper, cần Docker).
 

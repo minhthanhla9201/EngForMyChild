@@ -28,8 +28,9 @@
 {% else %}
 <div class="card child-card text-center p-5">
   <div class="display-6 mb-2">📭</div>
-  <p class="mb-0">Chưa có chủ đề nào. Phụ huynh hãy thêm từ vựng trong trang quản trị
-    (<a href="/admin/">/admin</a>) hoặc nhập bằng file CSV.</p>
+  <p class="mb-0">Chưa có chủ đề nào. Phụ huynh hãy
+    <a href="{% url 'catalog:topic_add' %}">thêm chủ đề</a> hoặc
+    <a href="{% url 'catalog:word_import' %}">nhập từ bằng file CSV</a> trong khu quản lý.</p>
 </div>
 {% endif %}
 {% endblock %}
