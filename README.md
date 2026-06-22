@@ -135,6 +135,15 @@ Bấm **Trò chơi** ở trang chủ → chọn bé → chọn game → chọn c
 Chơi xong được thưởng **sao ⭐**, kết quả lưu lại để theo dõi tiến độ. Mỗi game cần chủ đề có **đủ số từ tối thiểu** (mặc định 4) — nếu thiếu, hãy nhập thêm từ vựng.
 > Thêm trò chơi mới chỉ cần thêm 1 module trong `web/games/engine/` và 1 bản ghi `GameType` (không phải sửa màn hình chọn game).
 
+### Chạy offline (không cần internet)
+Toàn bộ thư viện giao diện (Bootstrap, Bootstrap Icons, HTMX, Alpine.js) đã được **tải sẵn** vào `web/static/vendor/` và nạp từ đó — **không gọi CDN**, nên giao diện chạy được khi không có mạng. Không cần làm gì thêm.
+
+### Xem trước giao diện (wireframe)
+Muốn xem nhanh bố cục các màn quản lý mà **không cần chạy server**: mở thẳng file
+`wireframe/index.html` (thư mục `wireframe/` ở **gốc dự án**, độc lập với mã nguồn web) bằng trình duyệt (nhấp đúp).
+Trang này tự chứa asset riêng, dùng đúng CSS thật, hiển thị 6 màn (Bảng điều khiển, Quản lý chủ đề, Quản lý từ vựng, Form thêm/sửa, Nhập CSV, Tiến độ) kèm dữ liệu mẫu để dễ xác nhận trước khi code/đổi giao diện.
+Chi tiết & cách đồng bộ khi đổi `style.css`: xem `wireframe/README.md`.
+
 ---
 
 ## 5. Cấu hình (file `web\.env`)

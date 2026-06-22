@@ -1,0 +1,85 @@
+/* Style dùng chung — màu tươi, nút to, thân thiện bé 6–7 tuổi.
+   (Đồng bộ biến màu khi tạo bản wireframe ở GĐ sau.) */
+:root {
+    --brand: #4f8cff;
+    --brand-dark: #2f6bdd;
+    --brand-soft: #eaf2ff;
+    --brand-border: #cfe0ff;
+    --accent: #ffb703;
+}
+
+body {
+    background: var(--brand-soft);
+    font-size: 1.05rem;
+}
+
+.navbar-brand-bar {
+    background: var(--brand);
+}
+.navbar-brand-bar .navbar-brand {
+    color: #fff;
+    font-size: 1.4rem;
+}
+/* Liên kết trên navbar màu trắng để nổi trên nền xanh */
+.navbar-brand-bar .nav-link {
+    color: rgba(255, 255, 255, .9);
+    font-weight: 500;
+}
+.navbar-brand-bar .nav-link:hover,
+.navbar-brand-bar .nav-link:focus { color: #fff; }
+.navbar-brand-bar .navbar-toggler {
+    border-color: rgba(255, 255, 255, .5);
+}
+.navbar-brand-bar .navbar-toggler-icon {
+    filter: invert(1) grayscale(1) brightness(2);
+}
+.navbar-username { color: rgba(255, 255, 255, .85); }
+
+/* Nút to dễ bấm cho bé */
+.btn-kid {
+    background: var(--brand);
+    color: #fff;
+    border: none;
+    border-radius: 1rem;
+    padding: .75rem 1.25rem;
+    font-weight: 600;
+}
+.btn-kid:hover { background: var(--brand-dark); color: #fff; }
+
+/* Thẻ hồ sơ bé */
+.child-card {
+    border: 2px solid var(--brand-border);
+    border-radius: 1.25rem;
+    background: #fff;
+    transition: transform .1s ease;
+}
+.child-card:hover { transform: translateY(-3px); }
+.child-avatar { font-size: 3rem; line-height: 1; }
+
+/* ===== Bảng điều khiển: thẻ khu (zone), số liệu (stat), khu quản lý ===== */
+.zone-card {
+    border: 2px solid var(--brand-border);
+    border-radius: 1.25rem;
+    background: #fff;
+    transition: transform .1s ease, box-shadow .1s ease;
+}
+.zone-card:hover { transform: translateY(-3px); box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .08); }
+/* Khu của bé: to, nhiều màu, icon lớn */
+.zone-kid .zone-icon { font-size: 2.75rem; line-height: 1.2; }
+/* Khu quản lý: gọn hơn, tông trung tính để phân biệt với khu của bé */
+.zone-manage { border-color: #e2e6ea; }
+.zone-manage .manage-icon {
+    width: 2.75rem; height: 2.75rem;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: .75rem;
+    background: var(--brand-soft); color: var(--brand-dark);
+    font-size: 1.4rem; flex: 0 0 auto;
+}
+
+/* Thẻ số liệu tổng quan */
+.stat-card {
+    border: 2px solid var(--brand-border);
+    border-radius: 1rem;
+    background: #fff;
+}
+.stat-num { font-size: 1.75rem; font-weight: 700; color: var(--brand-dark); }
