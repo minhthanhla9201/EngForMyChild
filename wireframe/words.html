@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wireframe — Quản lý từ vựng</title>
+<!-- Wireframe ĐỘC LẬP, chạy offline: asset trong assets/ cạnh file này. -->
+<link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+<link href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
+<link href="assets/style.css" rel="stylesheet">
+<link href="assets/wf-frame.css" rel="stylesheet">
+</head>
+<body data-screen="words">
+
+<!-- Thanh điều hướng wireframe (về mục lục + màn trước/sau) — wf-frame.js dựng -->
+<div class="wf-bar" id="wf-bar"></div>
+
+<section class="wf-screen" id="words">
+  <div class="wf-label"><i class="bi bi-card-list"></i> Quản lý từ vựng <span class="wf-url">/manage/words/</span></div>
+  <div class="wf-frame">
+    <div class="wf-nav-mng"></div>
+    <main class="container py-4">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h1 class="h4 m-0">🔤 Quản lý từ vựng</h1>
+        <div class="d-flex gap-2">
+          <button class="btn btn-kid btn-sm"><i class="bi bi-plus-lg"></i> Thêm từ</button>
+          <button class="btn btn-outline-primary btn-sm"><i class="bi bi-upload"></i> Nhập CSV</button>
+          <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-house"></i> Bảng điều khiển</button>
+        </div>
+      </div>
+      <form class="row g-2 mb-3" onsubmit="return false">
+        <div class="col-auto"><select class="form-select"><option>— Tất cả chủ đề —</option><option selected>Động vật</option></select></div>
+        <div class="col-auto"><input type="text" class="form-control" placeholder="Tìm từ tiếng Anh..." value="ca"></div>
+        <div class="col-auto"><button class="btn btn-outline-secondary"><i class="bi bi-search"></i> Tìm</button></div>
+      </form>
+      <div class="table-responsive"><table class="table align-middle">
+        <thead><tr><th>Từ (EN)</th><th>Nghĩa (VI)</th><th>IPA</th><th>Chủ đề</th>
+          <th class="text-center">Đang dùng</th><th></th></tr></thead>
+        <tbody>
+          <tr><td class="fw-bold">cat</td><td>con mèo</td><td class="text-muted small">/kæt/</td>
+            <td><span class="badge text-bg-light">Động vật</span></td>
+            <td class="text-center"><span class="badge text-bg-success">Có</span></td>
+            <td class="text-end"><button class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i> Sửa</button></td></tr>
+          <tr><td class="fw-bold">camel</td><td>con lạc đà</td><td class="text-muted small">/ˈkæməl/</td>
+            <td><span class="badge text-bg-light">Động vật</span></td>
+            <td class="text-center"><span class="badge text-bg-success">Có</span></td>
+            <td class="text-end"><button class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i> Sửa</button></td></tr>
+        </tbody>
+      </table></div>
+      <nav class="d-flex justify-content-center"><ul class="pagination">
+        <li class="page-item"><a class="page-link" href="#">«</a></li>
+        <li class="page-item disabled"><span class="page-link">Trang 1/3</span></li>
+        <li class="page-item"><a class="page-link" href="#">»</a></li>
+      </ul></nav>
+    </main>
+  </div>
+  <div class="wf-note">Lọc theo chủ đề + tìm theo từ tiếng Anh + phân trang (20 từ/trang).</div>
+</section>
+
+<script src="assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+<script src="assets/wf-frame.js"></script>
+</body>
+</html>

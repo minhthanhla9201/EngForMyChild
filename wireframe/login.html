@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wireframe — Đăng nhập</title>
+<!-- Wireframe ĐỘC LẬP, chạy offline: asset trong assets/ cạnh file này. -->
+<link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+<link href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
+<link href="assets/style.css" rel="stylesheet">
+<link href="assets/wf-frame.css" rel="stylesheet">
+</head>
+<body data-screen="login">
+
+<!-- Thanh điều hướng wireframe (về mục lục + màn trước/sau) — wf-frame.js dựng -->
+<div class="wf-bar" id="wf-bar"></div>
+
+<section class="wf-screen" id="login">
+  <div class="wf-label"><i class="bi bi-box-arrow-in-right"></i> Đăng nhập (phụ huynh) <span class="wf-url">/login/</span></div>
+  <div class="wf-frame">
+    <div class="wf-nav-guest"></div>
+    <main class="container py-4">
+      <div class="row justify-content-center"><div class="col-md-5">
+        <div class="card child-card p-2"><div class="card-body">
+          <h1 class="h4 text-center mb-3">👋 Phụ huynh đăng nhập</h1>
+          <form onsubmit="return false">
+            <div class="mb-3"><label class="form-label">Tên đăng nhập</label>
+              <input type="text" class="form-control" value="admin"></div>
+            <div class="mb-3"><label class="form-label">Mật khẩu</label>
+              <input type="password" class="form-control" value="••••••"></div>
+            <button class="btn btn-kid w-100">Đăng nhập</button>
+          </form>
+        </div></div>
+      </div></div>
+    </main>
+  </div>
+  <div class="wf-note">Đăng nhập 1 lần, phiên sống lâu (mặc định 30 ngày, trượt hạn) → ít phải đăng nhập lại.
+    Sau đăng nhập vào thẳng <b>Khu của bé</b>. Sai mật khẩu → cảnh báo đỏ.</div>
+</section>
+
+<script src="assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+<script src="assets/wf-frame.js"></script>
+</body>
+</html>

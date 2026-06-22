@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wireframe — Đặt passcode</title>
+<!-- Wireframe ĐỘC LẬP, chạy offline: asset trong assets/ cạnh file này. -->
+<link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+<link href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
+<link href="assets/style.css" rel="stylesheet">
+<link href="assets/wf-frame.css" rel="stylesheet">
+</head>
+<body data-screen="pass-set">
+
+<!-- Thanh điều hướng wireframe (về mục lục + màn trước/sau) — wf-frame.js dựng -->
+<div class="wf-bar" id="wf-bar"></div>
+
+<section class="wf-screen" id="pass-set">
+  <div class="wf-label"><i class="bi bi-shield-plus"></i> Đặt passcode lần đầu <span class="wf-url">/manage/unlock/ (chưa có passcode)</span></div>
+  <div class="wf-frame">
+    <div class="wf-nav-kid"></div>
+    <main class="container py-4">
+      <div class="row justify-content-center"><div class="col-md-5">
+        <div class="card child-card p-2"><div class="card-body">
+          <h1 class="h4 mb-1 text-center">🔑 Đặt passcode khu quản lý</h1>
+          <p class="text-muted small text-center mb-3">Lần đầu vào khu quản lý — hãy đặt một mã 4–6 chữ số.</p>
+          <form onsubmit="return false">
+            <div class="mb-3"><label class="form-label">Mã passcode mới</label>
+              <input type="password" class="form-control" placeholder="4–6 chữ số" inputmode="numeric"></div>
+            <div class="mb-3"><label class="form-label">Nhập lại</label>
+              <input type="password" class="form-control" placeholder="Nhập lại cho khớp" inputmode="numeric"></div>
+            <button class="btn btn-kid w-100">Lưu passcode</button>
+          </form>
+        </div></div>
+      </div></div>
+    </main>
+  </div>
+  <div class="wf-note">Khi DB chưa có passcode → buộc đặt trước. Lưu dạng <b>hash</b> (không lưu mã thô).</div>
+</section>
+
+<script src="assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+<script src="assets/wf-frame.js"></script>
+</body>
+</html>

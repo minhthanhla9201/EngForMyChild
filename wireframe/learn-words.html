@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wireframe — Học: từ trong chủ đề</title>
+<!-- Wireframe ĐỘC LẬP, chạy offline: asset trong assets/ cạnh file này. -->
+<link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+<link href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
+<link href="assets/style.css" rel="stylesheet">
+<link href="assets/wf-frame.css" rel="stylesheet">
+</head>
+<body data-screen="learn-words">
+
+<!-- Thanh điều hướng wireframe (về mục lục + màn trước/sau) — wf-frame.js dựng -->
+<div class="wf-bar" id="wf-bar"></div>
+
+<section class="wf-screen" id="learn-words">
+  <div class="wf-label"><i class="bi bi-card-text"></i> Học từ vựng — Từ trong chủ đề <span class="wf-url">/learn/topic/animals/</span></div>
+  <div class="wf-frame">
+    <div class="wf-nav-kid"></div>
+    <main class="container py-4">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h1 class="h4 m-0">🐶 Động vật <span class="text-muted fs-6">(Animals)</span></h1>
+        <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Chủ đề</button>
+      </div>
+      <div class="row g-3">
+        <div class="col-6 col-md-3"><div class="card child-card text-center h-100"><div class="card-body">
+          <div class="child-avatar mb-2">🔤</div><div class="fw-bold fs-5">cat</div>
+          <div class="text-muted small">/kæt/</div><div class="text-secondary">con mèo</div>
+          <button class="btn btn-kid mt-2"><i class="bi bi-volume-up-fill"></i> Nghe</button></div></div></div>
+        <div class="col-6 col-md-3"><div class="card child-card text-center h-100"><div class="card-body">
+          <div class="child-avatar mb-2">🔤</div><div class="fw-bold fs-5">dog</div>
+          <div class="text-muted small">/dɒg/</div><div class="text-secondary">con chó</div>
+          <button class="btn btn-kid mt-2"><i class="bi bi-volume-up-fill"></i> Nghe</button></div></div></div>
+        <div class="col-6 col-md-3"><div class="card child-card text-center h-100"><div class="card-body">
+          <div class="child-avatar mb-2">🔤</div><div class="fw-bold fs-5">bird</div>
+          <div class="text-muted small">/bɜːrd/</div><div class="text-secondary">con chim</div>
+          <button class="btn btn-kid mt-2"><i class="bi bi-volume-up-fill"></i> Nghe</button></div></div></div>
+        <div class="col-6 col-md-3"><div class="card child-card text-center h-100"><div class="card-body">
+          <div class="child-avatar mb-2">🔤</div><div class="fw-bold fs-5">fish</div>
+          <div class="text-muted small">/fɪʃ/</div><div class="text-secondary">con cá</div>
+          <button class="btn btn-kid mt-2"><i class="bi bi-volume-up-fill"></i> Nghe</button></div></div></div>
+      </div>
+    </main>
+  </div>
+  <div class="wf-note">Mỗi từ có nút 🔊 Nghe (sinh + cache audio lần đầu). Có ảnh minh hoạ thì hiện ảnh thay icon.</div>
+</section>
+
+<script src="assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+<script src="assets/wf-frame.js"></script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wireframe — Tiến độ của bé</title>
+<!-- Wireframe ĐỘC LẬP, chạy offline: asset trong assets/ cạnh file này. -->
+<link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+<link href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
+<link href="assets/style.css" rel="stylesheet">
+<link href="assets/wf-frame.css" rel="stylesheet">
+</head>
+<body data-screen="progress">
+
+<!-- Thanh điều hướng wireframe (về mục lục + màn trước/sau) — wf-frame.js dựng -->
+<div class="wf-bar" id="wf-bar"></div>
+
+<section class="wf-screen" id="progress">
+  <div class="wf-label"><i class="bi bi-graph-up"></i> Tiến độ của bé <span class="wf-url">/manage/progress/</span></div>
+  <div class="wf-frame">
+    <div class="wf-nav-mng"></div>
+    <main class="container py-4">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h1 class="h4 m-0">📈 Tiến độ của bé</h1>
+        <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-house"></i> Bảng điều khiển</button>
+      </div>
+      <form class="d-flex align-items-center gap-2 mb-3" onsubmit="return false">
+        <label class="form-label m-0">Chọn bé:</label>
+        <select class="form-select" style="max-width:240px"><option>— Tất cả các bé —</option><option selected>Bi</option></select>
+      </form>
+      <div class="row g-3 mb-4">
+        <div class="col-4"><div class="card stat-card text-center"><div class="card-body py-3">
+          <div class="stat-num">27⭐</div><div class="text-muted small">Tổng sao</div></div></div></div>
+        <div class="col-4"><div class="card stat-card text-center"><div class="card-body py-3">
+          <div class="stat-num">11</div><div class="text-muted small">Ván đã chơi</div></div></div></div>
+        <div class="col-4"><div class="card stat-card text-center"><div class="card-body py-3">
+          <div class="stat-num">34</div><div class="text-muted small">Lần phát âm</div></div></div></div>
+      </div>
+      <div class="row g-4">
+        <div class="col-md-7">
+          <h2 class="h6 text-muted mb-2"><i class="bi bi-controller"></i> Kết quả chơi gần đây</h2>
+          <table class="table table-sm align-middle">
+            <thead><tr><th>Bé</th><th>Game</th><th>Chủ đề</th><th class="text-center">Sao</th><th class="text-center">Đúng</th></tr></thead>
+            <tbody>
+              <tr><td>Bi</td><td>Nghe & chọn</td><td>Động vật</td><td class="text-center">3⭐</td><td class="text-center">4/4</td></tr>
+              <tr><td>Bi</td><td>Lật thẻ tìm cặp</td><td>Màu sắc</td><td class="text-center">2⭐</td><td class="text-center">3/4</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="col-md-5">
+          <h2 class="h6 text-muted mb-2"><i class="bi bi-mic-fill"></i> Luyện phát âm gần đây</h2>
+          <table class="table table-sm align-middle">
+            <thead><tr><th>Bé</th><th>Từ</th><th class="text-center">Kết quả</th></tr></thead>
+            <tbody>
+              <tr><td>Bi</td><td>cat</td><td class="text-center">3⭐</td></tr>
+              <tr><td>Bi</td><td>dog</td><td class="text-center"><span class="text-muted">chưa chấm</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+  <div class="wf-note">Gộp kết quả chơi + luyện phát âm, lọc theo từng bé, có số liệu tổng quan.</div>
+</section>
+
+<script src="assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+<script src="assets/wf-frame.js"></script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wireframe — Quản lý chủ đề</title>
+<!-- Wireframe ĐỘC LẬP, chạy offline: asset trong assets/ cạnh file này. -->
+<link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+<link href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
+<link href="assets/style.css" rel="stylesheet">
+<link href="assets/wf-frame.css" rel="stylesheet">
+</head>
+<body data-screen="topics">
+
+<!-- Thanh điều hướng wireframe (về mục lục + màn trước/sau) — wf-frame.js dựng -->
+<div class="wf-bar" id="wf-bar"></div>
+
+<section class="wf-screen" id="topics">
+  <div class="wf-label"><i class="bi bi-collection"></i> Quản lý chủ đề <span class="wf-url">/manage/topics/</span></div>
+  <div class="wf-frame">
+    <div class="wf-nav-mng"></div>
+    <main class="container py-4">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h1 class="h4 m-0">📂 Quản lý chủ đề</h1>
+        <div class="d-flex gap-2">
+          <button class="btn btn-kid btn-sm"><i class="bi bi-plus-lg"></i> Thêm chủ đề</button>
+          <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-house"></i> Bảng điều khiển</button>
+        </div>
+      </div>
+      <div class="table-responsive"><table class="table align-middle">
+        <thead><tr><th></th><th>Tên</th><th class="text-center">Số từ</th>
+          <th class="text-center">Thứ tự</th><th class="text-center">Đang dùng</th><th></th></tr></thead>
+        <tbody>
+          <tr><td class="fs-4">🐶</td>
+            <td><div class="fw-bold">Động vật</div><div class="text-muted small">Animals</div></td>
+            <td class="text-center">12</td><td class="text-center">1</td>
+            <td class="text-center"><span class="badge text-bg-success">Có</span></td>
+            <td class="text-end"><button class="btn btn-sm btn-outline-primary"><i class="bi bi-card-text"></i> Từ</button>
+              <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i> Sửa</button></td></tr>
+          <tr><td class="fs-4">🎨</td>
+            <td><div class="fw-bold">Màu sắc</div><div class="text-muted small">Colors</div></td>
+            <td class="text-center">8</td><td class="text-center">2</td>
+            <td class="text-center"><span class="badge text-bg-secondary">Tạm ẩn</span></td>
+            <td class="text-end"><button class="btn btn-sm btn-outline-primary"><i class="bi bi-card-text"></i> Từ</button>
+              <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i> Sửa</button></td></tr>
+        </tbody>
+      </table></div>
+    </main>
+  </div>
+  <div class="wf-note">Bảng có số từ mỗi chủ đề, trạng thái Đang dùng/Tạm ẩn, nút nhảy nhanh sang "Từ" của chủ đề đó.</div>
+</section>
+
+<script src="assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+<script src="assets/wf-frame.js"></script>
+</body>
+</html>

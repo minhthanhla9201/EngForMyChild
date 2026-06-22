@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wireframe — Nhập CSV</title>
+<!-- Wireframe ĐỘC LẬP, chạy offline: asset trong assets/ cạnh file này. -->
+<link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+<link href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
+<link href="assets/style.css" rel="stylesheet">
+<link href="assets/wf-frame.css" rel="stylesheet">
+</head>
+<body data-screen="import">
+
+<!-- Thanh điều hướng wireframe (về mục lục + màn trước/sau) — wf-frame.js dựng -->
+<div class="wf-bar" id="wf-bar"></div>
+
+<section class="wf-screen" id="import">
+  <div class="wf-label"><i class="bi bi-filetype-csv"></i> Nhập từ vựng từ CSV <span class="wf-url">/manage/import/</span></div>
+  <div class="wf-frame">
+    <div class="wf-nav-mng"></div>
+    <main class="container py-4">
+      <div class="row justify-content-center"><div class="col-md-8">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h1 class="h4 m-0">📥 Nhập từ vựng từ CSV</h1>
+          <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Từ vựng</button>
+        </div>
+        <div class="card child-card p-2 mb-3"><div class="card-body">
+          <form onsubmit="return false">
+            <div class="mb-3"><label class="form-label">Tệp CSV</label>
+              <input type="file" class="form-control" accept=".csv">
+              <div class="form-text">Cột bắt buộc: text_en. Cột tuỳ chọn: topic, text_vi, topic_vi, level.</div></div>
+            <div class="mb-3 form-check"><input type="checkbox" class="form-check-input" id="ma">
+              <label class="form-check-label" for="ma">Sinh sẵn audio phát âm (chậm hơn, cần TTS)</label></div>
+            <button class="btn btn-kid"><i class="bi bi-upload"></i> Nhập</button>
+          </form>
+        </div></div>
+        <div class="alert alert-info"><strong>Định dạng CSV</strong> (dòng đầu là tiêu đề):
+          <ul class="mb-1 mt-2">
+            <li><code>text_en</code> — từ tiếng Anh (bắt buộc)</li>
+            <li><code>text_vi</code> — nghĩa tiếng Việt</li>
+            <li><code>topic</code> — tên chủ đề (tiếng Anh); tự tạo nếu chưa có</li>
+            <li><code>topic_vi</code> — tên chủ đề tiếng Việt (tuỳ chọn)</li>
+            <li><code>level</code> — độ khó, mặc định 1 (tuỳ chọn)</li>
+          </ul>
+          <div class="small text-muted">Nhập lại cùng file sẽ không tạo trùng. IPA tự sinh khi để trống.</div>
+        </div>
+      </div></div>
+    </main>
+  </div>
+  <div class="wf-note">Nhập hàng loạt qua web, kèm hướng dẫn định dạng. Dùng chung bộ xử lý với lệnh <code>import_words</code>.</div>
+</section>
+
+<script src="assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+<script src="assets/wf-frame.js"></script>
+</body>
+</html>

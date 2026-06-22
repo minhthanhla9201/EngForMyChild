@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wireframe — Đổi passcode</title>
+<!-- Wireframe ĐỘC LẬP, chạy offline: asset trong assets/ cạnh file này. -->
+<link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+<link href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
+<link href="assets/style.css" rel="stylesheet">
+<link href="assets/wf-frame.css" rel="stylesheet">
+</head>
+<body data-screen="pass-change">
+
+<!-- Thanh điều hướng wireframe (về mục lục + màn trước/sau) — wf-frame.js dựng -->
+<div class="wf-bar" id="wf-bar"></div>
+
+<section class="wf-screen" id="pass-change">
+  <div class="wf-label"><i class="bi bi-key"></i> Đổi passcode (trong khu quản lý) <span class="wf-url">/manage/passcode/change/</span></div>
+  <div class="wf-frame">
+    <div class="wf-nav-mng"></div>
+    <main class="container py-4">
+      <div class="row justify-content-center"><div class="col-md-6">
+        <div class="card child-card p-2"><div class="card-body">
+          <h1 class="h4 mb-3">🔑 Đổi passcode</h1>
+          <form onsubmit="return false">
+            <div class="mb-3"><label class="form-label">Passcode hiện tại</label>
+              <input type="password" class="form-control" inputmode="numeric"></div>
+            <div class="mb-3"><label class="form-label">Passcode mới</label>
+              <input type="password" class="form-control" inputmode="numeric"></div>
+            <div class="mb-3"><label class="form-label">Nhập lại passcode mới</label>
+              <input type="password" class="form-control" inputmode="numeric"></div>
+            <div class="d-flex gap-2">
+              <button class="btn btn-kid">Lưu</button>
+              <button class="btn btn-outline-secondary">Huỷ</button></div>
+          </form>
+        </div></div>
+      </div></div>
+    </main>
+  </div>
+  <div class="wf-note">Nằm trong khu quản lý (nav xám). Phải nhập đúng passcode cũ mới đổi được.</div>
+</section>
+
+<script src="assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+<script src="assets/wf-frame.js"></script>
+</body>
+</html>

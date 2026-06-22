@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wireframe — Trò chơi: chọn</title>
+<!-- Wireframe ĐỘC LẬP, chạy offline: asset trong assets/ cạnh file này. -->
+<link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+<link href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
+<link href="assets/style.css" rel="stylesheet">
+<link href="assets/wf-frame.css" rel="stylesheet">
+</head>
+<body data-screen="game-choose">
+
+<!-- Thanh điều hướng wireframe (về mục lục + màn trước/sau) — wf-frame.js dựng -->
+<div class="wf-bar" id="wf-bar"></div>
+
+<section class="wf-screen" id="game-choose">
+  <div class="wf-label"><i class="bi bi-controller"></i> Trò chơi — Chọn bé, game & chủ đề <span class="wf-url">/games/</span></div>
+  <div class="wf-frame">
+    <div class="wf-nav-kid"></div>
+    <main class="container py-4">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h1 class="h4 m-0">🎮 Trò chơi</h1>
+        <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-house"></i> Trang chủ</button>
+      </div>
+      <div class="card child-card p-3 mb-3">
+        <label class="form-label fw-bold">Bé nào chơi?</label>
+        <div class="d-flex flex-wrap gap-2 mb-3">
+          <button class="btn btn-kid">🐥 Bi</button>
+          <button class="btn btn-outline-primary">🐰 Na</button>
+        </div>
+        <label class="form-label fw-bold">Chọn trò chơi:</label>
+        <div class="d-flex flex-wrap gap-2">
+          <button class="btn btn-kid">👂 Nghe & chọn</button>
+          <button class="btn btn-outline-primary">🃏 Lật thẻ tìm cặp</button>
+        </div>
+      </div>
+      <label class="form-label fw-bold">Chọn chủ đề để bắt đầu:</label>
+      <div class="row g-3">
+        <div class="col-6 col-md-3"><div class="card child-card text-center h-100"><div class="card-body">
+          <div class="child-avatar mb-2">🐶</div><div class="fw-bold text-dark">Động vật</div>
+          <div class="text-muted small">Animals</div></div></div></div>
+        <div class="col-6 col-md-3"><div class="card child-card text-center h-100"><div class="card-body">
+          <div class="child-avatar mb-2">🎨</div><div class="fw-bold text-dark">Màu sắc</div>
+          <div class="text-muted small">Colors</div></div></div></div>
+      </div>
+    </main>
+  </div>
+  <div class="wf-note">Chọn bé + game + chủ đề. Game lấy từ kho dùng chung; thêm game mới = thêm 1 module + 1 GameType.</div>
+</section>
+
+<script src="assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+<script src="assets/wf-frame.js"></script>
+</body>
+</html>

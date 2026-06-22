@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wireframe — Bảng điều khiển</title>
+<!-- Wireframe ĐỘC LẬP, chạy offline: asset trong assets/ cạnh file này. -->
+<link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+<link href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
+<link href="assets/style.css" rel="stylesheet">
+<link href="assets/wf-frame.css" rel="stylesheet">
+</head>
+<body data-screen="dashboard">
+
+<!-- Thanh điều hướng wireframe (về mục lục + màn trước/sau) — wf-frame.js dựng -->
+<div class="wf-bar" id="wf-bar"></div>
+
+<section class="wf-screen" id="dashboard">
+  <div class="wf-label"><i class="bi bi-speedometer2"></i> Bảng điều khiển <span class="wf-url">/manage/</span></div>
+  <div class="wf-frame">
+    <div class="wf-nav-mng"></div>
+    <main class="container py-4">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h1 class="h4 m-0">⚙️ Bảng điều khiển</h1>
+        <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Về khu của bé</button>
+      </div>
+      <section class="mb-4">
+        <div class="row g-3 mb-3">
+          <div class="col-4"><div class="card stat-card text-center"><div class="card-body py-3">
+            <div class="stat-num">2</div><div class="text-muted small">Hồ sơ bé</div></div></div></div>
+          <div class="col-4"><div class="card stat-card text-center"><div class="card-body py-3">
+            <div class="stat-num">5</div><div class="text-muted small">Chủ đề</div></div></div></div>
+          <div class="col-4"><div class="card stat-card text-center"><div class="card-body py-3">
+            <div class="stat-num">48</div><div class="text-muted small">Từ vựng</div></div></div></div>
+        </div>
+        <div class="row g-3">
+          <div class="col-6 col-md-4"><div class="card zone-card zone-manage h-100"><div class="card-body d-flex align-items-center gap-3">
+            <div class="manage-icon"><i class="bi bi-collection"></i></div>
+            <div><div class="fw-bold text-dark">Chủ đề</div><div class="text-muted small">Thêm / sửa chủ đề</div></div></div></div></div>
+          <div class="col-6 col-md-4"><div class="card zone-card zone-manage h-100"><div class="card-body d-flex align-items-center gap-3">
+            <div class="manage-icon"><i class="bi bi-card-text"></i></div>
+            <div><div class="fw-bold text-dark">Từ vựng</div><div class="text-muted small">Thêm / sửa từ</div></div></div></div></div>
+          <div class="col-6 col-md-4"><div class="card zone-card zone-manage h-100"><div class="card-body d-flex align-items-center gap-3">
+            <div class="manage-icon"><i class="bi bi-upload"></i></div>
+            <div><div class="fw-bold text-dark">Nhập từ CSV</div><div class="text-muted small">Nhập hàng loạt</div></div></div></div></div>
+          <div class="col-6 col-md-4"><div class="card zone-card zone-manage h-100"><div class="card-body d-flex align-items-center gap-3">
+            <div class="manage-icon"><i class="bi bi-graph-up"></i></div>
+            <div><div class="fw-bold text-dark">Tiến độ của bé</div><div class="text-muted small">Kết quả chơi & phát âm</div></div></div></div></div>
+        </div>
+      </section>
+
+<script src="assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+<script src="assets/wf-frame.js"></script>
+</body>
+</html>

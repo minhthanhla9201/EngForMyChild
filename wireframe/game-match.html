@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wireframe — Game: Lật thẻ</title>
+<!-- Wireframe ĐỘC LẬP, chạy offline: asset trong assets/ cạnh file này. -->
+<link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+<link href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
+<link href="assets/style.css" rel="stylesheet">
+<link href="assets/wf-frame.css" rel="stylesheet">
+</head>
+<body data-screen="game-match">
+
+<!-- Thanh điều hướng wireframe (về mục lục + màn trước/sau) — wf-frame.js dựng -->
+<div class="wf-bar" id="wf-bar"></div>
+
+<section class="wf-screen" id="game-match">
+  <div class="wf-label"><i class="bi bi-grid-3x3-gap"></i> Game: Lật thẻ tìm cặp <span class="wf-url">/games/1/match-pairs/animals/</span></div>
+  <div class="wf-frame">
+    <div class="wf-nav-kid"></div>
+    <main class="container py-4">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h1 class="h5 m-0">🃏 🐥 Bi — Động vật</h1>
+        <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Thoát</button>
+      </div>
+      <div class="text-muted small mb-2">Ghép: 1/4 · Lật sai: 2</div>
+      <p class="mb-3">Lật 2 thẻ để tìm cặp Anh – Việt nhé!</p>
+      <div class="row g-2">
+        <div class="col-3 col-md-2"><button class="btn btn-success w-100 p-3" style="min-height:64px">cat</button></div>
+        <div class="col-3 col-md-2"><button class="btn btn-warning w-100 p-3" style="min-height:64px">con chó</button></div>
+        <div class="col-3 col-md-2"><button class="btn btn-outline-primary w-100 p-3" style="min-height:64px">❓</button></div>
+        <div class="col-3 col-md-2"><button class="btn btn-outline-primary w-100 p-3" style="min-height:64px">❓</button></div>
+        <div class="col-3 col-md-2"><button class="btn btn-success w-100 p-3" style="min-height:64px">con mèo</button></div>
+        <div class="col-3 col-md-2"><button class="btn btn-outline-primary w-100 p-3" style="min-height:64px">❓</button></div>
+        <div class="col-3 col-md-2"><button class="btn btn-outline-primary w-100 p-3" style="min-height:64px">❓</button></div>
+        <div class="col-3 col-md-2"><button class="btn btn-outline-primary w-100 p-3" style="min-height:64px">❓</button></div>
+      </div>
+
+      <!-- Màn kết quả (mẫu) -->
+      <div class="card child-card text-center p-4 mt-4">
+        <div class="display-4 mb-2">⭐⭐⭐</div>
+        <p class="fs-5 mb-2">Ghép đúng 4/4 cặp, lật sai 2 lần</p>
+        <div class="d-flex justify-content-center gap-2">
+          <button class="btn btn-outline-primary">Chọn game khác</button>
+          <button class="btn btn-kid">Chơi lại</button>
+        </div>
+      </div>
+    </main>
+  </div>
+  <div class="wf-note">Lật thẻ ghép cặp Anh↔Việt (Alpine giữ trạng thái lật). Xong → thưởng ⭐ theo số lần lật sai (màn kết quả mẫu phía dưới).</div>
+</section>
+
+<script src="assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+<script src="assets/wf-frame.js"></script>
+</body>
+</html>

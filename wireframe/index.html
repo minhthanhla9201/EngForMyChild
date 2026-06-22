@@ -3,788 +3,96 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Wireframe — Bé học tiếng Anh</title>
-
-<!-- Wireframe ĐỘC LẬP: asset (Bootstrap/Icons/HTMX/Alpine + style.css) nằm trong assets/ cạnh file này.
-     Chạy offline hoàn toàn, không phụ thuộc web/static. Mở trực tiếp file này trong trình duyệt. -->
+<title>Wireframe — Bé học tiếng Anh (mục lục)</title>
+<!-- Trang MỤC LỤC: mỗi màn là 1 file riêng, bấm để mở. Chạy offline (asset trong assets/). -->
 <link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
 <link href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
 <link href="assets/style.css" rel="stylesheet">
-<style>
-  /* Khung trình bày riêng cho trang wireframe (KHÔNG ảnh hưởng app thật) */
-  body { background: #f1f3f5; }
-  .wf-toc { position: sticky; top: 0; z-index: 1020; background: #212529; }
-  .wf-toc a { color: #cfe0ff; text-decoration: none; font-size: .85rem; white-space: nowrap; }
-  .wf-toc a:hover { color: #fff; }
-  .wf-toc .wf-group { color: #ffd166; font-weight: 600; font-size: .8rem; }
-  .wf-divider { max-width: 980px; margin: 0 auto 1.25rem; }
-  .wf-divider h2 { font-size: 1.1rem; color: #495057; border-bottom: 2px solid #ced4da; padding-bottom: .4rem; }
-  .wf-screen { max-width: 980px; margin: 0 auto 2.5rem; }
-  .wf-label {
-    background: #212529; color: #fff; border-radius: .5rem .5rem 0 0;
-    padding: .4rem .9rem; font-weight: 600; font-size: .95rem;
-    display: flex; align-items: center; gap: .5rem;
-  }
-  .wf-label .wf-url { margin-left: auto; font-weight: 400; font-size: .8rem; color: #9ec5fe; font-family: monospace; }
-  /* "Màn hình giả lập trình duyệt" — viền + nền giống cửa sổ thật */
-  .wf-frame {
-    border: 1px solid #ced4da; border-top: none; border-radius: 0 0 .5rem .5rem;
-    background: #eaf2ff; overflow: hidden;
-  }
-  .wf-frame .container { max-width: 100%; }
-  .wf-note { font-size: .85rem; color: #6c757d; padding: .25rem .9rem .75rem; }
-  /* Navbar khu quản lý: tông xám trung tính, tách biệt hẳn nav xanh của bé (chỉ minh hoạ wireframe;
-     khi code thật đặt trong style.css). */
-  .wf-nav-manage { background: #343a40; }
-  .wf-nav-manage .navbar-brand { color: #fff; }
-  .wf-nav-manage .nav-link { color: rgba(255,255,255,.85); font-weight: 500; }
-  .wf-nav-manage .nav-link:hover { color: #fff; }
-  /* Ô nhập passcode to, dễ bấm */
-  .wf-pass-input { letter-spacing: .5rem; text-align: center; font-size: 1.6rem; }
-</style>
+<link href="assets/wf-frame.css" rel="stylesheet">
 </head>
 <body>
+<div class="container py-4" style="max-width:980px">
+  <h1 class="h3 mb-1">🦜 Wireframe — Bé học tiếng Anh</h1>
+  <p class="text-muted">Mỗi màn là một file HTML riêng. Bấm vào thẻ để mở; trong từng màn có thanh điều hướng để quay lại mục lục hoặc xem màn trước/sau.</p>
 
-<!-- Mục lục nhanh giữa các màn, gom theo nhóm -->
-<div class="wf-toc py-2">
-  <div class="container d-flex flex-wrap align-items-center gap-3">
-    <span class="wf-group">Đăng nhập:</span>
-    <a href="#login">0. Đăng nhập</a>
-    <span class="wf-group ms-2">Khu của bé:</span>
-    <a href="#learn-topics">Học: chủ đề</a>
-    <a href="#learn-words">Học: từ</a>
-    <a href="#speak-choose">PÂ: chọn</a>
-    <a href="#speak-practice">PÂ: luyện</a>
-    <a href="#game-choose">Game: chọn</a>
-    <a href="#game-listen">Game: nghe</a>
-    <a href="#game-match">Game: lật thẻ</a>
-    <a href="#game-empty">Thiếu dữ liệu</a>
-    <span class="wf-group ms-2">Vào khu quản lý:</span>
-    <a href="#pass-enter">Nhập passcode</a>
-    <a href="#pass-set">Đặt passcode</a>
-    <a href="#pass-change">Đổi passcode</a>
-    <span class="wf-group ms-2">Khu quản lý:</span>
-    <a href="#dashboard">Bảng ĐK</a>
-    <a href="#child-form">Hồ sơ bé</a>
-    <a href="#topics">Chủ đề</a>
-    <a href="#words">Từ vựng</a>
-    <a href="#wordform">Form từ</a>
-    <a href="#import">Nhập CSV</a>
-    <a href="#progress">Tiến độ</a>
+  <!-- 🔑 Đăng nhập -->
+  <h2 class="h5 wf-toc-group mt-4 mb-3">🔑 Đăng nhập</h2>
+  <div class="row g-3">
+    <div class="col-6 col-md-4"><a href="login.html" class="text-decoration-none">
+      <div class="card wf-toc-card child-card"><div class="card-body">
+        <div class="fw-bold text-dark"><i class="bi bi-box-arrow-in-right"></i> Đăng nhập</div>
+        <div class="text-muted small">Phụ huynh đăng nhập (phiên sống lâu)</div>
+      </div></div></a></div>
+  </div>
+
+  <!-- 🧒 Khu của bé -->
+  <h2 class="h5 wf-toc-group mt-4 mb-3">🧒 Khu của bé <span class="small text-muted">(navbar xanh)</span></h2>
+  <div class="row g-3">
+    <div class="col-6 col-md-4"><a href="learn-topics.html" class="text-decoration-none">
+      <div class="card wf-toc-card child-card"><div class="card-body">
+        <div class="fw-bold text-dark">📚 Học: chọn chủ đề</div></div></div></a></div>
+    <div class="col-6 col-md-4"><a href="learn-words.html" class="text-decoration-none">
+      <div class="card wf-toc-card child-card"><div class="card-body">
+        <div class="fw-bold text-dark">🔤 Học: từ trong chủ đề</div></div></div></a></div>
+    <div class="col-6 col-md-4"><a href="speak-choose.html" class="text-decoration-none">
+      <div class="card wf-toc-card child-card"><div class="card-body">
+        <div class="fw-bold text-dark">🎤 Phát âm: chọn bé & chủ đề</div></div></div></a></div>
+    <div class="col-6 col-md-4"><a href="speak-practice.html" class="text-decoration-none">
+      <div class="card wf-toc-card child-card"><div class="card-body">
+        <div class="fw-bold text-dark">🔊 Phát âm: đọc theo & ghi âm</div></div></div></a></div>
+    <div class="col-6 col-md-4"><a href="game-choose.html" class="text-decoration-none">
+      <div class="card wf-toc-card child-card"><div class="card-body">
+        <div class="fw-bold text-dark">🎮 Trò chơi: chọn</div></div></div></a></div>
+    <div class="col-6 col-md-4"><a href="game-listen.html" class="text-decoration-none">
+      <div class="card wf-toc-card child-card"><div class="card-body">
+        <div class="fw-bold text-dark">👂 Game: Nghe & chọn</div></div></div></a></div>
+    <div class="col-6 col-md-4"><a href="game-match.html" class="text-decoration-none">
+      <div class="card wf-toc-card child-card"><div class="card-body">
+        <div class="fw-bold text-dark">🃏 Game: Lật thẻ tìm cặp</div></div></div></a></div>
+    <div class="col-6 col-md-4"><a href="game-empty.html" class="text-decoration-none">
+      <div class="card wf-toc-card child-card"><div class="card-body">
+        <div class="fw-bold text-dark">🧩 Game: chủ đề chưa đủ từ</div></div></div></a></div>
+  </div>
+
+  <!-- 🔒 Vào khu quản lý (passcode) -->
+  <h2 class="h5 wf-toc-group mt-4 mb-3">🔒 Vào khu quản lý (passcode)</h2>
+  <div class="row g-3">
+    <div class="col-6 col-md-4"><a href="pass-enter.html" class="text-decoration-none">
+      <div class="card wf-toc-card child-card"><div class="card-body">
+        <div class="fw-bold text-dark">🔒 Nhập passcode</div></div></div></a></div>
+    <div class="col-6 col-md-4"><a href="pass-set.html" class="text-decoration-none">
+      <div class="card wf-toc-card child-card"><div class="card-body">
+        <div class="fw-bold text-dark">🔑 Đặt passcode lần đầu</div></div></div></a></div>
+    <div class="col-6 col-md-4"><a href="pass-change.html" class="text-decoration-none">
+      <div class="card wf-toc-card child-card"><div class="card-body">
+        <div class="fw-bold text-dark">🔑 Đổi passcode</div></div></div></a></div>
+  </div>
+
+  <!-- ⚙️ Khu quản lý -->
+  <h2 class="h5 wf-toc-group mt-4 mb-3">⚙️ Khu quản lý <span class="small text-muted">(navbar xám)</span></h2>
+  <div class="row g-3">
+    <div class="col-6 col-md-4"><a href="dashboard.html" class="text-decoration-none">
+      <div class="card wf-toc-card child-card"><div class="card-body">
+        <div class="fw-bold text-dark">⚙️ Bảng điều khiển</div></div></div></a></div>
+    <div class="col-6 col-md-4"><a href="child-form.html" class="text-decoration-none">
+      <div class="card wf-toc-card child-card"><div class="card-body">
+        <div class="fw-bold text-dark">👨‍👩‍👧 Thêm / sửa hồ sơ bé</div></div></div></a></div>
+    <div class="col-6 col-md-4"><a href="topics.html" class="text-decoration-none">
+      <div class="card wf-toc-card child-card"><div class="card-body">
+        <div class="fw-bold text-dark">📂 Quản lý chủ đề</div></div></div></a></div>
+    <div class="col-6 col-md-4"><a href="words.html" class="text-decoration-none">
+      <div class="card wf-toc-card child-card"><div class="card-body">
+        <div class="fw-bold text-dark">🔤 Quản lý từ vựng</div></div></div></a></div>
+    <div class="col-6 col-md-4"><a href="wordform.html" class="text-decoration-none">
+      <div class="card wf-toc-card child-card"><div class="card-body">
+        <div class="fw-bold text-dark">✏️ Form thêm/sửa từ</div></div></div></a></div>
+    <div class="col-6 col-md-4"><a href="import.html" class="text-decoration-none">
+      <div class="card wf-toc-card child-card"><div class="card-body">
+        <div class="fw-bold text-dark">📥 Nhập CSV</div></div></div></a></div>
+    <div class="col-6 col-md-4"><a href="progress.html" class="text-decoration-none">
+      <div class="card wf-toc-card child-card"><div class="card-body">
+        <div class="fw-bold text-dark">📈 Tiến độ của bé</div></div></div></a></div>
   </div>
 </div>
-
-<div class="py-4">
-
-<!-- NAVBAR KHU CỦA BÉ (base_kid.html): chỉ Học/Phát âm/Trò chơi + nút nhỏ "Cho phụ huynh".
-     KHÔNG có menu Quản lý / Thoát → bé không tự vào khu quản lý. -->
-<template id="tpl-navbar-kid">
-  <nav class="navbar navbar-expand-lg navbar-brand-bar">
-    <div class="container">
-      <a class="navbar-brand fw-bold" href="#">🦜 Bé học tiếng Anh</a>
-      <div class="navbar-collapse collapse show">
-        <ul class="navbar-nav me-auto">
-          <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-book"></i> Học từ vựng</a></li>
-          <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-mic-fill"></i> Luyện phát âm</a></li>
-          <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-controller"></i> Trò chơi</a></li>
-        </ul>
-        <ul class="navbar-nav align-items-lg-center">
-          <li class="nav-item">
-            <a class="nav-link" href="#"><i class="bi bi-shield-lock"></i> 👨‍👩‍👧 Cho phụ huynh</a>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </nav>
-</template>
-
-<!-- NAVBAR KHU QUẢN LÝ (base_manage.html): nền trung tính (xám), có menu Quản lý,
-     nút "Về khu của bé" + Thoát. KHÁC HẲN nav của bé để phụ huynh biết đang ở khu quản lý. -->
-<template id="tpl-navbar-manage">
-  <nav class="navbar navbar-expand-lg wf-nav-manage">
-    <div class="container">
-      <a class="navbar-brand fw-bold" href="#"><i class="bi bi-gear-fill"></i> Khu quản lý</a>
-      <div class="navbar-collapse collapse show">
-        <ul class="navbar-nav me-auto">
-          <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-speedometer2"></i> Bảng điều khiển</a></li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#"><i class="bi bi-list-ul"></i> Nội dung</a>
-          </li>
-          <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-graph-up"></i> Tiến độ</a></li>
-          <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-key"></i> Đổi passcode</a></li>
-        </ul>
-        <ul class="navbar-nav align-items-lg-center gap-lg-2">
-          <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-arrow-left"></i> Về khu của bé</a></li>
-          <li class="nav-item d-flex align-items-center gap-2">
-            <span class="small text-white-50">phuhuynh</span>
-            <button class="btn btn-sm btn-light"><i class="bi bi-box-arrow-right"></i> Thoát</button>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </nav>
-</template>
-
-<!-- Thanh điều hướng tối giản (chưa đăng nhập) cho màn login -->
-<template id="tpl-navbar-guest">
-  <nav class="navbar navbar-expand-lg navbar-brand-bar">
-    <div class="container">
-      <a class="navbar-brand fw-bold" href="#">🦜 Bé học tiếng Anh</a>
-    </div>
-  </nav>
-</template>
-
-
-<!-- ========================================================= -->
-<div class="wf-divider"><h2>🔑 Đăng nhập</h2></div>
-
-<!-- ===================== 0. ĐĂNG NHẬP ===================== -->
-<section class="wf-screen" id="login">
-  <div class="wf-label"><i class="bi bi-box-arrow-in-right"></i> Đăng nhập (phụ huynh) <span class="wf-url">/login/</span></div>
-  <div class="wf-frame">
-    <div class="wf-nav-guest"></div>
-    <main class="container py-4">
-      <div class="row justify-content-center"><div class="col-md-5">
-        <div class="card child-card p-2"><div class="card-body">
-          <h1 class="h4 text-center mb-3">👋 Phụ huynh đăng nhập</h1>
-          <form onsubmit="return false">
-            <div class="mb-3"><label class="form-label">Tên đăng nhập</label>
-              <input type="text" class="form-control" value="admin"></div>
-            <div class="mb-3"><label class="form-label">Mật khẩu</label>
-              <input type="password" class="form-control" value="••••••"></div>
-            <button class="btn btn-kid w-100">Đăng nhập</button>
-          </form>
-        </div></div>
-      </div></div>
-    </main>
-  </div>
-  <div class="wf-note">Đăng nhập 1 lần, phiên sống lâu (mặc định 30 ngày, trượt hạn) → ít phải đăng nhập lại.
-    Sau đăng nhập vào thẳng <b>Khu của bé</b>. Sai mật khẩu → cảnh báo đỏ.</div>
-</section>
-
-
-<!-- ========================================================= -->
-<div class="wf-divider"><h2>🧒 Khu của bé</h2></div>
-
-<!-- ===================== HỌC: CHỌN CHỦ ĐỀ ===================== -->
-<section class="wf-screen" id="learn-topics">
-  <div class="wf-label"><i class="bi bi-book"></i> Học từ vựng — Chọn chủ đề <span class="wf-url">/learn/</span></div>
-  <div class="wf-frame">
-    <div class="wf-nav-kid"></div>
-    <main class="container py-4">
-      <div class="d-flex align-items-center justify-content-between mb-3">
-        <h1 class="h4 m-0">📚 Chọn chủ đề</h1>
-        <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-house"></i> Trang chủ</button>
-      </div>
-      <div class="row g-3">
-        <div class="col-6 col-md-3"><div class="card child-card text-center h-100"><div class="card-body">
-          <div class="child-avatar mb-2">🐶</div><div class="fw-bold text-dark">Động vật</div>
-          <div class="text-muted small">Animals</div></div></div></div>
-        <div class="col-6 col-md-3"><div class="card child-card text-center h-100"><div class="card-body">
-          <div class="child-avatar mb-2">🎨</div><div class="fw-bold text-dark">Màu sắc</div>
-          <div class="text-muted small">Colors</div></div></div></div>
-        <div class="col-6 col-md-3"><div class="card child-card text-center h-100"><div class="card-body">
-          <div class="child-avatar mb-2">🍎</div><div class="fw-bold text-dark">Trái cây</div>
-          <div class="text-muted small">Fruits</div></div></div></div>
-        <div class="col-6 col-md-3"><div class="card child-card text-center h-100"><div class="card-body">
-          <div class="child-avatar mb-2">🔢</div><div class="fw-bold text-dark">Con số</div>
-          <div class="text-muted small">Numbers</div></div></div></div>
-      </div>
-    </main>
-  </div>
-  <div class="wf-note">Thẻ chủ đề to, icon lớn cho bé dễ chọn. Bấm vào → xem các từ trong chủ đề.</div>
-</section>
-
-<!-- ===================== HỌC: DANH SÁCH TỪ ===================== -->
-<section class="wf-screen" id="learn-words">
-  <div class="wf-label"><i class="bi bi-card-text"></i> Học từ vựng — Từ trong chủ đề <span class="wf-url">/learn/topic/animals/</span></div>
-  <div class="wf-frame">
-    <div class="wf-nav-kid"></div>
-    <main class="container py-4">
-      <div class="d-flex align-items-center justify-content-between mb-3">
-        <h1 class="h4 m-0">🐶 Động vật <span class="text-muted fs-6">(Animals)</span></h1>
-        <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Chủ đề</button>
-      </div>
-      <div class="row g-3">
-        <div class="col-6 col-md-3"><div class="card child-card text-center h-100"><div class="card-body">
-          <div class="child-avatar mb-2">🔤</div><div class="fw-bold fs-5">cat</div>
-          <div class="text-muted small">/kæt/</div><div class="text-secondary">con mèo</div>
-          <button class="btn btn-kid mt-2"><i class="bi bi-volume-up-fill"></i> Nghe</button></div></div></div>
-        <div class="col-6 col-md-3"><div class="card child-card text-center h-100"><div class="card-body">
-          <div class="child-avatar mb-2">🔤</div><div class="fw-bold fs-5">dog</div>
-          <div class="text-muted small">/dɒg/</div><div class="text-secondary">con chó</div>
-          <button class="btn btn-kid mt-2"><i class="bi bi-volume-up-fill"></i> Nghe</button></div></div></div>
-        <div class="col-6 col-md-3"><div class="card child-card text-center h-100"><div class="card-body">
-          <div class="child-avatar mb-2">🔤</div><div class="fw-bold fs-5">bird</div>
-          <div class="text-muted small">/bɜːrd/</div><div class="text-secondary">con chim</div>
-          <button class="btn btn-kid mt-2"><i class="bi bi-volume-up-fill"></i> Nghe</button></div></div></div>
-        <div class="col-6 col-md-3"><div class="card child-card text-center h-100"><div class="card-body">
-          <div class="child-avatar mb-2">🔤</div><div class="fw-bold fs-5">fish</div>
-          <div class="text-muted small">/fɪʃ/</div><div class="text-secondary">con cá</div>
-          <button class="btn btn-kid mt-2"><i class="bi bi-volume-up-fill"></i> Nghe</button></div></div></div>
-      </div>
-    </main>
-  </div>
-  <div class="wf-note">Mỗi từ có nút 🔊 Nghe (sinh + cache audio lần đầu). Có ảnh minh hoạ thì hiện ảnh thay icon.</div>
-</section>
-
-<!-- ===================== LUYỆN PHÁT ÂM: CHỌN ===================== -->
-<section class="wf-screen" id="speak-choose">
-  <div class="wf-label"><i class="bi bi-mic-fill"></i> Luyện phát âm — Chọn bé & chủ đề <span class="wf-url">/speak/</span></div>
-  <div class="wf-frame">
-    <div class="wf-nav-kid"></div>
-    <main class="container py-4">
-      <div class="d-flex align-items-center justify-content-between mb-3">
-        <h1 class="h4 m-0">🎤 Luyện phát âm</h1>
-        <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-house"></i> Trang chủ</button>
-      </div>
-      <div class="card child-card p-3 mb-3">
-        <label class="form-label fw-bold">Bé nào luyện?</label>
-        <div class="d-flex flex-wrap gap-2">
-          <button class="btn btn-kid">🐥 Bi</button>
-          <button class="btn btn-outline-primary">🐰 Na</button>
-        </div>
-      </div>
-      <label class="form-label fw-bold">Chọn chủ đề để luyện:</label>
-      <div class="row g-3">
-        <div class="col-6 col-md-3"><div class="card child-card text-center h-100"><div class="card-body">
-          <div class="child-avatar mb-2">🐶</div><div class="fw-bold text-dark">Động vật</div>
-          <div class="text-muted small">Animals</div></div></div></div>
-        <div class="col-6 col-md-3"><div class="card child-card text-center h-100"><div class="card-body">
-          <div class="child-avatar mb-2">🎨</div><div class="fw-bold text-dark">Màu sắc</div>
-          <div class="text-muted small">Colors</div></div></div></div>
-      </div>
-    </main>
-  </div>
-  <div class="wf-note">Chọn bé (nút sáng = đang chọn, Alpine) → chọn chủ đề để vào màn luyện.</div>
-</section>
-
-<!-- ===================== LUYỆN PHÁT ÂM: MÀN LUYỆN ===================== -->
-<section class="wf-screen" id="speak-practice">
-  <div class="wf-label"><i class="bi bi-soundwave"></i> Luyện phát âm — Đọc theo & ghi âm <span class="wf-url">/speak/1/animals/</span></div>
-  <div class="wf-frame">
-    <div class="wf-nav-kid"></div>
-    <main class="container py-4">
-      <div class="d-flex align-items-center justify-content-between mb-3">
-        <h1 class="h5 m-0">🎤 🐥 Bi — Động vật</h1>
-        <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Đổi</button>
-      </div>
-      <div class="text-muted small mb-2">Từ 1 / 4</div>
-      <div class="card child-card text-center p-4 mb-3">
-        <div class="display-1 mb-2">🐱</div>
-        <div class="fs-2 fw-bold">cat</div>
-        <div class="text-muted">/kæt/</div>
-        <div class="text-secondary mb-3">con mèo</div>
-        <div class="d-flex justify-content-center gap-2 flex-wrap">
-          <button class="btn btn-kid"><i class="bi bi-volume-up-fill"></i> Nghe mẫu</button>
-          <button class="btn btn-success"><i class="bi bi-mic-fill"></i> Thu giọng</button>
-        </div>
-        <div class="mt-3"><div class="alert alert-success mb-0">Đã lưu! 👍</div></div>
-        <audio controls class="w-100 mt-2"></audio>
-      </div>
-      <div class="d-flex justify-content-between">
-        <button class="btn btn-outline-secondary" disabled><i class="bi bi-chevron-left"></i> Trước</button>
-        <button class="btn btn-outline-primary">Từ tiếp theo <i class="bi bi-chevron-right"></i></button>
-      </div>
-    </main>
-  </div>
-  <div class="wf-note">Nghe mẫu → Thu giọng (MediaRecorder) → tự gửi lưu Attempt → nghe lại. Chấm điểm tự động ở GĐ 3.</div>
-</section>
-
-<!-- ===================== GAME: CHỌN ===================== -->
-<section class="wf-screen" id="game-choose">
-  <div class="wf-label"><i class="bi bi-controller"></i> Trò chơi — Chọn bé, game & chủ đề <span class="wf-url">/games/</span></div>
-  <div class="wf-frame">
-    <div class="wf-nav-kid"></div>
-    <main class="container py-4">
-      <div class="d-flex align-items-center justify-content-between mb-3">
-        <h1 class="h4 m-0">🎮 Trò chơi</h1>
-        <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-house"></i> Trang chủ</button>
-      </div>
-      <div class="card child-card p-3 mb-3">
-        <label class="form-label fw-bold">Bé nào chơi?</label>
-        <div class="d-flex flex-wrap gap-2 mb-3">
-          <button class="btn btn-kid">🐥 Bi</button>
-          <button class="btn btn-outline-primary">🐰 Na</button>
-        </div>
-        <label class="form-label fw-bold">Chọn trò chơi:</label>
-        <div class="d-flex flex-wrap gap-2">
-          <button class="btn btn-kid">👂 Nghe & chọn</button>
-          <button class="btn btn-outline-primary">🃏 Lật thẻ tìm cặp</button>
-        </div>
-      </div>
-      <label class="form-label fw-bold">Chọn chủ đề để bắt đầu:</label>
-      <div class="row g-3">
-        <div class="col-6 col-md-3"><div class="card child-card text-center h-100"><div class="card-body">
-          <div class="child-avatar mb-2">🐶</div><div class="fw-bold text-dark">Động vật</div>
-          <div class="text-muted small">Animals</div></div></div></div>
-        <div class="col-6 col-md-3"><div class="card child-card text-center h-100"><div class="card-body">
-          <div class="child-avatar mb-2">🎨</div><div class="fw-bold text-dark">Màu sắc</div>
-          <div class="text-muted small">Colors</div></div></div></div>
-      </div>
-    </main>
-  </div>
-  <div class="wf-note">Chọn bé + game + chủ đề. Game lấy từ kho dùng chung; thêm game mới = thêm 1 module + 1 GameType.</div>
-</section>
-
-<!-- ===================== GAME: NGHE & CHỌN ===================== -->
-<section class="wf-screen" id="game-listen">
-  <div class="wf-label"><i class="bi bi-ear"></i> Game: Nghe & chọn <span class="wf-url">/games/1/listen-pick/animals/</span></div>
-  <div class="wf-frame">
-    <div class="wf-nav-kid"></div>
-    <main class="container py-4">
-      <div class="d-flex align-items-center justify-content-between mb-3">
-        <h1 class="h5 m-0">👂 🐥 Bi — Động vật</h1>
-        <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Thoát</button>
-      </div>
-      <div class="text-muted small mb-2">Câu 2 / 5</div>
-      <div class="card child-card text-center p-4 mb-3">
-        <p class="mb-3">Nghe rồi chọn từ đúng nhé!</p>
-        <div><button class="btn btn-kid btn-lg"><i class="bi bi-volume-up-fill"></i> Nghe</button></div>
-      </div>
-      <div class="row g-3">
-        <div class="col-6"><button class="btn btn-outline-primary w-100 p-3 fs-5">cat<div class="small text-muted">con mèo</div></button></div>
-        <div class="col-6"><button class="btn btn-outline-primary w-100 p-3 fs-5">dog<div class="small text-muted">con chó</div></button></div>
-        <div class="col-6"><button class="btn btn-outline-primary w-100 p-3 fs-5">bird<div class="small text-muted">con chim</div></button></div>
-        <div class="col-6"><button class="btn btn-outline-primary w-100 p-3 fs-5">fish<div class="small text-muted">con cá</div></button></div>
-      </div>
-      <div class="mt-3 text-center"><div class="alert alert-success mb-0">🎉 Đúng rồi!</div></div>
-    </main>
-  </div>
-  <div class="wf-note">Nghe audio → chọn 1 trong 4. Phản hồi đúng/sai ngay. Hết câu → màn kết quả hiện ⭐ (xem dưới).</div>
-</section>
-
-<!-- ===================== GAME: LẬT THẺ TÌM CẶP ===================== -->
-<section class="wf-screen" id="game-match">
-  <div class="wf-label"><i class="bi bi-grid-3x3-gap"></i> Game: Lật thẻ tìm cặp <span class="wf-url">/games/1/match-pairs/animals/</span></div>
-  <div class="wf-frame">
-    <div class="wf-nav-kid"></div>
-    <main class="container py-4">
-      <div class="d-flex align-items-center justify-content-between mb-3">
-        <h1 class="h5 m-0">🃏 🐥 Bi — Động vật</h1>
-        <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Thoát</button>
-      </div>
-      <div class="text-muted small mb-2">Ghép: 1/4 · Lật sai: 2</div>
-      <p class="mb-3">Lật 2 thẻ để tìm cặp Anh – Việt nhé!</p>
-      <div class="row g-2">
-        <div class="col-3 col-md-2"><button class="btn btn-success w-100 p-3" style="min-height:64px">cat</button></div>
-        <div class="col-3 col-md-2"><button class="btn btn-warning w-100 p-3" style="min-height:64px">con chó</button></div>
-        <div class="col-3 col-md-2"><button class="btn btn-outline-primary w-100 p-3" style="min-height:64px">❓</button></div>
-        <div class="col-3 col-md-2"><button class="btn btn-outline-primary w-100 p-3" style="min-height:64px">❓</button></div>
-        <div class="col-3 col-md-2"><button class="btn btn-success w-100 p-3" style="min-height:64px">con mèo</button></div>
-        <div class="col-3 col-md-2"><button class="btn btn-outline-primary w-100 p-3" style="min-height:64px">❓</button></div>
-        <div class="col-3 col-md-2"><button class="btn btn-outline-primary w-100 p-3" style="min-height:64px">❓</button></div>
-        <div class="col-3 col-md-2"><button class="btn btn-outline-primary w-100 p-3" style="min-height:64px">❓</button></div>
-      </div>
-
-      {# Màn kết quả (mẫu) #}
-      <div class="card child-card text-center p-4 mt-4">
-        <div class="display-4 mb-2">⭐⭐⭐</div>
-        <p class="fs-5 mb-2">Ghép đúng 4/4 cặp, lật sai 2 lần</p>
-        <div class="d-flex justify-content-center gap-2">
-          <button class="btn btn-outline-primary">Chọn game khác</button>
-          <button class="btn btn-kid">Chơi lại</button>
-        </div>
-      </div>
-    </main>
-  </div>
-  <div class="wf-note">Lật thẻ ghép cặp Anh↔Việt (Alpine giữ trạng thái lật). Xong → thưởng ⭐ theo số lần lật sai (màn kết quả mẫu phía dưới).</div>
-</section>
-
-<!-- ===================== GAME: THIẾU DỮ LIỆU ===================== -->
-<section class="wf-screen" id="game-empty">
-  <div class="wf-label"><i class="bi bi-exclamation-triangle"></i> Game — Chủ đề chưa đủ từ <span class="wf-url">/games/1/listen-pick/colors/</span></div>
-  <div class="wf-frame">
-    <div class="wf-nav-kid"></div>
-    <main class="container py-4">
-      <div class="card child-card text-center p-5">
-        <div class="display-6 mb-2">🧩</div>
-        <p class="mb-3">Chủ đề <b>Màu sắc</b> chưa đủ từ để chơi <b>Nghe & chọn</b> (cần ít nhất 4 từ).</p>
-        <div><button class="btn btn-kid">Chọn lại</button></div>
-      </div>
-    </main>
-  </div>
-  <div class="wf-note">Khi chủ đề thiếu từ (hoặc thiếu ảnh với game cần ảnh) → báo thân thiện, không vào game.</div>
-</section>
-
-
-<!-- ========================================================= -->
-<div class="wf-divider"><h2>🔒 Vào khu quản lý (passcode)</h2></div>
-
-<!-- ===================== NHẬP PASSCODE ===================== -->
-<section class="wf-screen" id="pass-enter">
-  <div class="wf-label"><i class="bi bi-shield-lock"></i> Nhập passcode để vào khu quản lý <span class="wf-url">/manage/unlock/</span></div>
-  <div class="wf-frame">
-    <div class="wf-nav-kid"></div>
-    <main class="container py-4">
-      <div class="row justify-content-center"><div class="col-md-5">
-        <div class="card child-card p-2"><div class="card-body text-center">
-          <div class="display-5 mb-2">🔒</div>
-          <h1 class="h4 mb-1">Khu quản lý</h1>
-          <p class="text-muted small mb-3">Nhập mã passcode của phụ huynh để tiếp tục.</p>
-          <form onsubmit="return false">
-            <input type="password" class="form-control wf-pass-input mb-3" value="••••" maxlength="6" inputmode="numeric">
-            <button class="btn btn-kid w-100"><i class="bi bi-unlock"></i> Mở khoá</button>
-          </form>
-          <a href="#learn-topics" class="d-inline-block mt-3 small text-muted"><i class="bi bi-arrow-left"></i> Về khu của bé</a>
-        </div></div>
-      </div></div>
-    </main>
-  </div>
-  <div class="wf-note">Lớp khoá thứ 2 sau đăng nhập: bé không tự vào nghịch. Mở khoá rồi giữ 30 phút (trượt hạn theo thao tác); sai mã → cảnh báo đỏ.</div>
-</section>
-
-<!-- ===================== ĐẶT PASSCODE LẦN ĐẦU ===================== -->
-<section class="wf-screen" id="pass-set">
-  <div class="wf-label"><i class="bi bi-shield-plus"></i> Đặt passcode lần đầu <span class="wf-url">/manage/unlock/ (chưa có passcode)</span></div>
-  <div class="wf-frame">
-    <div class="wf-nav-kid"></div>
-    <main class="container py-4">
-      <div class="row justify-content-center"><div class="col-md-5">
-        <div class="card child-card p-2"><div class="card-body">
-          <h1 class="h4 mb-1 text-center">🔑 Đặt passcode khu quản lý</h1>
-          <p class="text-muted small text-center mb-3">Lần đầu vào khu quản lý — hãy đặt một mã 4–6 chữ số.</p>
-          <form onsubmit="return false">
-            <div class="mb-3"><label class="form-label">Mã passcode mới</label>
-              <input type="password" class="form-control" placeholder="4–6 chữ số" inputmode="numeric"></div>
-            <div class="mb-3"><label class="form-label">Nhập lại</label>
-              <input type="password" class="form-control" placeholder="Nhập lại cho khớp" inputmode="numeric"></div>
-            <button class="btn btn-kid w-100">Lưu passcode</button>
-          </form>
-        </div></div>
-      </div></div>
-    </main>
-  </div>
-  <div class="wf-note">Khi DB chưa có passcode → buộc đặt trước. Lưu dạng <b>hash</b> (không lưu mã thô).</div>
-</section>
-
-<!-- ===================== ĐỔI PASSCODE ===================== -->
-<section class="wf-screen" id="pass-change">
-  <div class="wf-label"><i class="bi bi-key"></i> Đổi passcode (trong khu quản lý) <span class="wf-url">/manage/passcode/change/</span></div>
-  <div class="wf-frame">
-    <div class="wf-nav-mng"></div>
-    <main class="container py-4">
-      <div class="row justify-content-center"><div class="col-md-6">
-        <div class="card child-card p-2"><div class="card-body">
-          <h1 class="h4 mb-3">🔑 Đổi passcode</h1>
-          <form onsubmit="return false">
-            <div class="mb-3"><label class="form-label">Passcode hiện tại</label>
-              <input type="password" class="form-control" inputmode="numeric"></div>
-            <div class="mb-3"><label class="form-label">Passcode mới</label>
-              <input type="password" class="form-control" inputmode="numeric"></div>
-            <div class="mb-3"><label class="form-label">Nhập lại passcode mới</label>
-              <input type="password" class="form-control" inputmode="numeric"></div>
-            <div class="d-flex gap-2">
-              <button class="btn btn-kid">Lưu</button>
-              <button class="btn btn-outline-secondary">Huỷ</button></div>
-          </form>
-        </div></div>
-      </div></div>
-    </main>
-  </div>
-  <div class="wf-note">Nằm trong khu quản lý (nav xám). Phải nhập đúng passcode cũ mới đổi được.</div>
-</section>
-
-
-<!-- ========================================================= -->
-<div class="wf-divider"><h2>⚙️ Khu quản lý (phụ huynh)</h2></div>
-
-<!-- ===================== BẢNG ĐIỀU KHIỂN ===================== -->
-<section class="wf-screen" id="dashboard">
-  <div class="wf-label"><i class="bi bi-speedometer2"></i> Bảng điều khiển <span class="wf-url">/manage/</span></div>
-  <div class="wf-frame">
-    <div class="wf-nav-mng"></div>
-    <main class="container py-4">
-      <div class="d-flex align-items-center justify-content-between mb-3">
-        <h1 class="h4 m-0">⚙️ Bảng điều khiển</h1>
-        <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Về khu của bé</button>
-      </div>
-      <section class="mb-4">
-        <div class="row g-3 mb-3">
-          <div class="col-4"><div class="card stat-card text-center"><div class="card-body py-3">
-            <div class="stat-num">2</div><div class="text-muted small">Hồ sơ bé</div></div></div></div>
-          <div class="col-4"><div class="card stat-card text-center"><div class="card-body py-3">
-            <div class="stat-num">5</div><div class="text-muted small">Chủ đề</div></div></div></div>
-          <div class="col-4"><div class="card stat-card text-center"><div class="card-body py-3">
-            <div class="stat-num">48</div><div class="text-muted small">Từ vựng</div></div></div></div>
-        </div>
-        <div class="row g-3">
-          <div class="col-6 col-md-4"><div class="card zone-card zone-manage h-100"><div class="card-body d-flex align-items-center gap-3">
-            <div class="manage-icon"><i class="bi bi-collection"></i></div>
-            <div><div class="fw-bold text-dark">Chủ đề</div><div class="text-muted small">Thêm / sửa chủ đề</div></div></div></div></div>
-          <div class="col-6 col-md-4"><div class="card zone-card zone-manage h-100"><div class="card-body d-flex align-items-center gap-3">
-            <div class="manage-icon"><i class="bi bi-card-text"></i></div>
-            <div><div class="fw-bold text-dark">Từ vựng</div><div class="text-muted small">Thêm / sửa từ</div></div></div></div></div>
-          <div class="col-6 col-md-4"><div class="card zone-card zone-manage h-100"><div class="card-body d-flex align-items-center gap-3">
-            <div class="manage-icon"><i class="bi bi-upload"></i></div>
-            <div><div class="fw-bold text-dark">Nhập từ CSV</div><div class="text-muted small">Nhập hàng loạt</div></div></div></div></div>
-          <div class="col-6 col-md-4"><div class="card zone-card zone-manage h-100"><div class="card-body d-flex align-items-center gap-3">
-            <div class="manage-icon"><i class="bi bi-graph-up"></i></div>
-            <div><div class="fw-bold text-dark">Tiến độ của bé</div><div class="text-muted small">Kết quả chơi & phát âm</div></div></div></div></div>
-        </div>
-      </section>
-      <section>
-        <div class="d-flex align-items-center justify-content-between mb-3">
-          <h2 class="h4 m-0">👨‍👩‍👧 Hồ sơ các bé</h2>
-          <button class="btn btn-outline-primary btn-sm"><i class="bi bi-plus-lg"></i> Thêm bé</button>
-        </div>
-        <div class="row g-3">
-          <div class="col-6 col-md-3"><div class="card child-card text-center h-100"><div class="card-body">
-            <div class="child-avatar mb-2">🐥</div><div class="fw-bold">Bi</div>
-            <div class="text-muted small">Năm sinh 2018</div>
-            <button class="btn btn-sm btn-outline-secondary mt-2"><i class="bi bi-pencil"></i> Sửa</button></div></div></div>
-          <div class="col-6 col-md-3"><div class="card child-card text-center h-100"><div class="card-body">
-            <div class="child-avatar mb-2">🐰</div><div class="fw-bold">Na</div>
-            <div class="text-muted small">Năm sinh 2019</div>
-            <button class="btn btn-sm btn-outline-secondary mt-2"><i class="bi bi-pencil"></i> Sửa</button></div></div></div>
-        </div>
-      </section>
-    </main>
-  </div>
-  <div class="wf-note">Trang chủ <b>khu quản lý</b> (nav xám) — số liệu tổng quan + lối tắt CRUD + hồ sơ bé.
-    Khu của bé tách riêng (nav xanh), vào bằng nút "Về khu của bé".</div>
-</section>
-
-<!-- ===================== FORM HỒ SƠ BÉ ===================== -->
-<section class="wf-screen" id="child-form">
-  <div class="wf-label"><i class="bi bi-person-plus"></i> Thêm / sửa hồ sơ bé <span class="wf-url">/manage/children/add/</span></div>
-  <div class="wf-frame">
-    <div class="wf-nav-mng"></div>
-    <main class="container py-4">
-      <div class="row justify-content-center"><div class="col-md-6">
-        <div class="card child-card p-2"><div class="card-body">
-          <h1 class="h4 mb-3">➕ Thêm bé</h1>
-          <form onsubmit="return false">
-            <div class="mb-3"><label class="form-label">Tên bé</label>
-              <input class="form-control" placeholder="Tên bé"></div>
-            <div class="mb-3"><label class="form-label">Năm sinh</label>
-              <input type="number" class="form-control" placeholder="VD: 2018"></div>
-            <div class="mb-3"><label class="form-label">Avatar</label>
-              <input class="form-control" placeholder="Emoji, vd 🐥"></div>
-            <div class="d-flex gap-2">
-              <button class="btn btn-kid">Lưu</button>
-              <button class="btn btn-outline-secondary">Huỷ</button></div>
-          </form>
-        </div></div>
-      </div></div>
-    </main>
-  </div>
-  <div class="wf-note">Form gọn cho phụ huynh: tên, năm sinh, avatar emoji. owner gán tự động theo người đăng nhập.</div>
-</section>
-
-<!-- ===================== QUẢN LÝ CHỦ ĐỀ ===================== -->
-<section class="wf-screen" id="topics">
-  <div class="wf-label"><i class="bi bi-collection"></i> Quản lý chủ đề <span class="wf-url">/manage/topics/</span></div>
-  <div class="wf-frame">
-    <div class="wf-nav-mng"></div>
-    <main class="container py-4">
-      <div class="d-flex align-items-center justify-content-between mb-3">
-        <h1 class="h4 m-0">📂 Quản lý chủ đề</h1>
-        <div class="d-flex gap-2">
-          <button class="btn btn-kid btn-sm"><i class="bi bi-plus-lg"></i> Thêm chủ đề</button>
-          <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-house"></i> Bảng điều khiển</button>
-        </div>
-      </div>
-      <div class="table-responsive"><table class="table align-middle">
-        <thead><tr><th></th><th>Tên</th><th class="text-center">Số từ</th>
-          <th class="text-center">Thứ tự</th><th class="text-center">Đang dùng</th><th></th></tr></thead>
-        <tbody>
-          <tr><td class="fs-4">🐶</td>
-            <td><div class="fw-bold">Động vật</div><div class="text-muted small">Animals</div></td>
-            <td class="text-center">12</td><td class="text-center">1</td>
-            <td class="text-center"><span class="badge text-bg-success">Có</span></td>
-            <td class="text-end"><button class="btn btn-sm btn-outline-primary"><i class="bi bi-card-text"></i> Từ</button>
-              <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i> Sửa</button></td></tr>
-          <tr><td class="fs-4">🎨</td>
-            <td><div class="fw-bold">Màu sắc</div><div class="text-muted small">Colors</div></td>
-            <td class="text-center">8</td><td class="text-center">2</td>
-            <td class="text-center"><span class="badge text-bg-secondary">Tạm ẩn</span></td>
-            <td class="text-end"><button class="btn btn-sm btn-outline-primary"><i class="bi bi-card-text"></i> Từ</button>
-              <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i> Sửa</button></td></tr>
-        </tbody>
-      </table></div>
-    </main>
-  </div>
-  <div class="wf-note">Bảng có số từ mỗi chủ đề, trạng thái Đang dùng/Tạm ẩn, nút nhảy nhanh sang "Từ" của chủ đề đó.</div>
-</section>
-
-<!-- ===================== QUẢN LÝ TỪ VỰNG ===================== -->
-<section class="wf-screen" id="words">
-  <div class="wf-label"><i class="bi bi-card-list"></i> Quản lý từ vựng <span class="wf-url">/manage/words/</span></div>
-  <div class="wf-frame">
-    <div class="wf-nav-mng"></div>
-    <main class="container py-4">
-      <div class="d-flex align-items-center justify-content-between mb-3">
-        <h1 class="h4 m-0">🔤 Quản lý từ vựng</h1>
-        <div class="d-flex gap-2">
-          <button class="btn btn-kid btn-sm"><i class="bi bi-plus-lg"></i> Thêm từ</button>
-          <button class="btn btn-outline-primary btn-sm"><i class="bi bi-upload"></i> Nhập CSV</button>
-          <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-house"></i> Bảng điều khiển</button>
-        </div>
-      </div>
-      <form class="row g-2 mb-3" onsubmit="return false">
-        <div class="col-auto"><select class="form-select"><option>— Tất cả chủ đề —</option><option selected>Động vật</option></select></div>
-        <div class="col-auto"><input type="text" class="form-control" placeholder="Tìm từ tiếng Anh..." value="ca"></div>
-        <div class="col-auto"><button class="btn btn-outline-secondary"><i class="bi bi-search"></i> Tìm</button></div>
-      </form>
-      <div class="table-responsive"><table class="table align-middle">
-        <thead><tr><th>Từ (EN)</th><th>Nghĩa (VI)</th><th>IPA</th><th>Chủ đề</th>
-          <th class="text-center">Đang dùng</th><th></th></tr></thead>
-        <tbody>
-          <tr><td class="fw-bold">cat</td><td>con mèo</td><td class="text-muted small">/kæt/</td>
-            <td><span class="badge text-bg-light">Động vật</span></td>
-            <td class="text-center"><span class="badge text-bg-success">Có</span></td>
-            <td class="text-end"><button class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i> Sửa</button></td></tr>
-          <tr><td class="fw-bold">camel</td><td>con lạc đà</td><td class="text-muted small">/ˈkæməl/</td>
-            <td><span class="badge text-bg-light">Động vật</span></td>
-            <td class="text-center"><span class="badge text-bg-success">Có</span></td>
-            <td class="text-end"><button class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i> Sửa</button></td></tr>
-        </tbody>
-      </table></div>
-      <nav class="d-flex justify-content-center"><ul class="pagination">
-        <li class="page-item"><a class="page-link" href="#">«</a></li>
-        <li class="page-item disabled"><span class="page-link">Trang 1/3</span></li>
-        <li class="page-item"><a class="page-link" href="#">»</a></li>
-      </ul></nav>
-    </main>
-  </div>
-  <div class="wf-note">Lọc theo chủ đề + tìm theo từ tiếng Anh + phân trang (20 từ/trang).</div>
-</section>
-
-<!-- ===================== FORM THÊM/SỬA TỪ ===================== -->
-<section class="wf-screen" id="wordform">
-  <div class="wf-label"><i class="bi bi-pencil-square"></i> Form thêm/sửa từ <span class="wf-url">/manage/words/add/</span></div>
-  <div class="wf-frame">
-    <div class="wf-nav-mng"></div>
-    <main class="container py-4">
-      <div class="row justify-content-center"><div class="col-md-7">
-        <div class="card child-card p-2"><div class="card-body">
-          <h1 class="h4 mb-3">➕ Thêm từ</h1>
-          <form onsubmit="return false">
-            <div class="mb-3"><label class="form-label">Chủ đề</label>
-              <select class="form-select"><option>Động vật</option><option>Màu sắc</option></select></div>
-            <div class="mb-3"><label class="form-label">Từ (tiếng Anh)</label>
-              <input class="form-control" placeholder="VD: cat"></div>
-            <div class="mb-3"><label class="form-label">Nghĩa (tiếng Việt)</label>
-              <input class="form-control" placeholder="VD: con mèo"></div>
-            <div class="mb-3"><label class="form-label">Phiên âm (IPA)</label>
-              <input class="form-control" placeholder="Để trống để tự sinh IPA"></div>
-            <div class="mb-3"><label class="form-label">Hình minh hoạ</label>
-              <input type="file" class="form-control"></div>
-            <div class="mb-3"><label class="form-label">Độ khó</label>
-              <input type="number" class="form-control" value="1"></div>
-            <div class="mb-3"><label class="form-label">Đang dùng</label>
-              <select class="form-select"><option>Có</option><option>Không</option></select></div>
-            <div class="d-flex gap-2">
-              <button class="btn btn-kid">Lưu</button>
-              <button class="btn btn-outline-secondary">Huỷ</button></div>
-          </form>
-        </div></div>
-      </div></div>
-    </main>
-  </div>
-  <div class="wf-note">Form gọn, nhãn tiếng Việt. Bỏ trống IPA → hệ thống tự sinh. (Form chủ đề tương tự, ít field hơn.)</div>
-</section>
-
-<!-- ===================== NHẬP CSV ===================== -->
-<section class="wf-screen" id="import">
-  <div class="wf-label"><i class="bi bi-filetype-csv"></i> Nhập từ vựng từ CSV <span class="wf-url">/manage/import/</span></div>
-  <div class="wf-frame">
-    <div class="wf-nav-mng"></div>
-    <main class="container py-4">
-      <div class="row justify-content-center"><div class="col-md-8">
-        <div class="d-flex align-items-center justify-content-between mb-3">
-          <h1 class="h4 m-0">📥 Nhập từ vựng từ CSV</h1>
-          <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Từ vựng</button>
-        </div>
-        <div class="card child-card p-2 mb-3"><div class="card-body">
-          <form onsubmit="return false">
-            <div class="mb-3"><label class="form-label">Tệp CSV</label>
-              <input type="file" class="form-control" accept=".csv">
-              <div class="form-text">Cột bắt buộc: text_en. Cột tuỳ chọn: topic, text_vi, topic_vi, level.</div></div>
-            <div class="mb-3 form-check"><input type="checkbox" class="form-check-input" id="ma">
-              <label class="form-check-label" for="ma">Sinh sẵn audio phát âm (chậm hơn, cần TTS)</label></div>
-            <button class="btn btn-kid"><i class="bi bi-upload"></i> Nhập</button>
-          </form>
-        </div></div>
-        <div class="alert alert-info"><strong>Định dạng CSV</strong> (dòng đầu là tiêu đề):
-          <ul class="mb-1 mt-2">
-            <li><code>text_en</code> — từ tiếng Anh (bắt buộc)</li>
-            <li><code>text_vi</code> — nghĩa tiếng Việt</li>
-            <li><code>topic</code> — tên chủ đề (tiếng Anh); tự tạo nếu chưa có</li>
-            <li><code>topic_vi</code> — tên chủ đề tiếng Việt (tuỳ chọn)</li>
-            <li><code>level</code> — độ khó, mặc định 1 (tuỳ chọn)</li>
-          </ul>
-          <div class="small text-muted">Nhập lại cùng file sẽ không tạo trùng. IPA tự sinh khi để trống.</div>
-        </div>
-      </div></div>
-    </main>
-  </div>
-  <div class="wf-note">Nhập hàng loạt qua web, kèm hướng dẫn định dạng. Dùng chung bộ xử lý với lệnh <code>import_words</code>.</div>
-</section>
-
-<!-- ===================== TIẾN ĐỘ CỦA BÉ ===================== -->
-<section class="wf-screen" id="progress">
-  <div class="wf-label"><i class="bi bi-graph-up"></i> Tiến độ của bé <span class="wf-url">/manage/progress/</span></div>
-  <div class="wf-frame">
-    <div class="wf-nav-mng"></div>
-    <main class="container py-4">
-      <div class="d-flex align-items-center justify-content-between mb-3">
-        <h1 class="h4 m-0">📈 Tiến độ của bé</h1>
-        <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-house"></i> Bảng điều khiển</button>
-      </div>
-      <form class="d-flex align-items-center gap-2 mb-3" onsubmit="return false">
-        <label class="form-label m-0">Chọn bé:</label>
-        <select class="form-select" style="max-width:240px"><option>— Tất cả các bé —</option><option selected>Bi</option></select>
-      </form>
-      <div class="row g-3 mb-4">
-        <div class="col-4"><div class="card stat-card text-center"><div class="card-body py-3">
-          <div class="stat-num">27⭐</div><div class="text-muted small">Tổng sao</div></div></div></div>
-        <div class="col-4"><div class="card stat-card text-center"><div class="card-body py-3">
-          <div class="stat-num">11</div><div class="text-muted small">Ván đã chơi</div></div></div></div>
-        <div class="col-4"><div class="card stat-card text-center"><div class="card-body py-3">
-          <div class="stat-num">34</div><div class="text-muted small">Lần phát âm</div></div></div></div>
-      </div>
-      <div class="row g-4">
-        <div class="col-md-7">
-          <h2 class="h6 text-muted mb-2"><i class="bi bi-controller"></i> Kết quả chơi gần đây</h2>
-          <table class="table table-sm align-middle">
-            <thead><tr><th>Bé</th><th>Game</th><th>Chủ đề</th><th class="text-center">Sao</th><th class="text-center">Đúng</th></tr></thead>
-            <tbody>
-              <tr><td>Bi</td><td>Nghe & chọn</td><td>Động vật</td><td class="text-center">3⭐</td><td class="text-center">4/4</td></tr>
-              <tr><td>Bi</td><td>Lật thẻ tìm cặp</td><td>Màu sắc</td><td class="text-center">2⭐</td><td class="text-center">3/4</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="col-md-5">
-          <h2 class="h6 text-muted mb-2"><i class="bi bi-mic-fill"></i> Luyện phát âm gần đây</h2>
-          <table class="table table-sm align-middle">
-            <thead><tr><th>Bé</th><th>Từ</th><th class="text-center">Kết quả</th></tr></thead>
-            <tbody>
-              <tr><td>Bi</td><td>cat</td><td class="text-center">3⭐</td></tr>
-              <tr><td>Bi</td><td>dog</td><td class="text-center"><span class="text-muted">chưa chấm</span></td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </main>
-  </div>
-  <div class="wf-note">Gộp kết quả chơi + luyện phát âm, lọc theo từng bé, có số liệu tổng quan.</div>
-</section>
-
-</div>
-
-<script src="assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
-<script>
-  // Chèn navbar mẫu vào mọi màn (tránh lặp HTML) — chỉ phục vụ wireframe.
-  // 3 loại nav theo khu: bé / quản lý / khách (login).
-  const inject = (sel, tplId) => {
-    const html = document.getElementById(tplId).innerHTML;
-    document.querySelectorAll(sel).forEach(el => el.innerHTML = html);
-  };
-  inject('.wf-nav-kid', 'tpl-navbar-kid');
-  inject('.wf-nav-mng', 'tpl-navbar-manage');
-  inject('.wf-nav-guest', 'tpl-navbar-guest');
-</script>
 </body>
 </html>

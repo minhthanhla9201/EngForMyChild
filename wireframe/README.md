@@ -3,12 +3,24 @@
 Bản xem trước giao diện (wireframe) **độc lập** với mã nguồn web.
 
 ## Cách xem
-Nhấp đúp **`index.html`** để mở trong trình duyệt — **không cần chạy server, không cần internet**.
+Nhấp đúp **`index.html`** (trang **mục lục**) → bấm thẻ để mở từng màn. Trong mỗi màn có thanh
+trên cùng để **về mục lục** hoặc xem **màn trước/sau**. Không cần chạy server, không cần internet.
+
+## Cấu trúc (mỗi màn 1 file)
+- `index.html` — trang mục lục, liên kết tới 19 file màn.
+- `<tên-màn>.html` — mỗi màn một file độc lập (vd `login.html`, `dashboard.html`, `pass-enter.html`...).
+- `assets/` — asset dùng chung:
+  - `vendor/` (Bootstrap, Bootstrap Icons, HTMX, Alpine.js) + `style.css` (CSS thật của app).
+  - `wf-frame.css` — CSS khung wireframe (nhãn màn, viền "cửa sổ", nav xám...).
+  - `wf-frame.js` — chèn navbar mẫu (bé / quản lý / khách) + dựng thanh điều hướng trước/sau.
+
+> Khung (navbar mẫu, CSS, thanh điều hướng) nằm CHUNG trong `assets/wf-frame.*` → sửa 1 chỗ áp cho mọi màn,
+> không lặp lại trong từng file. Mỗi file màn chỉ chứa nội dung màn + khai báo `<body data-screen="…">`.
 
 ## Đặc điểm
-- Tự chứa: mọi asset (Bootstrap, Bootstrap Icons, HTMX, Alpine.js, `style.css`) nằm trong `assets/` cạnh file này → chạy offline hoàn toàn.
+- Tự chứa: mọi asset nằm trong `assets/` cạnh các file → chạy offline hoàn toàn.
 - Dùng đúng `style.css` của app nên bố cục khớp với giao diện thật.
-- Hiển thị **tất cả màn** kèm dữ liệu mẫu, gom theo nhóm (mục lục dính ở đầu trang) để dễ xác nhận trước khi code/đổi giao diện:
+- **Tất cả màn** kèm dữ liệu mẫu, gom theo nhóm (xem trong `index.html`):
 
   **🔑 Đăng nhập**
   0. Đăng nhập (phụ huynh) — phiên sống lâu (mặc định 30 ngày, trượt hạn)
@@ -37,7 +49,7 @@ Nhấp đúp **`index.html`** để mở trong trình duyệt — **không cần
   - Nhập CSV
   - Tiến độ của bé
 
-> **Tách 2 khu (bản đề xuất đang chờ xác nhận):** khu của bé (nav xanh) và khu quản lý (nav xám) dùng 2 layout riêng (`base_kid.html` / `base_manage.html`), khu quản lý gom dưới tiền tố URL `/manage/` và cần passcode. Vẫn chung 1 lần đăng nhập.
+> **Tách 2 khu (đã triển khai trong app):** khu của bé (nav xanh) và khu quản lý (nav xám) dùng 2 layout riêng (`base_kid.html` / `base_manage.html`), khu quản lý gom dưới tiền tố URL `/manage/` và cần passcode. Vẫn chung 1 lần đăng nhập.
 >
 > Các màn động (game, luyện phát âm) hiển thị ở **một trạng thái đại diện** (đang chơi/đã ghi âm) để xem bố cục — wireframe là bản tĩnh, không chạy logic Alpine/JS thật.
 

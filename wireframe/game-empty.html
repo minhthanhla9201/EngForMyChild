@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wireframe — Game: thiếu dữ liệu</title>
+<!-- Wireframe ĐỘC LẬP, chạy offline: asset trong assets/ cạnh file này. -->
+<link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+<link href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
+<link href="assets/style.css" rel="stylesheet">
+<link href="assets/wf-frame.css" rel="stylesheet">
+</head>
+<body data-screen="game-empty">
+
+<!-- Thanh điều hướng wireframe (về mục lục + màn trước/sau) — wf-frame.js dựng -->
+<div class="wf-bar" id="wf-bar"></div>
+
+<section class="wf-screen" id="game-empty">
+  <div class="wf-label"><i class="bi bi-exclamation-triangle"></i> Game — Chủ đề chưa đủ từ <span class="wf-url">/games/1/listen-pick/colors/</span></div>
+  <div class="wf-frame">
+    <div class="wf-nav-kid"></div>
+    <main class="container py-4">
+      <div class="card child-card text-center p-5">
+        <div class="display-6 mb-2">🧩</div>
+        <p class="mb-3">Chủ đề <b>Màu sắc</b> chưa đủ từ để chơi <b>Nghe & chọn</b> (cần ít nhất 4 từ).</p>
+        <div><button class="btn btn-kid">Chọn lại</button></div>
+      </div>
+    </main>
+  </div>
+  <div class="wf-note">Khi chủ đề thiếu từ (hoặc thiếu ảnh với game cần ảnh) → báo thân thiện, không vào game.</div>
+</section>
+
+<script src="assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+<script src="assets/wf-frame.js"></script>
+</body>
+</html>

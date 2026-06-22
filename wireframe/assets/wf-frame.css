@@ -1,0 +1,41 @@
+/* ============================================================
+   Khung trình bày dùng chung cho MỌI màn wireframe (mỗi màn 1 file).
+   Nạp cùng Bootstrap + style.css. KHÔNG ảnh hưởng app thật.
+   ============================================================ */
+body { background: #f1f3f5; }
+
+/* Thanh điều hướng wireframe ở đầu mỗi màn: về mục lục + chuyển màn trước/sau */
+.wf-bar { background: #212529; }
+.wf-bar a, .wf-bar span { color: #cfe0ff; text-decoration: none; font-size: .85rem; }
+.wf-bar a:hover { color: #fff; }
+.wf-bar .wf-title { color: #fff; font-weight: 600; }
+
+.wf-screen { max-width: 980px; margin: 1.25rem auto 2.5rem; }
+.wf-label {
+  background: #212529; color: #fff; border-radius: .5rem .5rem 0 0;
+  padding: .4rem .9rem; font-weight: 600; font-size: .95rem;
+  display: flex; align-items: center; gap: .5rem;
+}
+.wf-label .wf-url { margin-left: auto; font-weight: 400; font-size: .8rem; color: #9ec5fe; font-family: monospace; }
+/* "Màn hình giả lập trình duyệt" — viền + nền giống cửa sổ thật */
+.wf-frame {
+  border: 1px solid #ced4da; border-top: none; border-radius: 0 0 .5rem .5rem;
+  background: #eaf2ff; overflow: hidden;
+}
+.wf-frame .container { max-width: 100%; }
+.wf-note { font-size: .85rem; color: #6c757d; padding: .5rem .9rem .75rem; }
+
+/* Navbar khu quản lý: tông xám trung tính, tách biệt hẳn nav xanh của bé
+   (chỉ minh hoạ wireframe; khi code thật đặt trong style.css) */
+.wf-nav-manage { background: #343a40; }
+.wf-nav-manage .navbar-brand { color: #fff; }
+.wf-nav-manage .nav-link { color: rgba(255,255,255,.85); font-weight: 500; }
+.wf-nav-manage .nav-link:hover { color: #fff; }
+
+/* Ô nhập passcode to, dễ bấm */
+.wf-pass-input { letter-spacing: .5rem; text-align: center; font-size: 1.6rem; }
+
+/* ===== Trang mục lục (index.html) ===== */
+.wf-toc-group { color: #495057; border-bottom: 2px solid #ced4da; padding-bottom: .4rem; }
+.wf-toc-card { transition: transform .1s ease, box-shadow .1s ease; height: 100%; }
+.wf-toc-card:hover { transform: translateY(-3px); box-shadow: 0 .5rem 1rem rgba(0,0,0,.08); }
