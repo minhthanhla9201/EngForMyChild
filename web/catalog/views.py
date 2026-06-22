@@ -16,6 +16,8 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.text import slugify
 
+from core.decorators import manage_required
+
 from . import audio as audio_service
 from . import imports as import_service
 from . import ipa as ipa_service
@@ -56,17 +58,17 @@ def word_audio(request, pk):
 
 # =====================================================================
 # KHU QUẢN LÝ (phụ huynh): CRUD chủ đề / từ vựng + nhập CSV.
-# Nội dung học là kho dùng chung (không lọc owner) — chỉ cần đăng nhập.
+# Nội dung học là kho dùng chung (không lọc owner) — cần đăng nhập + passcode.
 # =====================================================================
 
-@login_required
+@manage_required
 def topic_manage(request):
     """Danh sách chủ đề để quản lý (kèm số từ mỗi chủ đề)."""
     topics = Topic.objects.annotate(num_words=Count('words')).order_by('order', 'name_en')
     return render(request, 'catalog/manage/topic_list.html', {'topics': topics})
 
 
-@login_required
+@manage_required
 def topic_form(request, pk=None):
     """Tạo (pk=None) hoặc sửa chủ đề. slug tự sinh từ name_en nếu để trống."""
     topic = get_object_or_404(Topic, pk=pk) if pk else None
@@ -77,11 +79,11 @@ def topic_form(request, pk=None):
             obj.slug = slugify(obj.name_en) or 'topic'
         obj.save()
         messages.success(request, f'Đã lưu chủ đề "{obj.name_vi}".')
-        return redirect('catalog:topic_manage')
+        return redirect('catalog_manage:topic_manage')
     return render(request, 'catalog/manage/topic_form.html', {'form': form, 'is_add': topic is None})
 
 
-@login_required
+@manage_required
 def word_manage(request):
     """
     Danh sách từ vựng để quản lý — có lọc theo chủ đề (?topic=<slug>),
@@ -107,7 +109,7 @@ def word_manage(request):
     return render(request, 'catalog/manage/word_list.html', context)
 
 
-@login_required
+@manage_required
 def word_form(request, pk=None):
     """Tạo/sửa từ vựng. IPA tự sinh khi phonetic để trống (eng-to-ipa)."""
     word = get_object_or_404(Word, pk=pk) if pk else None
@@ -118,11 +120,11 @@ def word_form(request, pk=None):
             obj.phonetic = ipa_service.to_ipa(obj.text_en)
         obj.save()
         messages.success(request, f'Đã lưu từ "{obj.text_en}".')
-        return redirect('catalog:word_manage')
+        return redirect('catalog_manage:word_manage')
     return render(request, 'catalog/manage/word_form.html', {'form': form, 'is_add': word is None})
 
 
-@login_required
+@manage_required
 def word_import(request):
     """Nhập từ hàng loạt từ file CSV (dùng chung service catalog.imports)."""
     form = WordImportForm(request.POST or None, request.FILES or None)
@@ -139,5 +141,5 @@ def word_import(request):
                 request,
                 f"Nhập xong: {stats['created_topics']} chủ đề mới, "
                 f"{stats['created_words']} từ mới, {stats['updated_words']} từ cập nhật.")
-            return redirect('catalog:word_manage')
+            return redirect('catalog_manage:word_manage')
     return render(request, 'catalog/manage/word_import.html', {'form': form, 'stats': stats})

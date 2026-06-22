@@ -33,6 +33,14 @@
   }
   .wf-frame .container { max-width: 100%; }
   .wf-note { font-size: .85rem; color: #6c757d; padding: .25rem .9rem .75rem; }
+  /* Navbar khu quản lý: tông xám trung tính, tách biệt hẳn nav xanh của bé (chỉ minh hoạ wireframe;
+     khi code thật đặt trong style.css). */
+  .wf-nav-manage { background: #343a40; }
+  .wf-nav-manage .navbar-brand { color: #fff; }
+  .wf-nav-manage .nav-link { color: rgba(255,255,255,.85); font-weight: 500; }
+  .wf-nav-manage .nav-link:hover { color: #fff; }
+  /* Ô nhập passcode to, dễ bấm */
+  .wf-pass-input { letter-spacing: .5rem; text-align: center; font-size: 1.6rem; }
 </style>
 </head>
 <body>
@@ -51,6 +59,10 @@
     <a href="#game-listen">Game: nghe</a>
     <a href="#game-match">Game: lật thẻ</a>
     <a href="#game-empty">Thiếu dữ liệu</a>
+    <span class="wf-group ms-2">Vào khu quản lý:</span>
+    <a href="#pass-enter">Nhập passcode</a>
+    <a href="#pass-set">Đặt passcode</a>
+    <a href="#pass-change">Đổi passcode</a>
     <span class="wf-group ms-2">Khu quản lý:</span>
     <a href="#dashboard">Bảng ĐK</a>
     <a href="#child-form">Hồ sơ bé</a>
@@ -64,8 +76,9 @@
 
 <div class="py-4">
 
-<!-- Thanh điều hướng mẫu (đăng nhập rồi), tái dùng trong mọi màn sau khi đăng nhập -->
-<template id="tpl-navbar">
+<!-- NAVBAR KHU CỦA BÉ (base_kid.html): chỉ Học/Phát âm/Trò chơi + nút nhỏ "Cho phụ huynh".
+     KHÔNG có menu Quản lý / Thoát → bé không tự vào khu quản lý. -->
+<template id="tpl-navbar-kid">
   <nav class="navbar navbar-expand-lg navbar-brand-bar">
     <div class="container">
       <a class="navbar-brand fw-bold" href="#">🦜 Bé học tiếng Anh</a>
@@ -75,12 +88,35 @@
           <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-mic-fill"></i> Luyện phát âm</a></li>
           <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-controller"></i> Trò chơi</a></li>
         </ul>
-        <ul class="navbar-nav align-items-lg-center gap-lg-1">
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#"><i class="bi bi-gear-fill"></i> Quản lý</a>
+        <ul class="navbar-nav align-items-lg-center">
+          <li class="nav-item">
+            <a class="nav-link" href="#"><i class="bi bi-shield-lock"></i> 👨‍👩‍👧 Cho phụ huynh</a>
           </li>
-          <li class="nav-item d-flex align-items-center gap-2 ms-lg-2">
-            <span class="navbar-username small">phuhuynh</span>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</template>
+
+<!-- NAVBAR KHU QUẢN LÝ (base_manage.html): nền trung tính (xám), có menu Quản lý,
+     nút "Về khu của bé" + Thoát. KHÁC HẲN nav của bé để phụ huynh biết đang ở khu quản lý. -->
+<template id="tpl-navbar-manage">
+  <nav class="navbar navbar-expand-lg wf-nav-manage">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="#"><i class="bi bi-gear-fill"></i> Khu quản lý</a>
+      <div class="navbar-collapse collapse show">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-speedometer2"></i> Bảng điều khiển</a></li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#"><i class="bi bi-list-ul"></i> Nội dung</a>
+          </li>
+          <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-graph-up"></i> Tiến độ</a></li>
+          <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-key"></i> Đổi passcode</a></li>
+        </ul>
+        <ul class="navbar-nav align-items-lg-center gap-lg-2">
+          <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-arrow-left"></i> Về khu của bé</a></li>
+          <li class="nav-item d-flex align-items-center gap-2">
+            <span class="small text-white-50">phuhuynh</span>
             <button class="btn btn-sm btn-light"><i class="bi bi-box-arrow-right"></i> Thoát</button>
           </li>
         </ul>
@@ -122,7 +158,8 @@
       </div></div>
     </main>
   </div>
-  <div class="wf-note">Chỉ phụ huynh đăng nhập; khu của bé mở từ đây. Sai mật khẩu → hiện cảnh báo đỏ.</div>
+  <div class="wf-note">Đăng nhập 1 lần, phiên sống lâu (mặc định 30 ngày, trượt hạn) → ít phải đăng nhập lại.
+    Sau đăng nhập vào thẳng <b>Khu của bé</b>. Sai mật khẩu → cảnh báo đỏ.</div>
 </section>
 
 
@@ -133,7 +170,7 @@
 <section class="wf-screen" id="learn-topics">
   <div class="wf-label"><i class="bi bi-book"></i> Học từ vựng — Chọn chủ đề <span class="wf-url">/learn/</span></div>
   <div class="wf-frame">
-    <div class="wf-nav"></div>
+    <div class="wf-nav-kid"></div>
     <main class="container py-4">
       <div class="d-flex align-items-center justify-content-between mb-3">
         <h1 class="h4 m-0">📚 Chọn chủ đề</h1>
@@ -162,7 +199,7 @@
 <section class="wf-screen" id="learn-words">
   <div class="wf-label"><i class="bi bi-card-text"></i> Học từ vựng — Từ trong chủ đề <span class="wf-url">/learn/topic/animals/</span></div>
   <div class="wf-frame">
-    <div class="wf-nav"></div>
+    <div class="wf-nav-kid"></div>
     <main class="container py-4">
       <div class="d-flex align-items-center justify-content-between mb-3">
         <h1 class="h4 m-0">🐶 Động vật <span class="text-muted fs-6">(Animals)</span></h1>
@@ -195,7 +232,7 @@
 <section class="wf-screen" id="speak-choose">
   <div class="wf-label"><i class="bi bi-mic-fill"></i> Luyện phát âm — Chọn bé & chủ đề <span class="wf-url">/speak/</span></div>
   <div class="wf-frame">
-    <div class="wf-nav"></div>
+    <div class="wf-nav-kid"></div>
     <main class="container py-4">
       <div class="d-flex align-items-center justify-content-between mb-3">
         <h1 class="h4 m-0">🎤 Luyện phát âm</h1>
@@ -226,7 +263,7 @@
 <section class="wf-screen" id="speak-practice">
   <div class="wf-label"><i class="bi bi-soundwave"></i> Luyện phát âm — Đọc theo & ghi âm <span class="wf-url">/speak/1/animals/</span></div>
   <div class="wf-frame">
-    <div class="wf-nav"></div>
+    <div class="wf-nav-kid"></div>
     <main class="container py-4">
       <div class="d-flex align-items-center justify-content-between mb-3">
         <h1 class="h5 m-0">🎤 🐥 Bi — Động vật</h1>
@@ -258,7 +295,7 @@
 <section class="wf-screen" id="game-choose">
   <div class="wf-label"><i class="bi bi-controller"></i> Trò chơi — Chọn bé, game & chủ đề <span class="wf-url">/games/</span></div>
   <div class="wf-frame">
-    <div class="wf-nav"></div>
+    <div class="wf-nav-kid"></div>
     <main class="container py-4">
       <div class="d-flex align-items-center justify-content-between mb-3">
         <h1 class="h4 m-0">🎮 Trò chơi</h1>
@@ -294,7 +331,7 @@
 <section class="wf-screen" id="game-listen">
   <div class="wf-label"><i class="bi bi-ear"></i> Game: Nghe & chọn <span class="wf-url">/games/1/listen-pick/animals/</span></div>
   <div class="wf-frame">
-    <div class="wf-nav"></div>
+    <div class="wf-nav-kid"></div>
     <main class="container py-4">
       <div class="d-flex align-items-center justify-content-between mb-3">
         <h1 class="h5 m-0">👂 🐥 Bi — Động vật</h1>
@@ -321,7 +358,7 @@
 <section class="wf-screen" id="game-match">
   <div class="wf-label"><i class="bi bi-grid-3x3-gap"></i> Game: Lật thẻ tìm cặp <span class="wf-url">/games/1/match-pairs/animals/</span></div>
   <div class="wf-frame">
-    <div class="wf-nav"></div>
+    <div class="wf-nav-kid"></div>
     <main class="container py-4">
       <div class="d-flex align-items-center justify-content-between mb-3">
         <h1 class="h5 m-0">🃏 🐥 Bi — Động vật</h1>
@@ -358,7 +395,7 @@
 <section class="wf-screen" id="game-empty">
   <div class="wf-label"><i class="bi bi-exclamation-triangle"></i> Game — Chủ đề chưa đủ từ <span class="wf-url">/games/1/listen-pick/colors/</span></div>
   <div class="wf-frame">
-    <div class="wf-nav"></div>
+    <div class="wf-nav-kid"></div>
     <main class="container py-4">
       <div class="card child-card text-center p-5">
         <div class="display-6 mb-2">🧩</div>
@@ -372,30 +409,97 @@
 
 
 <!-- ========================================================= -->
+<div class="wf-divider"><h2>🔒 Vào khu quản lý (passcode)</h2></div>
+
+<!-- ===================== NHẬP PASSCODE ===================== -->
+<section class="wf-screen" id="pass-enter">
+  <div class="wf-label"><i class="bi bi-shield-lock"></i> Nhập passcode để vào khu quản lý <span class="wf-url">/manage/unlock/</span></div>
+  <div class="wf-frame">
+    <div class="wf-nav-kid"></div>
+    <main class="container py-4">
+      <div class="row justify-content-center"><div class="col-md-5">
+        <div class="card child-card p-2"><div class="card-body text-center">
+          <div class="display-5 mb-2">🔒</div>
+          <h1 class="h4 mb-1">Khu quản lý</h1>
+          <p class="text-muted small mb-3">Nhập mã passcode của phụ huynh để tiếp tục.</p>
+          <form onsubmit="return false">
+            <input type="password" class="form-control wf-pass-input mb-3" value="••••" maxlength="6" inputmode="numeric">
+            <button class="btn btn-kid w-100"><i class="bi bi-unlock"></i> Mở khoá</button>
+          </form>
+          <a href="#learn-topics" class="d-inline-block mt-3 small text-muted"><i class="bi bi-arrow-left"></i> Về khu của bé</a>
+        </div></div>
+      </div></div>
+    </main>
+  </div>
+  <div class="wf-note">Lớp khoá thứ 2 sau đăng nhập: bé không tự vào nghịch. Mở khoá rồi giữ 30 phút (trượt hạn theo thao tác); sai mã → cảnh báo đỏ.</div>
+</section>
+
+<!-- ===================== ĐẶT PASSCODE LẦN ĐẦU ===================== -->
+<section class="wf-screen" id="pass-set">
+  <div class="wf-label"><i class="bi bi-shield-plus"></i> Đặt passcode lần đầu <span class="wf-url">/manage/unlock/ (chưa có passcode)</span></div>
+  <div class="wf-frame">
+    <div class="wf-nav-kid"></div>
+    <main class="container py-4">
+      <div class="row justify-content-center"><div class="col-md-5">
+        <div class="card child-card p-2"><div class="card-body">
+          <h1 class="h4 mb-1 text-center">🔑 Đặt passcode khu quản lý</h1>
+          <p class="text-muted small text-center mb-3">Lần đầu vào khu quản lý — hãy đặt một mã 4–6 chữ số.</p>
+          <form onsubmit="return false">
+            <div class="mb-3"><label class="form-label">Mã passcode mới</label>
+              <input type="password" class="form-control" placeholder="4–6 chữ số" inputmode="numeric"></div>
+            <div class="mb-3"><label class="form-label">Nhập lại</label>
+              <input type="password" class="form-control" placeholder="Nhập lại cho khớp" inputmode="numeric"></div>
+            <button class="btn btn-kid w-100">Lưu passcode</button>
+          </form>
+        </div></div>
+      </div></div>
+    </main>
+  </div>
+  <div class="wf-note">Khi DB chưa có passcode → buộc đặt trước. Lưu dạng <b>hash</b> (không lưu mã thô).</div>
+</section>
+
+<!-- ===================== ĐỔI PASSCODE ===================== -->
+<section class="wf-screen" id="pass-change">
+  <div class="wf-label"><i class="bi bi-key"></i> Đổi passcode (trong khu quản lý) <span class="wf-url">/manage/passcode/change/</span></div>
+  <div class="wf-frame">
+    <div class="wf-nav-mng"></div>
+    <main class="container py-4">
+      <div class="row justify-content-center"><div class="col-md-6">
+        <div class="card child-card p-2"><div class="card-body">
+          <h1 class="h4 mb-3">🔑 Đổi passcode</h1>
+          <form onsubmit="return false">
+            <div class="mb-3"><label class="form-label">Passcode hiện tại</label>
+              <input type="password" class="form-control" inputmode="numeric"></div>
+            <div class="mb-3"><label class="form-label">Passcode mới</label>
+              <input type="password" class="form-control" inputmode="numeric"></div>
+            <div class="mb-3"><label class="form-label">Nhập lại passcode mới</label>
+              <input type="password" class="form-control" inputmode="numeric"></div>
+            <div class="d-flex gap-2">
+              <button class="btn btn-kid">Lưu</button>
+              <button class="btn btn-outline-secondary">Huỷ</button></div>
+          </form>
+        </div></div>
+      </div></div>
+    </main>
+  </div>
+  <div class="wf-note">Nằm trong khu quản lý (nav xám). Phải nhập đúng passcode cũ mới đổi được.</div>
+</section>
+
+
+<!-- ========================================================= -->
 <div class="wf-divider"><h2>⚙️ Khu quản lý (phụ huynh)</h2></div>
 
 <!-- ===================== BẢNG ĐIỀU KHIỂN ===================== -->
 <section class="wf-screen" id="dashboard">
-  <div class="wf-label"><i class="bi bi-speedometer2"></i> Bảng điều khiển <span class="wf-url">/</span></div>
+  <div class="wf-label"><i class="bi bi-speedometer2"></i> Bảng điều khiển <span class="wf-url">/manage/</span></div>
   <div class="wf-frame">
-    <div class="wf-nav"></div>
+    <div class="wf-nav-mng"></div>
     <main class="container py-4">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h1 class="h4 m-0">⚙️ Bảng điều khiển</h1>
+        <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Về khu của bé</button>
+      </div>
       <section class="mb-4">
-        <h1 class="h4 mb-3">🧒 Khu của bé</h1>
-        <div class="row g-3">
-          <div class="col-6 col-md-4"><div class="card zone-card zone-kid text-center h-100"><div class="card-body">
-            <div class="zone-icon">📚</div><div class="fw-bold text-dark">Học từ vựng</div>
-            <div class="text-muted small">Nghe & xem từ mới</div></div></div></div>
-          <div class="col-6 col-md-4"><div class="card zone-card zone-kid text-center h-100"><div class="card-body">
-            <div class="zone-icon">🎤</div><div class="fw-bold text-dark">Luyện phát âm</div>
-            <div class="text-muted small">Đọc theo & ghi âm</div></div></div></div>
-          <div class="col-6 col-md-4"><div class="card zone-card zone-kid text-center h-100"><div class="card-body">
-            <div class="zone-icon">🎮</div><div class="fw-bold text-dark">Trò chơi</div>
-            <div class="text-muted small">Vừa chơi vừa học</div></div></div></div>
-        </div>
-      </section>
-      <section class="mb-4">
-        <h2 class="h4 mb-3">⚙️ Khu quản lý</h2>
         <div class="row g-3 mb-3">
           <div class="col-4"><div class="card stat-card text-center"><div class="card-body py-3">
             <div class="stat-num">2</div><div class="text-muted small">Hồ sơ bé</div></div></div></div>
@@ -437,14 +541,15 @@
       </section>
     </main>
   </div>
-  <div class="wf-note">Trang chủ tách rõ <b>Khu của bé</b> (to, nhiều màu) và <b>Khu quản lý</b> (gọn, trung tính) + số liệu tổng quan.</div>
+  <div class="wf-note">Trang chủ <b>khu quản lý</b> (nav xám) — số liệu tổng quan + lối tắt CRUD + hồ sơ bé.
+    Khu của bé tách riêng (nav xanh), vào bằng nút "Về khu của bé".</div>
 </section>
 
 <!-- ===================== FORM HỒ SƠ BÉ ===================== -->
 <section class="wf-screen" id="child-form">
-  <div class="wf-label"><i class="bi bi-person-plus"></i> Thêm / sửa hồ sơ bé <span class="wf-url">/children/add/</span></div>
+  <div class="wf-label"><i class="bi bi-person-plus"></i> Thêm / sửa hồ sơ bé <span class="wf-url">/manage/children/add/</span></div>
   <div class="wf-frame">
-    <div class="wf-nav"></div>
+    <div class="wf-nav-mng"></div>
     <main class="container py-4">
       <div class="row justify-content-center"><div class="col-md-6">
         <div class="card child-card p-2"><div class="card-body">
@@ -469,9 +574,9 @@
 
 <!-- ===================== QUẢN LÝ CHỦ ĐỀ ===================== -->
 <section class="wf-screen" id="topics">
-  <div class="wf-label"><i class="bi bi-collection"></i> Quản lý chủ đề <span class="wf-url">/learn/manage/topics/</span></div>
+  <div class="wf-label"><i class="bi bi-collection"></i> Quản lý chủ đề <span class="wf-url">/manage/topics/</span></div>
   <div class="wf-frame">
-    <div class="wf-nav"></div>
+    <div class="wf-nav-mng"></div>
     <main class="container py-4">
       <div class="d-flex align-items-center justify-content-between mb-3">
         <h1 class="h4 m-0">📂 Quản lý chủ đề</h1>
@@ -505,9 +610,9 @@
 
 <!-- ===================== QUẢN LÝ TỪ VỰNG ===================== -->
 <section class="wf-screen" id="words">
-  <div class="wf-label"><i class="bi bi-card-list"></i> Quản lý từ vựng <span class="wf-url">/learn/manage/words/</span></div>
+  <div class="wf-label"><i class="bi bi-card-list"></i> Quản lý từ vựng <span class="wf-url">/manage/words/</span></div>
   <div class="wf-frame">
-    <div class="wf-nav"></div>
+    <div class="wf-nav-mng"></div>
     <main class="container py-4">
       <div class="d-flex align-items-center justify-content-between mb-3">
         <h1 class="h4 m-0">🔤 Quản lý từ vựng</h1>
@@ -548,9 +653,9 @@
 
 <!-- ===================== FORM THÊM/SỬA TỪ ===================== -->
 <section class="wf-screen" id="wordform">
-  <div class="wf-label"><i class="bi bi-pencil-square"></i> Form thêm/sửa từ <span class="wf-url">/learn/manage/words/add/</span></div>
+  <div class="wf-label"><i class="bi bi-pencil-square"></i> Form thêm/sửa từ <span class="wf-url">/manage/words/add/</span></div>
   <div class="wf-frame">
-    <div class="wf-nav"></div>
+    <div class="wf-nav-mng"></div>
     <main class="container py-4">
       <div class="row justify-content-center"><div class="col-md-7">
         <div class="card child-card p-2"><div class="card-body">
@@ -583,9 +688,9 @@
 
 <!-- ===================== NHẬP CSV ===================== -->
 <section class="wf-screen" id="import">
-  <div class="wf-label"><i class="bi bi-filetype-csv"></i> Nhập từ vựng từ CSV <span class="wf-url">/learn/manage/import/</span></div>
+  <div class="wf-label"><i class="bi bi-filetype-csv"></i> Nhập từ vựng từ CSV <span class="wf-url">/manage/import/</span></div>
   <div class="wf-frame">
-    <div class="wf-nav"></div>
+    <div class="wf-nav-mng"></div>
     <main class="container py-4">
       <div class="row justify-content-center"><div class="col-md-8">
         <div class="d-flex align-items-center justify-content-between mb-3">
@@ -620,9 +725,9 @@
 
 <!-- ===================== TIẾN ĐỘ CỦA BÉ ===================== -->
 <section class="wf-screen" id="progress">
-  <div class="wf-label"><i class="bi bi-graph-up"></i> Tiến độ của bé <span class="wf-url">/progress/</span></div>
+  <div class="wf-label"><i class="bi bi-graph-up"></i> Tiến độ của bé <span class="wf-url">/manage/progress/</span></div>
   <div class="wf-frame">
-    <div class="wf-nav"></div>
+    <div class="wf-nav-mng"></div>
     <main class="container py-4">
       <div class="d-flex align-items-center justify-content-between mb-3">
         <h1 class="h4 m-0">📈 Tiến độ của bé</h1>
@@ -672,10 +777,14 @@
 <script src="assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
 <script>
   // Chèn navbar mẫu vào mọi màn (tránh lặp HTML) — chỉ phục vụ wireframe.
-  const navHtml = document.getElementById('tpl-navbar').innerHTML;
-  document.querySelectorAll('.wf-nav').forEach(el => el.innerHTML = navHtml);
-  const guestHtml = document.getElementById('tpl-navbar-guest').innerHTML;
-  document.querySelectorAll('.wf-nav-guest').forEach(el => el.innerHTML = guestHtml);
+  // 3 loại nav theo khu: bé / quản lý / khách (login).
+  const inject = (sel, tplId) => {
+    const html = document.getElementById(tplId).innerHTML;
+    document.querySelectorAll(sel).forEach(el => el.innerHTML = html);
+  };
+  inject('.wf-nav-kid', 'tpl-navbar-kid');
+  inject('.wf-nav-mng', 'tpl-navbar-manage');
+  inject('.wf-nav-guest', 'tpl-navbar-guest');
 </script>
 </body>
 </html>

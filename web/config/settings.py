@@ -25,6 +25,14 @@ def env_bool(name, default=False):
     return os.getenv(name, str(default)).strip().lower() in ('1', 'true', 'yes', 'y', 'on')
 
 
+def env_int(name, default):
+    """Đọc biến môi trường dạng số nguyên; sai định dạng → dùng default."""
+    try:
+        return int(os.getenv(name, str(default)).strip())
+    except (TypeError, ValueError):
+        return default
+
+
 # --- Bảo mật & chế độ chạy ---
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-dev-key-doi-truoc-khi-len-that')
 DEBUG = env_bool('DEBUG', True)
@@ -133,8 +141,21 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 # --- Đăng nhập ---
 LOGIN_URL = 'accounts:login'
+# Sau đăng nhập vào thẳng khu của bé (trang chủ). Khu quản lý cần thêm passcode.
 LOGIN_REDIRECT_URL = 'accounts:home'
 LOGOUT_REDIRECT_URL = 'accounts:login'
+
+
+# --- Phiên đăng nhập (sống lâu để phụ huynh ít phải đăng nhập lại — app local) ---
+# Mặc định 30 ngày; SAVE_EVERY_REQUEST=True → mỗi request gia hạn lại (trượt hạn).
+SESSION_COOKIE_AGE = env_int('SESSION_DAYS', 30) * 86400
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
+
+# --- Khu quản lý: passcode (lớp khoá thứ 2 sau đăng nhập, để bé không tự vào) ---
+# Mở khoá giữ trong N phút không thao tác (trượt hạn) — xem core.decorators.manage_required.
+MANAGE_UNLOCK_MINUTES = env_int('MANAGE_UNLOCK_MINUTES', 30)
 
 
 # --- Khoá chính mặc định ---

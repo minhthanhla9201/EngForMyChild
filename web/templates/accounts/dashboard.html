@@ -1,0 +1,92 @@
+{% extends 'base_manage.html' %}
+{% block title %}Bảng điều khiển{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <h1 class="h4 m-0">⚙️ Bảng điều khiển</h1>
+  <a href="{% url 'accounts:manage_lock' %}" class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-arrow-left"></i> Về khu của bé
+  </a>
+</div>
+
+{# Số liệu tổng quan #}
+<div class="row g-3 mb-3">
+  <div class="col-4"><div class="card stat-card text-center"><div class="card-body py-3">
+    <div class="stat-num">{{ stats.children }}</div><div class="text-muted small">Hồ sơ bé</div>
+  </div></div></div>
+  <div class="col-4"><div class="card stat-card text-center"><div class="card-body py-3">
+    <div class="stat-num">{{ stats.topics }}</div><div class="text-muted small">Chủ đề</div>
+  </div></div></div>
+  <div class="col-4"><div class="card stat-card text-center"><div class="card-body py-3">
+    <div class="stat-num">{{ stats.words }}</div><div class="text-muted small">Từ vựng</div>
+  </div></div></div>
+</div>
+
+{# Lối tắt quản lý #}
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-4">
+    <a href="{% url 'catalog_manage:topic_manage' %}" class="text-decoration-none">
+      <div class="card zone-card zone-manage h-100"><div class="card-body d-flex align-items-center gap-3">
+        <div class="manage-icon"><i class="bi bi-collection"></i></div>
+        <div><div class="fw-bold text-dark">Chủ đề</div><div class="text-muted small">Thêm / sửa chủ đề</div></div>
+      </div></div>
+    </a>
+  </div>
+  <div class="col-6 col-md-4">
+    <a href="{% url 'catalog_manage:word_manage' %}" class="text-decoration-none">
+      <div class="card zone-card zone-manage h-100"><div class="card-body d-flex align-items-center gap-3">
+        <div class="manage-icon"><i class="bi bi-card-text"></i></div>
+        <div><div class="fw-bold text-dark">Từ vựng</div><div class="text-muted small">Thêm / sửa từ</div></div>
+      </div></div>
+    </a>
+  </div>
+  <div class="col-6 col-md-4">
+    <a href="{% url 'catalog_manage:word_import' %}" class="text-decoration-none">
+      <div class="card zone-card zone-manage h-100"><div class="card-body d-flex align-items-center gap-3">
+        <div class="manage-icon"><i class="bi bi-upload"></i></div>
+        <div><div class="fw-bold text-dark">Nhập từ CSV</div><div class="text-muted small">Nhập hàng loạt</div></div>
+      </div></div>
+    </a>
+  </div>
+  <div class="col-6 col-md-4">
+    <a href="{% url 'accounts:progress' %}" class="text-decoration-none">
+      <div class="card zone-card zone-manage h-100"><div class="card-body d-flex align-items-center gap-3">
+        <div class="manage-icon"><i class="bi bi-graph-up"></i></div>
+        <div><div class="fw-bold text-dark">Tiến độ của bé</div><div class="text-muted small">Kết quả chơi & phát âm</div></div>
+      </div></div>
+    </a>
+  </div>
+</div>
+
+{# Hồ sơ các bé #}
+<section id="children">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h2 class="h4 m-0">👨‍👩‍👧 Hồ sơ các bé</h2>
+    <a href="{% url 'accounts:child_add' %}" class="btn btn-outline-primary btn-sm">
+      <i class="bi bi-plus-lg"></i> Thêm bé
+    </a>
+  </div>
+  {% if children %}
+  <div class="row g-3">
+    {% for child in children %}
+    <div class="col-6 col-md-3">
+      <div class="card child-card text-center h-100"><div class="card-body">
+        <div class="child-avatar mb-2">{{ child.avatar }}</div>
+        <div class="fw-bold">{{ child.name }}</div>
+        {% if child.birth_year %}<div class="text-muted small">Năm sinh {{ child.birth_year }}</div>{% endif %}
+        <a href="{% url 'accounts:child_edit' child.pk %}" class="btn btn-sm btn-outline-secondary mt-2">
+          <i class="bi bi-pencil"></i> Sửa
+        </a>
+      </div></div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="card child-card text-center p-5">
+    <div class="display-6 mb-2">🐣</div>
+    <p class="mb-3">Chưa có hồ sơ bé nào. Hãy thêm bé đầu tiên!</p>
+    <div><a href="{% url 'accounts:child_add' %}" class="btn btn-kid">Thêm bé</a></div>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

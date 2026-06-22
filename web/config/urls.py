@@ -7,13 +7,13 @@ from django.urls import include, path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # Khu học từ vựng.
-    path('learn/', include('catalog.urls')),
-    # Khu luyện phát âm.
-    path('speak/', include('pronunciation.urls')),
-    # Khu trò chơi.
-    path('games/', include('games.urls')),
-    # Khu tài khoản đặt ở gốc (trang chủ, đăng nhập, hồ sơ bé).
+    # --- KHU CỦA BÉ (chỉ cần đăng nhập) ---
+    path('learn/', include('catalog.urls')),       # học từ vựng
+    path('speak/', include('pronunciation.urls')),  # luyện phát âm
+    path('games/', include('games.urls')),          # trò chơi
+    # --- KHU QUẢN LÝ NỘI DUNG (cần đăng nhập + passcode) ---
+    path('manage/', include('catalog.urls_manage')),
+    # Khu tài khoản: trang chủ bé, đăng nhập, và /manage/ (dashboard, hồ sơ bé, tiến độ, passcode).
     path('', include('accounts.urls')),
 ]
 

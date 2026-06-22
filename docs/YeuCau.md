@@ -15,6 +15,11 @@ Website **học tiếng Anh chạy local** cho **bé 6–7 tuổi**, giúp bé l
 - **Bé (người học):** chọn chủ đề, chơi game, luyện phát âm. Không cần đăng nhập phức tạp (chọn avatar/hồ sơ).
 - **Phụ huynh (quản trị nội dung):** đăng nhập, tạo hồ sơ bé, thêm/sửa từ vựng, xem tiến độ, nghe lại bản ghi của bé.
 
+### 3.1. Tách 2 khu & lối vào khu quản lý
+- Giao diện tách rõ **Khu của bé** (layout `base_kid`, navbar xanh) và **Khu quản lý** (layout `base_manage`, navbar xám, URL dưới `/manage/`). Chung một lần đăng nhập.
+- **Đăng nhập** dùng cho cả 2 khu; phiên sống lâu (mặc định 30 ngày, trượt hạn — `SESSION_DAYS`).
+- **Khu quản lý có lớp khoá thứ 2 = passcode** (`ManagePasscode`, lưu hash): bé không tự vào nghịch. Nhập đúng → mở khoá trong `MANAGE_UNLOCK_MINUTES` phút (mặc định 30, trượt hạn). Lần đầu chưa có passcode → buộc đặt; có màn đổi passcode trong khu quản lý.
+
 ## 4. Tính năng theo module
 
 ### 4.1. Phát âm (ưu tiên 1)

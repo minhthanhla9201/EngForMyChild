@@ -1,0 +1,38 @@
+{% extends 'base_kid.html' %}
+{% block title %}Bé học tiếng Anh{% endblock %}
+
+{% block content %}
+<div class="text-center mb-4">
+  <h1 class="h3">🦜 Chào bé! Hôm nay học gì nào?</h1>
+</div>
+
+<div class="row g-3 justify-content-center">
+  <div class="col-6 col-md-4">
+    <a href="{% url 'catalog:topic_list' %}" class="text-decoration-none">
+      <div class="card zone-card zone-kid text-center h-100"><div class="card-body py-4">
+        <div class="zone-icon">📚</div>
+        <div class="fw-bold fs-5 text-dark">Học từ vựng</div>
+        <div class="text-muted small">Nghe & xem từ mới</div>
+      </div></div>
+    </a>
+  </div>
+  <div class="col-6 col-md-4">
+    <a href="{% url 'pronunciation:choose' %}" class="text-decoration-none">
+      <div class="card zone-card zone-kid text-center h-100"><div class="card-body py-4">
+        <div class="zone-icon">🎤</div>
+        <div class="fw-bold fs-5 text-dark">Luyện phát âm</div>
+        <div class="text-muted small">Đọc theo & ghi âm</div>
+      </div></div>
+    </a>
+  </div>
+  <div class="col-6 col-md-4">
+    <a href="{% url 'games:choose' %}" class="text-decoration-none">
+      <div class="card zone-card zone-kid text-center h-100"><div class="card-body py-4">
+        <div class="zone-icon">🎮</div>
+        <div class="fw-bold fs-5 text-dark">Trò chơi</div>
+        <div class="text-muted small">Vừa chơi vừa học</div>
+      </div></div>
+    </a>
+  </div>
+</div>
+{% endblock %}

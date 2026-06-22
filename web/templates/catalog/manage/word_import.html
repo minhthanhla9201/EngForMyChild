@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'base_manage.html' %}
 {% block title %}Nhập từ vựng từ CSV{% endblock %}
 
 {% block content %}
@@ -6,7 +6,7 @@
   <div class="col-md-8">
     <div class="d-flex align-items-center justify-content-between mb-3">
       <h1 class="h4 m-0">📥 Nhập từ vựng từ CSV</h1>
-      <a href="{% url 'catalog:word_manage' %}" class="btn btn-outline-secondary btn-sm">
+      <a href="{% url 'catalog_manage:word_manage' %}" class="btn btn-outline-secondary btn-sm">
         <i class="bi bi-arrow-left"></i> Từ vựng
       </a>
     </div>

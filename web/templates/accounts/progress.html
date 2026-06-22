@@ -1,10 +1,10 @@
-{% extends 'base.html' %}
+{% extends 'base_manage.html' %}
 {% block title %}Tiến độ của bé{% endblock %}
 
 {% block content %}
 <div class="d-flex align-items-center justify-content-between mb-3">
   <h1 class="h4 m-0">📈 Tiến độ của bé</h1>
-  <a href="{% url 'accounts:home' %}" class="btn btn-outline-secondary btn-sm">
+  <a href="{% url 'accounts:dashboard' %}" class="btn btn-outline-secondary btn-sm">
     <i class="bi bi-house"></i> Bảng điều khiển
   </a>
 </div>

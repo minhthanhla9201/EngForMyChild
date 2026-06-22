@@ -14,6 +14,8 @@ from django.core.management import call_command
 from django.test import TestCase
 from django.urls import reverse
 
+from accounts.models import ManagePasscode
+
 from .models import AudioClip, Topic, Word
 
 
@@ -97,7 +99,13 @@ class ImportWordsCommandTests(TestCase):
 
 
 class CatalogManageViewTests(TestCase):
-    """Test khu quản lý (phụ huynh): CRUD chủ đề/từ + nhập CSV qua web."""
+    """
+    Test khu quản lý (phụ huynh): CRUD chủ đề/từ + nhập CSV qua web.
+
+    Khu quản lý cần đăng nhập + mở khoá passcode (xem core.decorators.manage_required).
+    """
+
+    PASSCODE = '4321'
 
     @classmethod
     def setUpTestData(cls):
@@ -105,91 +113,96 @@ class CatalogManageViewTests(TestCase):
         cls.topic = Topic.objects.create(name_en='Animals', name_vi='Động vật', slug='animals')
         cls.word = Word.objects.create(topic=cls.topic, text_en='cat', text_vi='con mèo')
 
-    def _login(self):
+    def _unlock(self):
+        """Đăng nhập + đặt passcode + mở khoá khu quản lý."""
         self.client.login(username='parent', password='pass12345')
+        ManagePasscode.get_solo().set_passcode(self.PASSCODE)
+        self.client.post(reverse('accounts:manage_unlock'), {'passcode': self.PASSCODE})
 
-    # --- Yêu cầu đăng nhập ---
-    def test_manage_views_require_login(self):
-        """Mọi màn quản lý đều redirect login khi chưa đăng nhập."""
+    # --- Yêu cầu mở khoá (đăng nhập + passcode) ---
+    def test_manage_views_require_unlock(self):
+        """Chưa mở khoá → mọi màn quản lý chuyển về màn nhập passcode."""
+        self.client.login(username='parent', password='pass12345')
+        ManagePasscode.get_solo().set_passcode(self.PASSCODE)
         for name in ('topic_manage', 'topic_add', 'word_manage', 'word_add', 'word_import'):
-            resp = self.client.get(reverse(f'catalog:{name}'))
+            resp = self.client.get(reverse(f'catalog_manage:{name}'))
             self.assertEqual(resp.status_code, 302, name)
-            self.assertIn(reverse('accounts:login'), resp.url)
+            self.assertIn(reverse('accounts:manage_unlock'), resp.url, name)
 
     # --- Chủ đề ---
     def test_topic_list_shows_word_count(self):
-        self._login()
-        resp = self.client.get(reverse('catalog:topic_manage'))
+        self._unlock()
+        resp = self.client.get(reverse('catalog_manage:topic_manage'))
         self.assertContains(resp, 'Động vật')
         self.assertEqual(resp.context['topics'][0].num_words, 1)
 
     def test_topic_add_autoslug(self):
         """Tạo chủ đề bỏ trống slug → tự sinh từ name_en."""
-        self._login()
-        resp = self.client.post(reverse('catalog:topic_add'),
+        self._unlock()
+        resp = self.client.post(reverse('catalog_manage:topic_add'),
                                 {'name_en': 'Colors', 'name_vi': 'Màu sắc',
                                  'slug': '', 'icon': '🎨', 'order': 0, 'active': 'Y'})
-        self.assertRedirects(resp, reverse('catalog:topic_manage'))
+        self.assertRedirects(resp, reverse('catalog_manage:topic_manage'))
         self.assertTrue(Topic.objects.filter(slug='colors').exists())
 
     def test_topic_edit(self):
-        self._login()
-        resp = self.client.post(reverse('catalog:topic_edit', args=[self.topic.pk]),
+        self._unlock()
+        resp = self.client.post(reverse('catalog_manage:topic_edit', args=[self.topic.pk]),
                                 {'name_en': 'Animals', 'name_vi': 'Thú vật',
                                  'slug': 'animals', 'icon': '🐶', 'order': 1, 'active': 'Y'})
-        self.assertRedirects(resp, reverse('catalog:topic_manage'))
+        self.assertRedirects(resp, reverse('catalog_manage:topic_manage'))
         self.topic.refresh_from_db()
         self.assertEqual(self.topic.name_vi, 'Thú vật')
 
     # --- Từ vựng ---
     def test_word_manage_filter_and_search(self):
-        self._login()
+        self._unlock()
         Word.objects.create(topic=self.topic, text_en='dog', text_vi='con chó')
         # Lọc theo chủ đề: thấy cả 2 từ.
-        resp = self.client.get(reverse('catalog:word_manage'), {'topic': 'animals'})
+        resp = self.client.get(reverse('catalog_manage:word_manage'), {'topic': 'animals'})
         self.assertContains(resp, 'cat')
         self.assertContains(resp, 'dog')
         # Tìm theo từ: chỉ thấy 'cat'.
-        resp2 = self.client.get(reverse('catalog:word_manage'), {'q': 'cat'})
+        resp2 = self.client.get(reverse('catalog_manage:word_manage'), {'q': 'cat'})
         self.assertContains(resp2, 'cat')
         self.assertNotContains(resp2, '>dog<')
 
     @mock.patch('catalog.views.ipa_service.to_ipa', return_value='dɒg')
     def test_word_add_autogenerates_ipa(self, _mock):
         """Thêm từ bỏ trống IPA → tự sinh (mock eng-to-ipa)."""
-        self._login()
-        resp = self.client.post(reverse('catalog:word_add'),
+        self._unlock()
+        resp = self.client.post(reverse('catalog_manage:word_add'),
                                 {'topic': self.topic.pk, 'text_en': 'dog', 'text_vi': 'con chó',
                                  'phonetic': '', 'level': 1, 'active': 'Y'})
-        self.assertRedirects(resp, reverse('catalog:word_manage'))
+        self.assertRedirects(resp, reverse('catalog_manage:word_manage'))
         dog = Word.objects.get(text_en='dog')
         self.assertEqual(dog.phonetic, 'dɒg')
 
     def test_word_edit(self):
-        self._login()
-        resp = self.client.post(reverse('catalog:word_edit', args=[self.word.pk]),
+        self._unlock()
+        resp = self.client.post(reverse('catalog_manage:word_edit', args=[self.word.pk]),
                                 {'topic': self.topic.pk, 'text_en': 'cat', 'text_vi': 'mèo con',
                                  'phonetic': 'kæt', 'level': 1, 'active': 'Y'})
-        self.assertRedirects(resp, reverse('catalog:word_manage'))
+        self.assertRedirects(resp, reverse('catalog_manage:word_manage'))
         self.word.refresh_from_db()
         self.assertEqual(self.word.text_vi, 'mèo con')
 
     # --- Nhập CSV qua web ---
     def test_word_import_via_web(self):
         """Upload CSV qua web → tạo đúng chủ đề/từ (no-audio: make_audio off)."""
-        self._login()
+        self._unlock()
         csv_bytes = b'topic,text_en,text_vi\nColors,red,mau do\n'
         upload = SimpleUploadedFile('words.csv', csv_bytes, content_type='text/csv')
         with mock.patch('catalog.imports.ipa_service.to_ipa', return_value=''):
-            resp = self.client.post(reverse('catalog:word_import'),
+            resp = self.client.post(reverse('catalog_manage:word_import'),
                                     {'csv_file': upload})  # make_audio off (không tick)
-        self.assertRedirects(resp, reverse('catalog:word_manage'))
+        self.assertRedirects(resp, reverse('catalog_manage:word_manage'))
         self.assertTrue(Word.objects.filter(text_en='red').exists())
 
     def test_word_import_rejects_non_csv(self):
         """File không phải .csv → form lỗi, không nhập."""
-        self._login()
+        self._unlock()
         upload = SimpleUploadedFile('words.txt', b'x', content_type='text/plain')
-        resp = self.client.post(reverse('catalog:word_import'), {'csv_file': upload})
+        resp = self.client.post(reverse('catalog_manage:word_import'), {'csv_file': upload})
         self.assertEqual(resp.status_code, 200)
         self.assertContains(resp, '.csv')

@@ -1,14 +1,16 @@
-{% extends 'base_manage.html' %}
-{% block title %}{% if is_add %}Thêm bé{% else %}Sửa hồ sơ bé{% endif %}{% endblock %}
+{% extends 'base_kid.html' %}
+{% block title %}Đặt passcode khu quản lý{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
-  <div class="col-md-6">
+  <div class="col-md-5">
     <div class="card child-card p-2">
       <div class="card-body">
-        <h1 class="h4 mb-3">{% if is_add %}➕ Thêm bé{% else %}✏️ Sửa hồ sơ bé{% endif %}</h1>
+        <h1 class="h4 mb-1 text-center">🔑 Đặt passcode khu quản lý</h1>
+        <p class="text-muted small text-center mb-3">Lần đầu vào khu quản lý — hãy đặt một mã 4–6 chữ số.</p>
         <form method="post">
           {% csrf_token %}
+          <input type="hidden" name="next" value="{{ next }}">
           {% for field in form %}
           <div class="mb-3">
             <label class="form-label">{{ field.label }}</label>
@@ -16,10 +18,7 @@
             {% for err in field.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
           </div>
           {% endfor %}
-          <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-kid">Lưu</button>
-            <a href="{% url 'accounts:dashboard' %}" class="btn btn-outline-secondary">Huỷ</a>
-          </div>
+          <button type="submit" class="btn btn-kid w-100">Lưu passcode</button>
         </form>
       </div>
     </div>

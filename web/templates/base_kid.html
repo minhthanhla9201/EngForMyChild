@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{# Layout KHU CỦA BÉ: navbar xanh, to, nhiều màu. Chỉ Học/Phát âm/Trò chơi +
+   nút nhỏ "Cho phụ huynh" (dẫn tới khu quản lý qua passcode). KHÔNG có Thoát/Quản lý. #}
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg navbar-brand-bar">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="{% url 'accounts:home' %}">🦜 Bé học tiếng Anh</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#kidNav"
+                aria-controls="kidNav" aria-expanded="false" aria-label="Mở menu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="kidNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'catalog:topic_list' %}"><i class="bi bi-book"></i> Học từ vựng</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'pronunciation:choose' %}"><i class="bi bi-mic-fill"></i> Luyện phát âm</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'games:choose' %}"><i class="bi bi-controller"></i> Trò chơi</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav align-items-lg-center">
+                {# Vào khu quản lý: qua màn nhập passcode #}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'accounts:manage_unlock' %}">
+                        <i class="bi bi-shield-lock"></i> 👨‍👩‍👧 Cho phụ huynh
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+{% endblock %}

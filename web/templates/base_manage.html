@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{# Layout KHU QUẢN LÝ: navbar xám trung tính, tách hẳn khỏi khu của bé.
+   Có menu Quản lý + nút "Về khu của bé" + Thoát. #}
+
+{% block body_class %}body-manage{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg navbar-manage-bar">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="{% url 'accounts:dashboard' %}">
+            <i class="bi bi-gear-fill"></i> Khu quản lý
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#manageNav"
+                aria-controls="manageNav" aria-expanded="false" aria-label="Mở menu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="manageNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'accounts:dashboard' %}"><i class="bi bi-speedometer2"></i> Bảng điều khiển</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="contentMenu" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-list-ul"></i> Nội dung</a>
+                    <ul class="dropdown-menu" aria-labelledby="contentMenu">
+                        <li><a class="dropdown-item" href="{% url 'accounts:dashboard' %}#children"><i class="bi bi-people"></i> Hồ sơ bé</a></li>
+                        <li><a class="dropdown-item" href="{% url 'catalog_manage:topic_manage' %}"><i class="bi bi-collection"></i> Chủ đề</a></li>
+                        <li><a class="dropdown-item" href="{% url 'catalog_manage:word_manage' %}"><i class="bi bi-card-text"></i> Từ vựng</a></li>
+                        <li><a class="dropdown-item" href="{% url 'catalog_manage:word_import' %}"><i class="bi bi-upload"></i> Nhập từ CSV</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'accounts:progress' %}"><i class="bi bi-graph-up"></i> Tiến độ</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'accounts:manage_passcode_change' %}"><i class="bi bi-key"></i> Đổi passcode</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav align-items-lg-center gap-lg-2">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'accounts:manage_lock' %}"><i class="bi bi-arrow-left"></i> Về khu của bé</a>
+                </li>
+                <li class="nav-item d-flex align-items-center gap-2 mt-2 mt-lg-0">
+                    <span class="navbar-username small">{{ user.username }}</span>
+                    <form action="{% url 'accounts:logout' %}" method="post" class="m-0">
+                        {% csrf_token %}
+                        <button class="btn btn-sm btn-light"><i class="bi bi-box-arrow-right"></i> Thoát</button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+{% endblock %}

@@ -1,14 +1,14 @@
-{% extends 'base.html' %}
+{% extends 'base_manage.html' %}
 {% block title %}Quản lý chủ đề{% endblock %}
 
 {% block content %}
 <div class="d-flex align-items-center justify-content-between mb-3">
   <h1 class="h4 m-0">📂 Quản lý chủ đề</h1>
   <div class="d-flex gap-2">
-    <a href="{% url 'catalog:topic_add' %}" class="btn btn-kid btn-sm">
+    <a href="{% url 'catalog_manage:topic_add' %}" class="btn btn-kid btn-sm">
       <i class="bi bi-plus-lg"></i> Thêm chủ đề
     </a>
-    <a href="{% url 'accounts:home' %}" class="btn btn-outline-secondary btn-sm">
+    <a href="{% url 'accounts:dashboard' %}" class="btn btn-outline-secondary btn-sm">
       <i class="bi bi-house"></i> Bảng điều khiển
     </a>
   </div>
@@ -38,9 +38,9 @@
           {% else %}<span class="badge text-bg-secondary">Tạm ẩn</span>{% endif %}
         </td>
         <td class="text-end">
-          <a href="{% url 'catalog:word_manage' %}?topic={{ topic.slug }}"
+          <a href="{% url 'catalog_manage:word_manage' %}?topic={{ topic.slug }}"
              class="btn btn-sm btn-outline-primary"><i class="bi bi-card-text"></i> Từ</a>
-          <a href="{% url 'catalog:topic_edit' topic.pk %}"
+          <a href="{% url 'catalog_manage:topic_edit' topic.pk %}"
              class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i> Sửa</a>
         </td>
       </tr>
@@ -52,7 +52,7 @@
 <div class="card child-card text-center p-5">
   <div class="display-6 mb-2">📭</div>
   <p class="mb-3">Chưa có chủ đề nào.</p>
-  <div><a href="{% url 'catalog:topic_add' %}" class="btn btn-kid">Thêm chủ đề đầu tiên</a></div>
+  <div><a href="{% url 'catalog_manage:topic_add' %}" class="btn btn-kid">Thêm chủ đề đầu tiên</a></div>
 </div>
 {% endif %}
 {% endblock %}

@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'base_kid.html' %}
 {% block title %}Chủ đề học{% endblock %}
 
 {% block content %}
@@ -29,8 +29,8 @@
 <div class="card child-card text-center p-5">
   <div class="display-6 mb-2">📭</div>
   <p class="mb-0">Chưa có chủ đề nào. Phụ huynh hãy
-    <a href="{% url 'catalog:topic_add' %}">thêm chủ đề</a> hoặc
-    <a href="{% url 'catalog:word_import' %}">nhập từ bằng file CSV</a> trong khu quản lý.</p>
+    <a href="{% url 'catalog_manage:topic_add' %}">thêm chủ đề</a> hoặc
+    <a href="{% url 'catalog_manage:word_import' %}">nhập từ bằng file CSV</a> trong khu quản lý.</p>
 </div>
 {% endif %}
 {% endblock %}

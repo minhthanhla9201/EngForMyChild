@@ -1,23 +1,27 @@
 """
-View khu tài khoản (phụ huynh).
+View khu tài khoản (phụ huynh) + trang chủ khu của bé + luồng passcode khu quản lý.
 
-GĐ 0: trang chủ + CRUD hồ sơ bé (lọc theo owner). Đăng nhập/đăng xuất dùng
-view sẵn của Django (khai trong urls.py).
+- Trang chủ khu của bé (`/`): chỉ cần đăng nhập, dùng layout base_kid.
+- Khu quản lý (`/manage/...`): dùng @manage_required (đăng nhập + passcode), layout base_manage.
+- Đăng nhập/đăng xuất dùng view sẵn của Django (khai trong urls.py).
 """
 
 import logging
 
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
-from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
 
 from catalog.models import Topic, Word
+from core.decorators import (clear_manage_unlock, manage_required,
+                             mark_manage_unlocked)
 from games.models import GameResult
 from pronunciation.models import Attempt
 
-from .forms import ChildProfileForm
-from .models import ChildProfile
+from .forms import (ChangePasscodeForm, ChildProfileForm, ManageUnlockForm,
+                    SetPasscodeForm)
+from .models import ChildProfile, ManagePasscode
 
 logger = logging.getLogger('eng.auth')
 
@@ -35,25 +39,85 @@ class ParentLoginView(LoginView):
         return super().form_invalid(form)
 
 
+# =====================================================================
+# KHU CỦA BÉ — trang chủ (chỉ cần đăng nhập). Layout base_kid.
+# =====================================================================
+
 @login_required
 def home(request):
-    """
-    Bảng điều khiển phụ huynh.
+    """Trang chủ khu của bé: 3 hoạt động lớn (Học / Luyện phát âm / Trò chơi)."""
+    return render(request, 'accounts/kid_home.html')
 
-    Tách rõ 2 khu: "Khu của bé" (vào học/chơi/phát âm) và "Khu quản lý"
-    (hồ sơ bé, từ vựng, tiến độ). Kèm vài con số tổng quan để dễ nắm tình hình.
+
+# =====================================================================
+# VÀO KHU QUẢN LÝ — nhập / đặt passcode (đăng nhập rồi, chưa mở khoá).
+# =====================================================================
+
+@login_required
+def manage_unlock(request):
     """
+    Mở khoá khu quản lý bằng passcode.
+
+    - Chưa đặt passcode (DB) → chuyển sang form ĐẶT passcode lần đầu.
+    - Đã đặt → form NHẬP passcode; đúng → mở khoá (lưu thời điểm vào session) → next.
+    """
+    passcode = ManagePasscode.get_solo()
+    next_url = request.GET.get('next') or request.POST.get('next') or 'accounts:dashboard'
+
+    # Lần đầu chưa có passcode → buộc đặt trước.
+    if not passcode.is_set:
+        form = SetPasscodeForm(request.POST or None)
+        if request.method == 'POST' and form.is_valid():
+            passcode.set_passcode(form.cleaned_data['passcode1'])
+            mark_manage_unlocked(request)
+            messages.success(request, 'Đã đặt passcode khu quản lý.')
+            return redirect(next_url)
+        return render(request, 'accounts/manage_set_passcode.html',
+                      {'form': form, 'next': next_url})
+
+    # Đã có passcode → nhập để mở khoá.
+    form = ManageUnlockForm(request.POST or None, passcode_obj=passcode)
+    if request.method == 'POST' and form.is_valid():
+        mark_manage_unlocked(request)
+        return redirect(next_url)
+    return render(request, 'accounts/manage_unlock.html', {'form': form, 'next': next_url})
+
+
+@manage_required
+def manage_passcode_change(request):
+    """Đổi passcode (trong khu quản lý): phải nhập đúng passcode hiện tại."""
+    passcode = ManagePasscode.get_solo()
+    form = ChangePasscodeForm(request.POST or None, passcode_obj=passcode)
+    if request.method == 'POST' and form.is_valid():
+        passcode.set_passcode(form.cleaned_data['passcode1'])
+        messages.success(request, 'Đã đổi passcode khu quản lý.')
+        return redirect('accounts:dashboard')
+    return render(request, 'accounts/manage_change_passcode.html', {'form': form})
+
+
+def manage_lock(request):
+    """Khoá lại khu quản lý (về khu của bé). Không cần passcode để gọi."""
+    clear_manage_unlock(request)
+    return redirect('accounts:home')
+
+
+# =====================================================================
+# KHU QUẢN LÝ — bảng điều khiển + CRUD hồ sơ bé + tiến độ. @manage_required.
+# =====================================================================
+
+@manage_required
+def dashboard(request):
+    """Bảng điều khiển khu quản lý: số liệu tổng quan + lối tắt + hồ sơ bé."""
     children = ChildProfile.objects.filter(owner=request.user, active='Y')
-    # Số liệu tổng quan cho dashboard (nội dung học là kho chung, không lọc owner).
     stats = {
         'children': children.count(),
         'topics': Topic.objects.filter(active='Y').count(),
         'words': Word.objects.filter(active='Y').count(),
     }
-    return render(request, 'accounts/home.html', {'children': children, 'stats': stats})
+    return render(request, 'accounts/dashboard.html', {'children': children, 'stats': stats})
 
 
-@login_required
+@manage_required
 def progress(request):
     """
     Tiến độ của bé: kết quả chơi (GameResult) + lần luyện phát âm (Attempt).
@@ -85,7 +149,7 @@ def progress(request):
     return render(request, 'accounts/progress.html', context)
 
 
-@login_required
+@manage_required
 def child_add(request):
     """Tạo hồ sơ bé mới. owner = phụ huynh đang đăng nhập."""
     form = ChildProfileForm(request.POST or None)
@@ -94,11 +158,11 @@ def child_add(request):
         child.owner = request.user  # luôn gán owner theo người đăng nhập
         child.save()
         messages.success(request, f'Đã thêm bé {child.name}.')
-        return redirect('accounts:home')
+        return redirect('accounts:dashboard')
     return render(request, 'accounts/child_form.html', {'form': form, 'is_add': True})
 
 
-@login_required
+@manage_required
 def child_edit(request, pk):
     """Sửa hồ sơ bé — chỉ hồ sơ thuộc phụ huynh đang đăng nhập (lọc owner → 404 nếu khác)."""
     child = get_object_or_404(ChildProfile, pk=pk, owner=request.user)
@@ -106,5 +170,5 @@ def child_edit(request, pk):
     if request.method == 'POST' and form.is_valid():
         form.save()
         messages.success(request, f'Đã cập nhật bé {child.name}.')
-        return redirect('accounts:home')
+        return redirect('accounts:dashboard')
     return render(request, 'accounts/child_form.html', {'form': form, 'is_add': False})

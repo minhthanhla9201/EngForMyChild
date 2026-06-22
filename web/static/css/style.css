@@ -35,6 +35,20 @@ body {
 }
 .navbar-username { color: rgba(255, 255, 255, .85); }
 
+/* Navbar KHU QUẢN LÝ: tông xám trung tính, tách biệt hẳn nav xanh của bé */
+.navbar-manage-bar { background: #343a40; }
+.navbar-manage-bar .navbar-brand { color: #fff; font-size: 1.25rem; }
+.navbar-manage-bar .nav-link { color: rgba(255, 255, 255, .85); font-weight: 500; }
+.navbar-manage-bar .nav-link:hover,
+.navbar-manage-bar .nav-link:focus { color: #fff; }
+.navbar-manage-bar .navbar-toggler { border-color: rgba(255, 255, 255, .5); }
+.navbar-manage-bar .navbar-toggler-icon { filter: invert(1) grayscale(1) brightness(2); }
+/* Nền khu quản lý hơi xám để phụ huynh thấy rõ đang ở khu khác với khu của bé */
+body.body-manage { background: #eef1f4; }
+
+/* Ô nhập passcode: to, dễ bấm, ẩn ký tự */
+.passcode-input { letter-spacing: .5rem; text-align: center; font-size: 1.6rem; }
+
 /* Nút to dễ bấm cho bé */
 .btn-kid {
     background: var(--brand);

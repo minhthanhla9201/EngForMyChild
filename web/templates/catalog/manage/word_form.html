@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'base_manage.html' %}
 {% block title %}{% if is_add %}Thêm từ{% else %}Sửa từ{% endif %}{% endblock %}
 
 {% block content %}
@@ -13,7 +13,7 @@
           {% include 'catalog/manage/_form_fields.html' %}
           <div class="d-flex gap-2">
             <button type="submit" class="btn btn-kid">Lưu</button>
-            <a href="{% url 'catalog:word_manage' %}" class="btn btn-outline-secondary">Huỷ</a>
+            <a href="{% url 'catalog_manage:word_manage' %}" class="btn btn-outline-secondary">Huỷ</a>
           </div>
         </form>
       </div>
