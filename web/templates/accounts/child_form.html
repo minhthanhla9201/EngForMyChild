@@ -16,13 +16,51 @@
             {% for err in field.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
           </div>
           {% endfor %}
-          <div class="d-flex gap-2">
+          <div class="d-flex gap-2 align-items-center">
             <button type="submit" class="btn btn-kid">Lưu</button>
             <a href="{% url 'accounts:dashboard' %}" class="btn btn-outline-secondary">Huỷ</a>
+            {# Nút Xoá chỉ hiện khi SỬA (đã có bé), không hiện lúc Thêm mới. #}
+            {% if not is_add %}
+            <button type="button" class="btn btn-outline-danger ms-auto"
+                    data-bs-toggle="modal" data-bs-target="#confirmDelete">
+              <i class="bi bi-trash"></i> Xoá bé
+            </button>
+            {% endif %}
           </div>
         </form>
       </div>
     </div>
   </div>
 </div>
+
+{% if not is_add %}
+{# Hộp xác nhận xoá: cảnh báo xoá kèm toàn bộ dữ liệu của bé; phải gõ đúng tên để xoá. #}
+<div class="modal fade" id="confirmDelete" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form method="post" action="{% url 'accounts:child_delete' form.instance.pk %}">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title text-danger"><i class="bi bi-exclamation-triangle"></i> Xoá hồ sơ bé?</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        </div>
+        <div class="modal-body">
+          <p>Bạn sắp xoá hồ sơ bé <strong>{{ form.instance.name }}</strong>. Thao tác này
+             <strong>không hoàn tác</strong> và sẽ xoá theo tất cả dữ liệu của bé:</p>
+          <ul class="mb-3">
+            <li>Các lần luyện phát âm (kèm file ghi âm)</li>
+            <li>Kết quả các ván chơi (điểm, sao)</li>
+          </ul>
+          <label class="form-label">Gõ tên bé <code>{{ form.instance.name }}</code> để xác nhận:</label>
+          <input type="text" name="confirm_name" class="form-control" placeholder="Nhập tên bé để xoá" autocomplete="off">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Huỷ</button>
+          <button type="submit" class="btn btn-danger"><i class="bi bi-trash"></i> Xoá vĩnh viễn</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endif %}
 {% endblock %}

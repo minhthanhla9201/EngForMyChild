@@ -149,7 +149,8 @@ ManagePasscode (singleton pk=1)
 | `/manage/lock/` | `manage_lock` | Khoá lại, về khu của bé |
 | `/manage/passcode/change/` | `manage_passcode_change` | Đổi passcode |
 | `/manage/` | `dashboard` | Bảng điều khiển (số liệu + hồ sơ bé) |
-| `/manage/children/add/` `.../edit/` | `child_add` / `child_edit` | CRUD hồ sơ bé |
+| `/manage/children/add/` `.../edit/` | `child_add` / `child_edit` | Thêm / sửa hồ sơ bé |
+| `/manage/children/<pk>/delete/` | `child_delete` | Xoá bé + toàn bộ dữ liệu liên quan (POST, xác nhận tên) |
 | `/manage/progress/` | `progress` | Tiến độ (kết quả chơi + lần luyện) |
 
 **catalog — khu bé** ([urls.py](../web/catalog/urls.py)): `/learn/` (chủ đề), `/learn/topic/<slug>/` (từ), `/learn/word/<pk>/audio/` (lấy URL audio, JSON).
@@ -171,7 +172,8 @@ ManagePasscode (singleton pk=1)
 ### 5.1. Tài khoản & khu quản lý (app `accounts`) — GĐ 0
 - **Đăng nhập** — dùng view Django, ghi log lý do lỗi để chẩn đoán ("sai mật khẩu"...). Phiên 30 ngày trượt hạn.
 - **Passcode khu quản lý** — lần đầu chưa có → buộc **đặt** (4–6 số); sau đó **nhập** để mở khoá 30 phút; **đổi** passcode phải nhập đúng mã cũ; **khoá lại** ngay. Lưu hash.
-- **Hồ sơ bé (CRUD)** — thêm/sửa bé; `owner` luôn gán theo phụ huynh đăng nhập; sửa/xem lọc theo owner (404 nếu của người khác).
+- **Hồ sơ bé (CRUD)** — thêm/sửa/**xoá** bé; `owner` luôn gán theo phụ huynh đăng nhập; sửa/xoá/xem lọc theo owner (404 nếu của người khác).
+  - **Xoá bé (xoá cứng có chủ đích):** nút "Xoá bé" chỉ hiện ở màn **sửa** → modal xác nhận, phải **gõ đúng tên bé** mới xoá (chống nhầm). Chỉ nhận **POST**. Xoá kéo theo **toàn bộ dữ liệu của bé**: `Attempt` + `GameResult` tự xoá theo (`on_delete=CASCADE`), và **file ghi âm** trong `media/recordings/` được **dọn tay** trước khi xoá bản ghi (Django không tự xoá file). Đây là ngoại lệ có chủ đích so với quy ước "xoá mềm" chung — hợp lý cho app local trong gia đình.
 - **Bảng điều khiển** — số bé / chủ đề / từ đang dùng + lối tắt + danh sách bé.
 - **Trang tiến độ** — gộp `GameResult` + `Attempt` của các bé thuộc phụ huynh; lọc theo 1 bé qua `?child=<pk>`; tổng sao / số ván / số lần luyện.
 
@@ -283,7 +285,7 @@ Wireframe ([wireframe/](../wireframe/), mở [index.html](../wireframe/index.htm
 | Wireframe | Chức năng (mục) | URL → View | Template thật |
 |---|---|---|---|
 | [dashboard.html](../wireframe/dashboard.html) | Bảng điều khiển: số liệu + hồ sơ bé (5.1) | `/manage/` → `dashboard` | `accounts/dashboard.html` |
-| [child-form.html](../wireframe/child-form.html) | Thêm/sửa hồ sơ bé (5.1) | `/manage/children/add|<pk>/edit/` → `child_add`/`child_edit` | `accounts/child_form.html` |
+| [child-form.html](../wireframe/child-form.html) | Thêm/sửa/**xoá** hồ sơ bé (5.1) | `/manage/children/add|<pk>/edit/` → `child_add`/`child_edit`; nút Xoá → `.../delete/` → `child_delete` (modal xác nhận tên) | `accounts/child_form.html` |
 | [topics.html](../wireframe/topics.html) | Quản lý chủ đề (5.2) | `/manage/topics/` → `topic_manage` | `catalog/manage/topic_list.html` |
 | *(dùng chung form)* | Thêm/sửa chủ đề (5.2) | `/manage/topics/add|<pk>/edit/` → `topic_form` | `catalog/manage/topic_form.html` |
 | [words.html](../wireframe/words.html) | Quản lý từ vựng: lọc + tìm + phân trang (5.2) | `/manage/words/` → `word_manage` | `catalog/manage/word_list.html` |

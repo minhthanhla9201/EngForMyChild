@@ -243,6 +243,8 @@ erDiagram
 | `avatar` | CharField/ImageField | bé chọn avatar |
 | `active` | CharField('Y'/'N') | |
 
+> **Xoá hồ sơ bé (xoá cứng):** phụ huynh có thể xoá hẳn 1 bé ở màn sửa (phải xác nhận đúng tên). Vì `Attempt` và `GameResult` tham chiếu `ChildProfile` với `on_delete=CASCADE`, xoá bé sẽ **tự xoá theo** mọi lần luyện & ván chơi của bé. Riêng **file ghi âm** (`Attempt.recording` trong `media/recordings/`) do Django không tự xoá nên view `child_delete` **dọn tay** trước khi xoá bản ghi. Đây là ngoại lệ có chủ đích so với quy ước xoá mềm (app local, dữ liệu của chính gia đình).
+
 ### Attempt — mỗi lần luyện phát âm (dữ liệu tích luỹ)
 | field | kiểu | ghi chú |
 |---|---|---|

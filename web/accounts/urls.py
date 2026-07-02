@@ -23,5 +23,6 @@ urlpatterns = [
     path('manage/', views.dashboard, name='dashboard'),
     path('manage/children/add/', views.child_add, name='child_add'),
     path('manage/children/<int:pk>/edit/', views.child_edit, name='child_edit'),
+    path('manage/children/<int:pk>/delete/', views.child_delete, name='child_delete'),
     path('manage/progress/', views.progress, name='progress'),
 ]

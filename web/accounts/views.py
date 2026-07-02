@@ -172,3 +172,37 @@ def child_edit(request, pk):
         messages.success(request, f'Đã cập nhật bé {child.name}.')
         return redirect('accounts:dashboard')
     return render(request, 'accounts/child_form.html', {'form': form, 'is_add': False})
+
+
+@manage_required
+def child_delete(request, pk):
+    """
+    Xoá hẳn hồ sơ bé + TẤT CẢ dữ liệu liên quan (lần luyện, kết quả chơi).
+
+    Đây là xoá cứng có chủ đích (app local trong gia đình, phụ huynh tự quyết) —
+    khác quy ước "xoá mềm" chung, nên phải xác nhận bằng gõ đúng tên bé (chống nhầm).
+    Attempt/GameResult có on_delete=CASCADE nên tự xoá theo ở DB; nhưng FILE ghi âm
+    trong media/recordings/ Django KHÔNG tự xoá → phải dọn tay TRƯỚC khi xoá bản ghi.
+    Chỉ nhận POST (thao tác thay đổi dữ liệu).
+    """
+    child = get_object_or_404(ChildProfile, pk=pk, owner=request.user)
+    if request.method != 'POST':
+        return redirect('accounts:child_edit', pk=pk)
+
+    # Xác nhận: phải gõ đúng tên bé (khớp, đã strip khoảng trắng).
+    if (request.POST.get('confirm_name') or '').strip() != child.name:
+        messages.error(request, 'Tên xác nhận chưa khớp — chưa xoá gì cả.')
+        return redirect('accounts:child_edit', pk=pk)
+
+    name = child.name
+    # Dọn file ghi âm của bé trước (xoá bản ghi sẽ mất đường dẫn tới file).
+    removed_files = 0
+    for attempt in child.attempts.all():
+        if attempt.recording:
+            attempt.recording.delete(save=False)  # xoá file trên đĩa, không đụng DB
+            removed_files += 1
+
+    child.delete()  # CASCADE tự xoá Attempt + GameResult của bé
+    logger.info('Xoá hồ sơ bé %r (id=%s), dọn %s file ghi âm.', name, pk, removed_files)
+    messages.success(request, f'Đã xoá bé {name} cùng toàn bộ dữ liệu liên quan.')
+    return redirect('accounts:dashboard')
