@@ -303,12 +303,16 @@ score_round(payload) -> {score,total,stars} # chấm kết quả bé gửi lên
 ### Các khuôn game (cùng dùng kho Word)
 | code (module) | tên | cách chơi | cần | trạng thái |
 |---|---|---|---|---|
-| `listen_pick` | Nghe & chọn | nghe audio → chọn đúng từ trong 4 | audio | **XONG (GĐ4)** |
-| `match_pairs` | Lật thẻ tìm cặp | memory Anh↔Việt | — | **XONG (GĐ4)** |
-| `match_word` | Nối hình ↔ từ | kéo từ về đúng hình | image | dự kiến |
+| `listen_pick` | Nghe & chọn | nghe audio → chọn đúng từ trong 4 (hiện kèm **hình** để bé chưa biết chữ chọn được) | audio (+image nếu có) | **XONG (GĐ4)** |
+| `match_pairs` | Lật thẻ tìm cặp | memory Anh↔Việt (cần đọc chữ) | — | **XONG (GĐ4)** |
+| `listen_pick_image` | Nghe & chọn hình | nghe audio → chạm **hình** đúng trong 4 (không cần chữ) | image + audio | **XONG** |
+| `image_pick_audio` | Nhìn hình & chọn tiếng | hiện 1 hình → nghe 4 audio (chạm loa) → chọn tiếng đúng | image + audio | **XONG** |
+| `match_image_audio` | Ghép hình với tiếng | memory: ghép thẻ **hình** ↔ thẻ **loa** (không cần chữ) | image + audio | **XONG** |
 | `parrot` | Nhại con vẹt 🦜 | nghe → lặp lại → ASR chấm | audio + ASR | GĐ3 (cần Docker) |
 | `build_sentence` | Xếp câu (ngữ pháp) | kéo từ thành câu đúng | Sentence | GĐ5 |
 
+> **Nhóm game nhận dạng (nghe/nhìn)** — `listen_pick_image`, `image_pick_audio`, `match_image_audio` — dành cho **bé chưa biết chữ**: lựa chọn là hình/âm thanh, không phải chữ. Đều `needs_image='Y'` (chỉ dùng từ có ảnh); chủ đề thiếu từ có ảnh → màn "chưa đủ từ".
+>
 > Thêm từ mới → mọi game tự có thêm nội dung, không đụng code. Thêm game mới = 1 module trong `games/engine/` + 1 bản ghi `GameType` (seed qua migration).
 
 ### Reward / Badge — huy hiệu (mở khoá dần)

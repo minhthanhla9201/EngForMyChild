@@ -1,0 +1,116 @@
+{% extends 'base_kid.html' %}
+{% block title %}Ghép hình với tiếng — {{ topic.name_vi }}{% endblock %}
+
+{% block content %}
+{{ round_data|json_script:"round-data" }}
+
+<div x-data="matchImageAudio()" x-init="init()">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h1 class="h5 m-0">🖼️🔊 {{ child.avatar }} {{ child.name }} — {{ topic.name_vi }}</h1>
+    <a href="{% url 'games:choose' %}" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-arrow-left"></i> Thoát
+    </a>
+  </div>
+
+  <div x-show="!finished">
+    <div class="text-muted small mb-2">
+      Ghép: <span x-text="matched"></span>/<span x-text="pairsTotal"></span> · Lật sai: <span x-text="mistakes"></span>
+    </div>
+    <p class="mb-3">Lật thẻ hình và thẻ loa để ghép đúng nhé! Chạm thẻ loa để nghe.</p>
+
+    <div class="row g-2">
+      <template x-for="(card, i) in cards" :key="i">
+        <div class="col-4 col-md-3">
+          <button class="btn w-100 p-2 d-flex align-items-center justify-content-center"
+                  :class="card.done ? 'btn-success' : (isUp(i) ? 'btn-warning' : 'btn-outline-primary')"
+                  style="min-height:96px"
+                  @click="flip(i)" :disabled="card.done || busy">
+            {# Úp: dấu hỏi. Lật/đã ghép: hình hoặc nút loa tuỳ mặt thẻ. #}
+            <template x-if="!card.done && !isUp(i)">
+              <span class="fs-2">❓</span>
+            </template>
+            <template x-if="(card.done || isUp(i)) && card.face === 'image'">
+              <img :src="card.image" class="img-fluid rounded" style="height:80px;object-fit:contain" alt="">
+            </template>
+            <template x-if="(card.done || isUp(i)) && card.face === 'audio'">
+              <span class="fs-1"><i class="bi bi-volume-up-fill"></i></span>
+            </template>
+          </button>
+        </div>
+      </template>
+    </div>
+  </div>
+
+  <div x-show="finished" x-transition class="card child-card text-center p-5">
+    <div class="display-4 mb-2" x-text="starText"></div>
+    <p class="fs-5">Ghép đúng <span x-text="matched"></span>/<span x-text="pairsTotal"></span> cặp,
+      lật sai <span x-text="mistakes"></span> lần</p>
+    <div class="d-flex justify-content-center gap-2">
+      <a href="{% url 'games:choose' %}" class="btn btn-outline-primary">Chọn game khác</a>
+      <button class="btn btn-kid" @click="location.reload()">Chơi lại</button>
+    </div>
+  </div>
+
+  <audio x-ref="player"></audio>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const SUBMIT_URL = "{% url 'games:submit' child.pk game.code topic.slug %}";
+  function getCookie(n){const m=document.cookie.match('(^|;)\\s*'+n+'\\s*=\\s*([^;]+)');return m?m.pop():'';}
+
+  function matchImageAudio() {
+    return {
+      cards: [], up: [], matched: 0, mistakes: 0, pairsTotal: 0,
+      busy: false, finished: false, starText: '',
+      init() {
+        const data = JSON.parse(document.getElementById('round-data').textContent);
+        this.cards = (data.cards || []).map(c => ({...c, done: false}));
+        this.pairsTotal = (data.pairs || []).length;
+        if (!this.pairsTotal) { this.finished = true; }
+      },
+      isUp(i){ return this.up.includes(i); },
+      // Phát audio của thẻ loa khi lật.
+      async playCard(card) {
+        if (card.face !== 'audio') return;
+        try {
+          const r = await fetch(`/learn/word/${card.word_id}/audio/`);
+          const d = await r.json();
+          if (d.ok) { this.$refs.player.src = d.url; await this.$refs.player.play(); }
+        } catch(e){}
+      },
+      flip(i) {
+        if (this.busy || this.cards[i].done || this.isUp(i)) return;
+        this.up.push(i);
+        this.playCard(this.cards[i]);  // lật thẻ loa thì nghe ngay
+        if (this.up.length === 2) {
+          this.busy = true;
+          const [a, b] = this.up;
+          if (this.cards[a].pair_id === this.cards[b].pair_id) {
+            this.cards[a].done = true; this.cards[b].done = true;
+            this.matched++;
+            this.up = []; this.busy = false;
+            if (this.matched === this.pairsTotal) this.submit();
+          } else {
+            this.mistakes++;
+            setTimeout(() => { this.up = []; this.busy = false; }, 900);
+          }
+        }
+      },
+      async submit() {
+        try {
+          const r = await fetch(SUBMIT_URL, {
+            method: 'POST',
+            headers: {'Content-Type':'application/json','X-CSRFToken':getCookie('csrftoken')},
+            body: JSON.stringify({pairs_total: this.pairsTotal, pairs_matched: this.matched, mistakes: this.mistakes}),
+          });
+          const d = await r.json();
+          this.starText = '⭐'.repeat(d.stars || 0) || '🌱';
+        } catch(e){ this.starText = '🌱'; }
+        this.finished = true;
+      },
+    };
+  }
+</script>
+{% endblock %}

@@ -1,12 +1,12 @@
 {% extends 'base_kid.html' %}
-{% block title %}Nghe & chọn — {{ topic.name_vi }}{% endblock %}
+{% block title %}Nhìn hình & chọn tiếng — {{ topic.name_vi }}{% endblock %}
 
 {% block content %}
 {{ round_data|json_script:"round-data" }}
 
-<div x-data="listenPick()" x-init="init()">
+<div x-data="imagePickAudio()" x-init="init()">
   <div class="d-flex align-items-center justify-content-between mb-3">
-    <h1 class="h5 m-0">👂 {{ child.avatar }} {{ child.name }} — {{ topic.name_vi }}</h1>
+    <h1 class="h5 m-0">🖼️🔊 {{ child.avatar }} {{ child.name }} — {{ topic.name_vi }}</h1>
     <a href="{% url 'games:choose' %}" class="btn btn-outline-secondary btn-sm">
       <i class="bi bi-arrow-left"></i> Thoát
     </a>
@@ -17,27 +17,30 @@
     <div class="text-muted small mb-2">Câu <span x-text="index + 1"></span> / <span x-text="questions.length"></span></div>
 
     <div class="card child-card text-center p-4 mb-3">
-      <p class="mb-3">Nghe rồi chọn từ đúng nhé!</p>
-      <div><button class="btn btn-kid btn-lg" @click="playAudio()">
-        <i class="bi bi-volume-up-fill"></i> Nghe
-      </button></div>
+      <p class="mb-2">Nhìn hình, chạm loa để nghe rồi chọn tiếng đúng nhé!</p>
+      <div>
+        <img :src="current.image" class="img-fluid rounded"
+             style="height:160px;object-fit:contain" alt="">
+      </div>
     </div>
 
     <div class="row g-3">
       <template x-for="choice in current.choices" :key="choice.id">
         <div class="col-6">
-          <button class="btn btn-outline-primary w-100 p-2"
-                  @click="pick(choice.id)" :disabled="answered">
-            {# Hình lớn để bé chưa biết chữ vẫn chọn được; chữ nhỏ bên dưới để làm quen mặt chữ. #}
-            <template x-if="choice.image">
-              <img :src="choice.image" :alt="choice.text_en"
-                   class="img-fluid rounded mb-2" style="height:110px;object-fit:contain">
-            </template>
-            <div class="fs-5" x-text="choice.text_en"></div>
-            <div class="small text-muted" x-text="choice.text_vi"></div>
+          <button class="btn btn-outline-primary w-100 p-4 fs-3"
+                  :class="{'btn-warning': playingId === choice.id}"
+                  @click="listen(choice.id)" :disabled="answered">
+            <i class="bi bi-volume-up-fill"></i>
           </button>
         </div>
       </template>
+    </div>
+
+    <div class="text-center mt-3" x-show="!answered">
+      <button class="btn btn-kid" @click="confirm()" :disabled="chosenId === null">
+        <i class="bi bi-check-lg"></i> Chọn tiếng này
+      </button>
+      <div class="small text-muted mt-1" x-show="chosenId !== null">Đã chọn loa <span x-text="chosenPos"></span></div>
     </div>
 
     <div class="mt-3 text-center" x-show="answered" x-transition>
@@ -62,38 +65,47 @@
 
 {% block extra_js %}
 <script>
-  const CHILD_ID = {{ child.pk }};
   const SUBMIT_URL = "{% url 'games:submit' child.pk game.code topic.slug %}";
   function getCookie(n){const m=document.cookie.match('(^|;)\\s*'+n+'\\s*=\\s*([^;]+)');return m?m.pop():'';}
 
-  function listenPick() {
+  function imagePickAudio() {
     return {
       questions: [], index: 0, answered: false, lastCorrect: false,
       score: 0, finished: false, answers: [], starText: '',
+      chosenId: null, playingId: null,
       init() {
         const data = JSON.parse(document.getElementById('round-data').textContent);
         this.questions = data.questions || [];
         if (!this.questions.length) { this.finished = true; }
       },
       get current(){ return this.questions[this.index] || {choices: []}; },
-      // Phát audio mẫu của từ đáp án (API catalog).
-      async playAudio() {
-        try {
-          const r = await fetch(`/learn/word/${this.current.audio_word_id}/audio/`);
-          const d = await r.json();
-          if (d.ok) { this.$refs.player.src = d.url; this.$refs.player.play(); }
-        } catch(e){}
+      // Vị trí (1-based) của loa đang chọn để bé dễ nhận biết.
+      get chosenPos(){
+        const i = this.current.choices.findIndex(c => c.id === this.chosenId);
+        return i >= 0 ? i + 1 : '';
       },
-      pick(pickedId) {
+      // Chạm loa: phát audio của lựa chọn đó VÀ đánh dấu là lựa chọn hiện tại.
+      async listen(choiceId) {
         if (this.answered) return;
+        this.chosenId = choiceId;
+        this.playingId = choiceId;
+        try {
+          const r = await fetch(`/learn/word/${choiceId}/audio/`);
+          const d = await r.json();
+          if (d.ok) { this.$refs.player.src = d.url; await this.$refs.player.play(); }
+        } catch(e){}
+        setTimeout(() => { if (this.playingId === choiceId) this.playingId = null; }, 600);
+      },
+      confirm() {
+        if (this.answered || this.chosenId === null) return;
         this.answered = true;
-        this.lastCorrect = (pickedId === this.current.answer_id);
+        this.lastCorrect = (this.chosenId === this.current.answer_id);
         if (this.lastCorrect) this.score++;
-        this.answers.push({answer_id: this.current.answer_id, picked_id: pickedId});
-        // Sang câu sau (hoặc kết thúc) sau 0.9s để bé thấy phản hồi.
+        this.answers.push({answer_id: this.current.answer_id, picked_id: this.chosenId});
         setTimeout(() => {
-          if (this.index < this.questions.length - 1) { this.index++; this.answered = false; }
-          else { this.submit(); }
+          if (this.index < this.questions.length - 1) {
+            this.index++; this.answered = false; this.chosenId = null;
+          } else { this.submit(); }
         }, 900);
       },
       async submit() {
