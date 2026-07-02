@@ -106,6 +106,7 @@ Tất cả lệnh chạy từ thư mục gốc dự án, dùng Python trong `.ve
 | Chạy kiểm thử (test) | `.\.venv\Scripts\python.exe web\manage.py test core accounts catalog pronunciation games` |
 | Nhập từ vựng từ file CSV | `.\.venv\Scripts\python.exe web\manage.py import_words web\sample_words.csv` |
 | Nhập từ vựng KHÔNG cần mạng (không sinh audio) | `.\.venv\Scripts\python.exe web\manage.py import_words web\sample_words.csv --no-audio` |
+| Sao lưu (xuất) toàn bộ từ vựng ra CSV | `.\.venv\Scripts\python.exe web\manage.py export_words web\words_backup.csv` |
 
 ### Nhập từ vựng (thu thập dữ liệu dần)
 Tạo file CSV (mở bằng Excel/Google Sheet rồi lưu dạng CSV) với các cột:
@@ -124,8 +125,33 @@ Cả 2 cách dùng chung một bộ xử lý: tự tạo chủ đề, tự sinh 
 - **Mạng yếu/không có mạng:** thêm `--no-audio` để chỉ nhập từ (audio sẽ được tạo sau, ngay khi bé bấm "Nghe" lần đầu — lúc đó cần mạng một lần; nếu vẫn không có mạng, hệ thống tự đọc bằng giọng máy của Windows).
 - Chạy lại lệnh nhiều lần **không tạo trùng** (an toàn).
 
+### Sao lưu & khôi phục từ vựng (backup/restore)
+Muốn giữ lại toàn bộ từ vựng đã nhập (phòng khi cài lại/đổi máy):
+1. **Xuất ra CSV:** vào khu quản lý → **Nội dung → Nhập từ CSV**, bấm **📥 Xuất CSV** (hoặc ở màn **Từ vựng** bấm **Xuất CSV**). File `words_backup.csv` tải về gồm tất cả từ, đúng định dạng nhập.
+   - Qua dòng lệnh: `.\.venv\Scripts\python.exe web\manage.py export_words web\words_backup.csv`
+2. **Khôi phục:** dùng chính file vừa xuất, nhập lại ở màn **Nhập từ CSV** (hoặc lệnh `import_words ... --no-audio`). Nhập lại **không tạo trùng** — chỉ bổ sung/cập nhật, nên an toàn.
+
 ### Học từ vựng & nghe phát âm
 Sau khi đăng nhập, bấm **Học từ vựng** ở trang chủ → chọn chủ đề → bấm 🔊 **Nghe** ở mỗi từ. Lần đầu nghe một từ, hệ thống sinh audio rồi lưu lại; các lần sau phát ngay.
+
+#### File âm thanh được tạo ra thế nào?
+- **Lần đầu nghe một từ:** hệ thống sinh audio bằng `edge-tts` (giọng Microsoft, **cần mạng một lần**). Nếu không có mạng → tự dùng giọng máy của Windows (`pyttsx3`, **offline**). File lưu ở `web\media\audio\word_<id>.mp3` và ghi nhớ lại (cache).
+- **Các lần sau:** dùng lại file đã lưu → **phát ngay, không cần mạng**.
+- Muốn tạo sẵn audio lúc nhập từ (bé khỏi chờ lần đầu): tick **Sinh sẵn audio** khi nhập CSV qua web, hoặc chạy `import_words` **không** kèm `--no-audio`.
+
+#### Đổi giọng đọc (TTS_VOICE)
+Giọng đọc do một dòng trong **`web\.env`** quyết định: `TTS_VOICE` (mặc định `en-US-AnaNeural` — giọng bé gái Mỹ). Đổi giọng:
+1. Mở `web\.env` bằng Notepad, sửa dòng `TTS_VOICE=` thành mã giọng khác, ví dụ `TTS_VOICE=en-GB-MaisieNeural`.
+2. **Khởi động lại server** (`Ctrl + C` rồi chạy lại `runserver`) — `.env` chỉ đọc lúc khởi động.
+3. **Xoá audio cũ để nghe giọng mới:** giọng mới chỉ áp dụng cho từ **chưa có** audio; từ đã nghe rồi vẫn dùng file cũ. Muốn áp cho tất cả:
+   - Xoá file: `Remove-Item web\media\audio\*.mp3`
+   - Xoá bản ghi audio trong DB: vào **http://127.0.0.1:8000/admin → Audio phát âm →** chọn tất cả → Delete.
+   - Lần sau bé bấm 🔊, hệ thống sinh lại bằng giọng mới.
+
+Vài giọng tiếng Anh hợp cho bé: `en-US-AnaNeural` (bé gái Mỹ), `en-US-JennyNeural` (nữ Mỹ), `en-GB-MaisieNeural` (bé gái Anh), `en-GB-SoniaNeural` (nữ Anh), `en-AU-NatashaNeural` (nữ Úc).
+**Xem toàn bộ giọng** (cần mạng): `.\.venv\Scripts\python.exe -m edge_tts --list-voices` (lọc các mã bắt đầu bằng `en-`).
+
+> `TTS_VOICE` chỉ áp cho `edge-tts` (cần mạng). Khi chạy offline dùng giọng Windows — đổi ở **Cài đặt Windows → Thời gian & Ngôn ngữ → Giọng nói**, không qua `.env`.
 
 ### Luyện phát âm (ghi âm)
 Bấm **Luyện phát âm** ở trang chủ → chọn bé → chọn chủ đề. Ở mỗi từ: bé bấm **Nghe mẫu**, rồi bấm **Thu giọng** để đọc theo (bấm lần nữa để dừng). Bản ghi được lưu lại; phụ huynh xem ở khu quản lý **→ Tiến độ** (chi tiết bản ghi xem trong Django Admin).
@@ -157,7 +183,8 @@ Các thiết lập đổi theo máy nằm trong **`web\.env`** (đã tạo sẵn
 
 - `DEBUG=True` — chế độ phát triển (hiện lỗi chi tiết). Khi chạy thật để `False`.
 - `DATABASE_URL=sqlite:///db.sqlite3` — đang dùng **SQLite** (một file, không cần cài gì). Có thể đổi sang MySQL sau (xem mục 7).
-- `TTS_VOICE`, `ASR_URL` — dùng cho phần phát âm ở giai đoạn sau.
+- `TTS_VOICE=en-US-AnaNeural` — giọng đọc mẫu (edge-tts). Cách đổi giọng: xem mục **Đổi giọng đọc** ở phần 4.
+- `ASR_URL` — địa chỉ dịch vụ chấm phát âm, dùng ở Giai đoạn 3 (chưa bật).
 
 > File `.env.example` là bản mẫu để tham khảo; **`.env`** mới là bản đang dùng thật.
 

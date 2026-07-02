@@ -130,3 +130,37 @@ def import_csv_file(file_obj, make_audio=True, on_progress=None):
 
     reader = csv.DictReader(stream)
     return import_rows(reader, make_audio=make_audio, on_progress=on_progress)
+
+
+# --- Xuất (backup) ---
+# Cột xuất khớp ĐÚNG cột import (mục 8 trên) → file xuất ra nạp lại được ngay.
+# Thêm 'phonetic' để backup đầy đủ IPA; khi nhập lại import bỏ qua cột này và tự sinh
+# lại nếu trống, nên không gây lỗi mà vẫn giữ được dữ liệu khi mở bằng Excel.
+EXPORT_FIELDS = ['topic', 'topic_vi', 'text_en', 'text_vi', 'phonetic', 'level']
+
+
+def export_words(queryset=None):
+    """
+    Xuất từ vựng ra chuỗi CSV (có BOM cho Excel), khớp định dạng nhập → restore được.
+
+    queryset: QuerySet Word tuỳ chọn; mặc định TẤT CẢ từ (kể cả active='N') để
+    backup đầy đủ. Sắp theo chủ đề rồi từ cho ổn định (dễ so sánh giữa các lần xuất).
+    """
+    if queryset is None:
+        queryset = Word.objects.all()
+    queryset = queryset.select_related('topic').order_by('topic__order', 'topic__name_en', 'text_en')
+
+    buf = io.StringIO()
+    writer = csv.DictWriter(buf, fieldnames=EXPORT_FIELDS)
+    writer.writeheader()
+    for w in queryset:
+        writer.writerow({
+            'topic': w.topic.name_en,
+            'topic_vi': w.topic.name_vi,
+            'text_en': w.text_en,
+            'text_vi': w.text_vi,
+            'phonetic': w.phonetic,
+            'level': w.level,
+        })
+    # BOM utf-8-sig để Excel mở đúng tiếng Việt; import đã bỏ BOM khi đọc lại.
+    return '﻿' + buf.getvalue()

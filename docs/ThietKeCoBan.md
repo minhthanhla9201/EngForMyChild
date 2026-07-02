@@ -154,7 +154,7 @@ ManagePasscode (singleton pk=1)
 | `/manage/progress/` | `progress` | Tiến độ (kết quả chơi + lần luyện) |
 
 **catalog — khu bé** ([urls.py](../web/catalog/urls.py)): `/learn/` (chủ đề), `/learn/topic/<slug>/` (từ), `/learn/word/<pk>/audio/` (lấy URL audio, JSON).
-**catalog — khu quản lý** ([urls_manage.py](../web/catalog/urls_manage.py)): `/manage/topics/`, `.../add|edit`, `/manage/words/`, `.../add|edit`, `/manage/import/`.
+**catalog — khu quản lý** ([urls_manage.py](../web/catalog/urls_manage.py)): `/manage/topics/`, `.../add|edit`, `/manage/words/`, `.../add|edit`, `/manage/import/` (nhập CSV), `/manage/export/` (xuất CSV backup → `word_export`).
 **pronunciation** ([urls.py](../web/pronunciation/urls.py)): `/speak/` (chọn), `/speak/<child>/<slug>/` (luyện), `/speak/<child>/word/<word>/save/` (POST bản ghi).
 **games** ([urls.py](../web/games/urls.py)): `/games/` (chọn), `/games/<child>/<code>/<slug>/` (chơi), `.../submit/` (POST kết quả).
 
@@ -184,6 +184,7 @@ ManagePasscode (singleton pk=1)
 - **Sinh IPA** ([ipa.py](../web/catalog/ipa.py)) — tự điền `phonetic` khi để trống.
 - **Quản lý nội dung (khu quản lý)** — CRUD chủ đề (slug tự sinh), CRUD từ vựng (lọc theo chủ đề + tìm `?q=` + phân trang), **nhập CSV**.
 - **Nhập CSV — service dùng chung** ([imports.py](../web/catalog/imports.py)) — dùng cho cả web lẫn lệnh `import_words`. **Idempotent** (chạy lại không trùng nhờ unique `(topic,text_en)`), tự tạo chủ đề, tự sinh IPA, tuỳ chọn sinh audio (`--no-audio` để bỏ khi offline). Trả dict thống kê.
+- **Xuất CSV (backup/restore)** ([imports.py](../web/catalog/imports.py) `export_words()` + view `word_export`) — nút **Xuất CSV** ở màn quản lý từ vựng & màn Nhập CSV tải toàn bộ từ ra file `words_backup.csv`. **Cột xuất khớp đúng cột nhập** (`topic, topic_vi, text_en, text_vi, phonetic, level`, kèm BOM cho Excel) → **upload lại chính file này để khôi phục** (idempotent, không tạo trùng). Có lệnh CLI đối xứng `export_words [path]`. Lưu ý: import bỏ qua cột `phonetic` (tự sinh khi trống) — cột này chỉ để backup đầy đủ/đọc bằng Excel.
 
 ### 5.3. Luyện phát âm (app `pronunciation`) — GĐ 2
 - **Luồng:** chọn bé + chủ đề → màn luyện hiện từng từ → bé **Nghe mẫu** (dùng lại API audio catalog) → **Thu giọng** (MediaRecorder trình duyệt) → POST multipart → lưu `Attempt` → từ kế tiếp.
@@ -214,6 +215,7 @@ Nhóm template theo app: `templates/accounts/`, `catalog/` (+ `catalog/manage/`)
 ## 7. Cấu hình & vận hành
 
 - **Cấu hình theo máy:** `web/.env` (mẫu `.env.example`). Mục quan trọng: `DEBUG`, `DATABASE_URL`, `SESSION_DAYS`, `MANAGE_UNLOCK_MINUTES`, `TTS_VOICE`, `ASR_URL`, `LOG_LEVEL`.
+- **Đổi giọng đọc mẫu:** sửa `TTS_VOICE` trong `.env` → khởi động lại server → xoá audio cũ (`media/audio/*.mp3` + `AudioClip` trong Admin) để sinh lại bằng giọng mới. Hướng dẫn chi tiết + danh sách giọng: [README.md](../README.md) mục "Đổi giọng đọc".
 - **Đổi CSDL SQLite ↔ MySQL:** chỉ sửa `DATABASE_URL`, không sửa code (settings đọc qua `dj_database_url`). File SQLite neo tuyệt đối vào `web/` để tránh lệch DB theo thư mục chạy lệnh.
 - **Media** (`media/audio|images|recordings/`) và **DB** giữ qua các lần chạy; khi dùng Docker gắn volume.
 - **Chạy:** `.\.venv\Scripts\python.exe web\manage.py runserver` → http://127.0.0.1:8000 (đăng nhập `admin`). Chi tiết & cheat-sheet: [README.md](../README.md).
@@ -290,7 +292,7 @@ Wireframe ([wireframe/](../wireframe/), mở [index.html](../wireframe/index.htm
 | *(dùng chung form)* | Thêm/sửa chủ đề (5.2) | `/manage/topics/add|<pk>/edit/` → `topic_form` | `catalog/manage/topic_form.html` |
 | [words.html](../wireframe/words.html) | Quản lý từ vựng: lọc + tìm + phân trang (5.2) | `/manage/words/` → `word_manage` | `catalog/manage/word_list.html` |
 | [wordform.html](../wireframe/wordform.html) | Form thêm/sửa từ (5.2) | `/manage/words/add|<pk>/edit/` → `word_form` | `catalog/manage/word_form.html` |
-| [import.html](../wireframe/import.html) | Nhập CSV (5.2) | `/manage/import/` → `word_import` | `catalog/manage/word_import.html` |
+| [import.html](../wireframe/import.html) | Nhập CSV + **Xuất CSV** (backup) (5.2) | `/manage/import/` → `word_import`; nút Xuất → `/manage/export/` → `word_export` | `catalog/manage/word_import.html` |
 | [progress.html](../wireframe/progress.html) | Tiến độ của bé (5.1) | `/manage/progress/` → `progress` | `accounts/progress.html` |
 
 ### Ghi chú map

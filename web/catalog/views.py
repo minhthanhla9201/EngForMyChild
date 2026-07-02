@@ -12,7 +12,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Count
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.text import slugify
 
@@ -122,6 +122,20 @@ def word_form(request, pk=None):
         messages.success(request, f'Đã lưu từ "{obj.text_en}".')
         return redirect('catalog_manage:word_manage')
     return render(request, 'catalog/manage/word_form.html', {'form': form, 'is_add': word is None})
+
+
+@manage_required
+def word_export(request):
+    """
+    Xuất TẤT CẢ từ vựng ra file CSV để tải về (backup) — nạp lại được qua màn Nhập CSV.
+
+    Tải toàn bộ (không theo bộ lọc) để restore đầy đủ. Trả file đính kèm (download).
+    """
+    csv_text = import_service.export_words()
+    resp = HttpResponse(csv_text, content_type='text/csv; charset=utf-8')
+    resp['Content-Disposition'] = 'attachment; filename="words_backup.csv"'
+    logger.info('Xuất CSV từ vựng (%s từ).', Word.objects.count())
+    return resp
 
 
 @manage_required

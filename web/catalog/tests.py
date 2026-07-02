@@ -16,6 +16,7 @@ from django.urls import reverse
 
 from accounts.models import ManagePasscode
 
+from . import imports as import_service
 from .models import AudioClip, Topic, Word
 
 
@@ -124,7 +125,7 @@ class CatalogManageViewTests(TestCase):
         """Chưa mở khoá → mọi màn quản lý chuyển về màn nhập passcode."""
         self.client.login(username='parent', password='pass12345')
         ManagePasscode.get_solo().set_passcode(self.PASSCODE)
-        for name in ('topic_manage', 'topic_add', 'word_manage', 'word_add', 'word_import'):
+        for name in ('topic_manage', 'topic_add', 'word_manage', 'word_add', 'word_import', 'word_export'):
             resp = self.client.get(reverse(f'catalog_manage:{name}'))
             self.assertEqual(resp.status_code, 302, name)
             self.assertIn(reverse('accounts:manage_unlock'), resp.url, name)
@@ -206,3 +207,31 @@ class CatalogManageViewTests(TestCase):
         resp = self.client.post(reverse('catalog_manage:word_import'), {'csv_file': upload})
         self.assertEqual(resp.status_code, 200)
         self.assertContains(resp, '.csv')
+
+    # --- Xuất CSV (backup) ---
+    def test_word_export_downloads_csv_with_data(self):
+        """Xuất CSV: trả file đính kèm, có tiêu đề đúng cột + dữ liệu từ."""
+        self._unlock()
+        resp = self.client.get(reverse('catalog_manage:word_export'))
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('attachment', resp['Content-Disposition'])
+        self.assertIn('words_backup.csv', resp['Content-Disposition'])
+        body = resp.content.decode('utf-8-sig')  # bỏ BOM
+        self.assertIn('topic,topic_vi,text_en,text_vi,phonetic,level', body)
+        self.assertIn('cat', body)
+        self.assertIn('con mèo', body)
+
+    def test_export_then_import_roundtrip(self):
+        """Round-trip: xuất ra CSV rồi nhập lại KHÔNG tạo trùng (khôi phục đúng)."""
+        self._unlock()
+        Word.objects.create(topic=self.topic, text_en='dog', text_vi='con chó')
+        before_topics, before_words = Topic.objects.count(), Word.objects.count()
+
+        csv_text = import_service.export_words()
+        upload = SimpleUploadedFile('backup.csv', csv_text.encode('utf-8'),
+                                    content_type='text/csv')
+        resp = self.client.post(reverse('catalog_manage:word_import'), {'csv_file': upload})
+        self.assertRedirects(resp, reverse('catalog_manage:word_manage'))
+        # Nạp lại chính dữ liệu vừa xuất → số chủ đề/từ không đổi (idempotent).
+        self.assertEqual(Topic.objects.count(), before_topics)
+        self.assertEqual(Word.objects.count(), before_words)

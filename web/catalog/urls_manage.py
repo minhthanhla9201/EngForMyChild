@@ -19,4 +19,5 @@ urlpatterns = [
     path('words/add/', views.word_form, name='word_add'),
     path('words/<int:pk>/edit/', views.word_form, name='word_edit'),
     path('import/', views.word_import, name='word_import'),
+    path('export/', views.word_export, name='word_export'),
 ]
