@@ -147,8 +147,19 @@ Bộ dữ liệu sẵn có **đã gán hình cho ~99% số từ**. Hình là fil
 - Lệnh map mỗi từ → emoji phù hợp (bảng ở `web\catalog\emoji_map.py`), tải SVG về `media\images\` **một lần** (cần mạng lúc chạy lệnh này), rồi gán vào từ. Chạy lại không tải trùng.
 - `--force`: gán lại cho cả từ đã có hình. `--offline`: chỉ dùng SVG có sẵn, không tải mạng.
 - **Thêm hình cho từ mới:** thêm 1 dòng `'tu_moi': '😊',` vào đúng nhóm trong `emoji_map.py` rồi chạy lại lệnh.
-- Muốn dùng **ảnh riêng** (ảnh chụp/tranh vẽ) cho một từ: vào khu quản lý → **Từ vựng → Sửa** → chọn file ở ô *Hình minh hoạ* (ảnh này ưu tiên hơn, ghi đè hình emoji).
 - Từ nào chưa có hình vẫn hiển thị icon 🔤 tạm — không lỗi.
+
+**Hai bộ hình để chọn (`--style`):**
+- `twemoji` (mặc định) — emoji Twitter, khối màu đầy đặn.
+- `openmoji` — emoji **vẽ tay** phong cách hoạt hình, nét mảnh dễ thương. Lưu riêng ở `media\images\openmoji\` nên không đè bộ kia.
+
+Muốn **đổi vài từ sang bộ vẽ đẹp hơn** (OpenMoji), chỉ áp cho từ chỉ định:
+```powershell
+.\.venv\Scripts\python.exe web\manage.py fetch_images --style openmoji --force --words "cat,dog,apple,car"
+```
+Bộ dữ liệu hiện đã đổi sẵn ~33 từ tiêu biểu (con vật, trái cây, đồ vật) sang OpenMoji để so sánh phong cách; phần còn lại dùng Twemoji.
+
+**Dùng ảnh riêng (ảnh chụp/tranh vẽ) cho một từ:** vào khu quản lý → **Từ vựng → Sửa** → chọn file ở ô *Hình minh hoạ*. Ảnh upload tay **ưu tiên cao nhất**, ghi đè hình emoji.
 
 > Cột `image` trong file CSV backup lưu **đường dẫn** tới hình (vd `images/1F431.svg`), không phải ảnh nhúng. Khi khôi phục/đổi máy, nhớ mang theo cả thư mục `web\media\images\`.
 
