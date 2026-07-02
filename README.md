@@ -124,7 +124,8 @@ Có **2 cách nhập**:
 
 Cả 2 cách dùng chung một bộ xử lý: tự tạo chủ đề, tự sinh phiên âm IPA và (tuỳ chọn) **tự sinh audio** cho từng từ.
 - Thêm/sửa thủ công từng chủ đề, từng từ cũng làm ngay trong khu quản lý (menu **Nội dung**).
-- File mẫu có sẵn: `web\sample_words.csv`.
+- File mẫu nhỏ: `web\sample_words.csv` (vài từ để thử định dạng).
+- **Bộ từ đầy đủ sẵn dùng:** `web\words_backup.csv` — hơn **430 từ / 28 chủ đề** (động vật, màu sắc, hành động, cảm xúc, nghề nghiệp, thời gian...). Nhập nhanh: `.\.venv\Scripts\python.exe web\manage.py import_words web\words_backup.csv --no-audio`.
 - **Mạng yếu/không có mạng:** thêm `--no-audio` để chỉ nhập từ (audio sẽ được tạo sau, ngay khi bé bấm "Nghe" lần đầu — lúc đó cần mạng một lần; nếu vẫn không có mạng, hệ thống tự đọc bằng giọng máy của Windows).
 - Chạy lại lệnh nhiều lần **không tạo trùng** (an toàn).
 

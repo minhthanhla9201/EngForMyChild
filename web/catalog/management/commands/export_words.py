@@ -27,12 +27,14 @@ class Command(BaseCommand):
         csv_text = import_service.export_words()
         path = options['csv_path']
 
+        # Ép UTF-8 để in nội dung/thông báo tiếng Việt không crash trên console Windows
+        # (cp932/cp1258...). Áp cho cả nhánh in ra màn hình lẫn thông báo thành công.
+        try:
+            self.stdout._out.reconfigure(encoding='utf-8', errors='replace')
+        except (AttributeError, ValueError):
+            pass
+
         if not path:
-            # In ra stdout — ép UTF-8 để không crash trên console Windows (như import_words).
-            try:
-                self.stdout._out.reconfigure(encoding='utf-8', errors='replace')
-            except (AttributeError, ValueError):
-                pass
             self.stdout.write(csv_text)
             return
 

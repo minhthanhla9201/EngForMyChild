@@ -58,7 +58,9 @@ EngForMyChild/
    ├─ manage.py
    ├─ .env / .env.example    # Cấu hình theo máy (DEBUG, DATABASE_URL, TTS_VOICE...)
    ├─ db.sqlite3             # CSDL SQLite
-   ├─ sample_words.csv       # File từ vựng mẫu để nhập
+   ├─ sample_words.csv       # File từ vựng mẫu nhỏ (thử định dạng)
+   ├─ words_backup.csv       # Bộ từ vựng đầy đủ (~430 từ / 28 chủ đề) — nhập/restore
+
    ├─ config/                # ⚙️ Cấu hình dự án
    │  ├─ settings.py         #   Toàn bộ cấu hình (đọc .env)
    │  ├─ urls.py             #   Định tuyến gốc (map các khu)
