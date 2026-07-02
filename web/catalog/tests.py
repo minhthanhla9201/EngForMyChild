@@ -265,3 +265,68 @@ class CatalogManageViewTests(TestCase):
         dog.refresh_from_db()
         self.assertEqual(dog.image.name, 'images/dog2.png')
         self.assertEqual(Word.objects.filter(text_en='dog').count(), 1)
+
+
+class PraiseTests(TestCase):
+    """Giọng động viên (edge-tts mock): sinh + cache + manifest + API."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user('parent', password='pass12345')
+
+    def setUp(self):
+        # Cache giọng vào thư mục tạm để không đụng media thật của dự án.
+        self._tmp = tempfile.mkdtemp()
+        self._override = self.settings(MEDIA_ROOT=self._tmp)
+        self._override.enable()
+
+    def tearDown(self):
+        self._override.disable()
+
+    def _fake_edge(self, text, out_path, voice):
+        """Giả lập edge-tts: ghi file mp3 rỗng (không gọi mạng)."""
+        from pathlib import Path
+        Path(out_path).write_bytes(b'ID3')
+
+    def test_generate_all_creates_and_is_idempotent(self):
+        """Sinh mp3 cho mọi câu; chạy lại thì bỏ qua (không sinh trùng)."""
+        from catalog import praise
+        with mock.patch('catalog.praise.tts._edge_tts_save', side_effect=self._fake_edge):
+            gen, skip, fail = praise.generate_all()
+            total = sum(len(v) for v in praise.PRAISE_LINES.values())
+            self.assertEqual(gen, total)
+            self.assertEqual(fail, 0)
+            # Lần 2: đã có file → bỏ qua hết, không sinh mới.
+            gen2, skip2, fail2 = praise.generate_all()
+            self.assertEqual(gen2, 0)
+            self.assertEqual(skip2, total)
+
+    def test_generate_no_pyttsx3_fallback_on_failure(self):
+        """edge-tts thất bại hẳn → tính là lỗi, KHÔNG tạo file (tránh giọng OS)."""
+        from catalog import praise
+        with mock.patch('catalog.praise.tts._edge_tts_save', side_effect=Exception('net')):
+            gen, skip, fail = praise.generate_all()
+            self.assertEqual(gen, 0)
+            self.assertTrue(fail > 0)
+
+    def test_manifest_lists_only_existing(self):
+        """Manifest chỉ chứa URL của file đã sinh; chưa sinh → danh sách rỗng."""
+        from catalog import praise
+        empty = praise.manifest()
+        self.assertEqual(empty['correct'], [])
+        with mock.patch('catalog.praise.tts._edge_tts_save', side_effect=self._fake_edge):
+            praise.generate_all()
+        full = praise.manifest()
+        self.assertTrue(len(full['correct']) > 0)
+        self.assertTrue(all(u.endswith('.mp3') for u in full['correct']))
+
+    def test_manifest_api_requires_login_and_returns_json(self):
+        """API manifest: cần đăng nhập; trả JSON đúng cấu trúc."""
+        url = reverse('catalog:praise_manifest')
+        self.assertEqual(self.client.get(url).status_code, 302)  # chưa login → redirect
+        self.client.login(username='parent', password='pass12345')
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertTrue(data['ok'])
+        self.assertIn('correct', data['lines'])

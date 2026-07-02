@@ -21,6 +21,7 @@ from core.decorators import manage_required
 from . import audio as audio_service
 from . import imports as import_service
 from . import ipa as ipa_service
+from . import praise as praise_service
 from .forms import TopicForm, WordForm, WordImportForm
 from .models import Topic, Word
 
@@ -54,6 +55,15 @@ def word_audio(request, pk):
         # Không sinh được (vd offline và pyttsx3 lỗi) → báo nhẹ nhàng, không 500.
         return JsonResponse({'ok': False, 'message': 'Chưa nghe được, thử lại sau nhé.'}, status=503)
     return JsonResponse({'ok': True, 'url': clip.file.url})
+
+
+@login_required
+def praise_manifest(request):
+    """
+    Trả danh sách URL mp3 giọng động viên đã sinh (theo tình huống).
+    Client (kidFx) bốc ngẫu nhiên 1 câu để phát. Rỗng → client bỏ qua giọng.
+    """
+    return JsonResponse({'ok': True, 'lines': praise_service.manifest()})
 
 
 # =====================================================================

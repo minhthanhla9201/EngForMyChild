@@ -107,6 +107,8 @@ Tất cả lệnh chạy từ thư mục gốc dự án, dùng Python trong `.ve
 | Nhập từ vựng từ file CSV | `.\.venv\Scripts\python.exe web\manage.py import_words web\sample_words.csv` |
 | Nhập từ vựng KHÔNG cần mạng (không sinh audio) | `.\.venv\Scripts\python.exe web\manage.py import_words web\sample_words.csv --no-audio` |
 | Sao lưu (xuất) toàn bộ từ vựng ra CSV | `.\.venv\Scripts\python.exe web\manage.py export_words web\words_backup.csv` |
+| Tạo âm thanh hiệu ứng game (WAV, offline) | `.\.venv\Scripts\python.exe web\manage.py gen_sfx` |
+| Tạo giọng động viên tiếng Việt (mp3 Neural, cần mạng 1 lần) | `.\.venv\Scripts\python.exe web\manage.py gen_praise` |
 
 ### Nhập từ vựng (thu thập dữ liệu dần)
 Tạo file CSV (mở bằng Excel/Google Sheet rồi lưu dạng CSV) với các cột:

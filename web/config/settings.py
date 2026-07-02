@@ -166,6 +166,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # URL service ASR (faster-whisper) — dùng từ GĐ 3. Giọng TTS mặc định cho edge-tts.
 ASR_URL = os.getenv('ASR_URL', 'http://asr:9000')
 TTS_VOICE = os.getenv('TTS_VOICE', 'en-US-AnaNeural')  # giọng trẻ em, rõ ràng
+# Giọng tiếng Việt (Neural, tự nhiên) cho lời động viên khi bé chơi game.
+TTS_VOICE_VI = os.getenv('TTS_VOICE_VI', 'vi-VN-HoaiMyNeural')
 
 
 # --- Logging ---

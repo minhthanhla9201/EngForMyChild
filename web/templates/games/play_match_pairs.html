@@ -71,11 +71,13 @@
             // Đúng cặp → giữ lật.
             this.cards[a].done = true; this.cards[b].done = true;
             this.matched++;
+            if (window.kidFx) kidFx.correct();
             this.up = []; this.busy = false;
             if (this.matched === this.pairsTotal) this.submit();
           } else {
             // Sai → úp lại sau 0.8s.
             this.mistakes++;
+            if (window.kidFx) kidFx.wrong();
             setTimeout(() => { this.up = []; this.busy = false; }, 800);
           }
         }
@@ -91,6 +93,7 @@
           this.starText = '⭐'.repeat(d.stars || 0) || '🌱';
         } catch(e){ this.starText = '🌱'; }
         this.finished = true;
+        if (window.kidFx) kidFx.cheer();
       },
     };
   }

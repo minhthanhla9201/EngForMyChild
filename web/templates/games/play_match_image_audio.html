@@ -90,10 +90,12 @@
           if (this.cards[a].pair_id === this.cards[b].pair_id) {
             this.cards[a].done = true; this.cards[b].done = true;
             this.matched++;
+            if (window.kidFx) kidFx.correct();  // ghép đúng cặp → khích lệ
             this.up = []; this.busy = false;
             if (this.matched === this.pairsTotal) this.submit();
           } else {
             this.mistakes++;
+            if (window.kidFx) kidFx.wrong();    // lật sai → nhẹ nhàng, không phạt
             setTimeout(() => { this.up = []; this.busy = false; }, 900);
           }
         }
@@ -109,6 +111,7 @@
           this.starText = '⭐'.repeat(d.stars || 0) || '🌱';
         } catch(e){ this.starText = '🌱'; }
         this.finished = true;
+        if (window.kidFx) kidFx.cheer();
       },
     };
   }

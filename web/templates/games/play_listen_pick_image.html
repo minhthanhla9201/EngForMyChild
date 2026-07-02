@@ -90,6 +90,8 @@
         this.answered = true;
         this.lastCorrect = (pickedId === this.current.answer_id);
         if (this.lastCorrect) this.score++;
+        // Hiệu ứng khích lệ đa giác quan (dùng chung kidFx): đúng vui, sai nhẹ nhàng.
+        if (window.kidFx) { this.lastCorrect ? kidFx.correct() : kidFx.wrong(); }
         this.answers.push({answer_id: this.current.answer_id, picked_id: pickedId});
         setTimeout(() => {
           if (this.index < this.questions.length - 1) {
@@ -109,6 +111,7 @@
           this.starText = '⭐'.repeat(d.stars || 0) || '🌱';
         } catch(e){ this.starText = '🌱'; }
         this.finished = true;
+        if (window.kidFx) kidFx.cheer();  // reo mừng khi xong ván
       },
     };
   }
