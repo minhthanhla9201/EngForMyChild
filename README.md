@@ -111,10 +111,13 @@ Tất cả lệnh chạy từ thư mục gốc dự án, dùng Python trong `.ve
 ### Nhập từ vựng (thu thập dữ liệu dần)
 Tạo file CSV (mở bằng Excel/Google Sheet rồi lưu dạng CSV) với các cột:
 ```csv
-topic,topic_vi,text_en,text_vi,level
-Animals,Động vật,cat,con mèo,1
-Colors,Màu sắc,red,màu đỏ,1
+topic,topic_vi,text_en,text_vi,level,image
+Animals,Động vật,cat,con mèo,1,images/cat.jpg
+Colors,Màu sắc,red,màu đỏ,1,
 ```
+Cột `image` (tuỳ chọn) là **đường dẫn file hình trong `web\media\`**, vd `images/cat.jpg`. Nhập
+**không tự tải hình về** — hãy đặt sẵn file hình vào `web\media\images\` rồi ghi đường dẫn tương ứng.
+Để trống nếu chưa có hình.
 Có **2 cách nhập**:
 1. **Qua web (dễ nhất):** vào khu quản lý (**👨‍👩‍👧 Cho phụ huynh** → nhập passcode) → **Nội dung → Nhập từ CSV**, chọn file rồi bấm Nhập.
 2. **Qua dòng lệnh:** chạy lệnh `import_words` (xem bảng trên).

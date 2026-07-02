@@ -217,9 +217,17 @@ class CatalogManageViewTests(TestCase):
         self.assertIn('attachment', resp['Content-Disposition'])
         self.assertIn('words_backup.csv', resp['Content-Disposition'])
         body = resp.content.decode('utf-8-sig')  # bỏ BOM
-        self.assertIn('topic,topic_vi,text_en,text_vi,phonetic,level', body)
+        self.assertIn('topic,topic_vi,text_en,text_vi,phonetic,level,image', body)
         self.assertIn('cat', body)
         self.assertIn('con mèo', body)
+
+    def test_export_includes_image_path(self):
+        """Từ có hình → cột image trong CSV chứa đường dẫn file (images/...)."""
+        self._unlock()
+        self.word.image = 'images/cat.jpg'
+        self.word.save(update_fields=['image'])
+        csv_text = import_service.export_words()
+        self.assertIn('images/cat.jpg', csv_text)
 
     def test_export_then_import_roundtrip(self):
         """Round-trip: xuất ra CSV rồi nhập lại KHÔNG tạo trùng (khôi phục đúng)."""
@@ -235,3 +243,25 @@ class CatalogManageViewTests(TestCase):
         # Nạp lại chính dữ liệu vừa xuất → số chủ đề/từ không đổi (idempotent).
         self.assertEqual(Topic.objects.count(), before_topics)
         self.assertEqual(Word.objects.count(), before_words)
+
+    def test_import_sets_image_path(self):
+        """CSV có cột image → gán đường dẫn hình cho từ (tạo mới và cập nhật)."""
+        self._unlock()
+        # Tạo mới kèm hình.
+        csv_bytes = ('topic,text_en,text_vi,image\n'
+                     'Animals,dog,con chó,images/dog.png\n').encode('utf-8')
+        upload = SimpleUploadedFile('w.csv', csv_bytes, content_type='text/csv')
+        with mock.patch('catalog.imports.ipa_service.to_ipa', return_value=''):
+            self.client.post(reverse('catalog_manage:word_import'), {'csv_file': upload})
+        dog = Word.objects.get(text_en='dog')
+        self.assertEqual(dog.image.name, 'images/dog.png')
+
+        # Nhập lại với hình khác → cập nhật (idempotent, không tạo trùng).
+        csv2 = ('topic,text_en,text_vi,image\n'
+                'Animals,dog,con chó,images/dog2.png\n').encode('utf-8')
+        upload2 = SimpleUploadedFile('w2.csv', csv2, content_type='text/csv')
+        with mock.patch('catalog.imports.ipa_service.to_ipa', return_value=''):
+            self.client.post(reverse('catalog_manage:word_import'), {'csv_file': upload2})
+        dog.refresh_from_db()
+        self.assertEqual(dog.image.name, 'images/dog2.png')
+        self.assertEqual(Word.objects.filter(text_en='dog').count(), 1)
