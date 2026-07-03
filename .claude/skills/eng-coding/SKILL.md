@@ -74,6 +74,7 @@ Mục tiêu: mọi lần code đều theo cùng một khuôn để dễ đọc, 
 ## 8. Templates
 - Đều `{% extends 'base.html' %}`; đặt trong `web/templates/` hoặc `templates/` của app.
 - **Thân thiện trẻ em:** nút to, icon (Bootstrap Icons) + emoji, ít chữ; thao tác chính có nút 🔊 nghe hướng dẫn. Màu tươi qua biến CSS (`--brand`...).
+- **Đơn vị CSS = `px` (BẮT BUỘC):** mọi kích thước trong `web/static/css/style.css` (và style inline) dùng **`px`**, KHÔNG dùng `rem`/`em`. Quy đổi 1rem = 16px. (Giữ nguyên `%`, `vh/vw`, `s`, và số thuần như `line-height`/`scale`/`z-index`.)
 - Form POST luôn có `{% csrf_token %}`.
 - Link bằng `{% url 'app:name' %}`, KHÔNG hardcode đường dẫn.
 - Hiển thị cờ Y/N qua `get_<field>_display` hoặc property, không in thẳng `'Y'/'N'`.

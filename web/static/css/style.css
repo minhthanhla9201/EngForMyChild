@@ -1,5 +1,6 @@
 /* Style dùng chung — màu tươi, nút to, thân thiện bé 6–7 tuổi.
-   (Đồng bộ biến màu khi tạo bản wireframe ở GĐ sau.) */
+   (Đồng bộ biến màu khi tạo bản wireframe ở GĐ sau.)
+   ĐƠN VỊ: dùng px cho mọi kích thước (KHÔNG dùng rem/em) — xem docs/CongNghe.md. */
 :root {
     --brand: #4f8cff;
     --brand-dark: #2f6bdd;
@@ -10,7 +11,7 @@
 
 body {
     background: var(--brand-soft);
-    font-size: 1.05rem;
+    font-size: 17px;
 }
 
 .navbar-brand-bar {
@@ -18,7 +19,7 @@ body {
 }
 .navbar-brand-bar .navbar-brand {
     color: #fff;
-    font-size: 1.4rem;
+    font-size: 22px;
 }
 /* Liên kết trên navbar màu trắng để nổi trên nền xanh */
 .navbar-brand-bar .nav-link {
@@ -37,7 +38,7 @@ body {
 
 /* Navbar KHU QUẢN LÝ: tông xám trung tính, tách biệt hẳn nav xanh của bé */
 .navbar-manage-bar { background: #343a40; }
-.navbar-manage-bar .navbar-brand { color: #fff; font-size: 1.25rem; }
+.navbar-manage-bar .navbar-brand { color: #fff; font-size: 20px; }
 .navbar-manage-bar .nav-link { color: rgba(255, 255, 255, .85); font-weight: 500; }
 .navbar-manage-bar .nav-link:hover,
 .navbar-manage-bar .nav-link:focus { color: #fff; }
@@ -47,15 +48,15 @@ body {
 body.body-manage { background: #eef1f4; }
 
 /* Ô nhập passcode: to, dễ bấm, ẩn ký tự */
-.passcode-input { letter-spacing: .5rem; text-align: center; font-size: 1.6rem; }
+.passcode-input { letter-spacing: 8px; text-align: center; font-size: 26px; }
 
 /* Nút to dễ bấm cho bé */
 .btn-kid {
     background: var(--brand);
     color: #fff;
     border: none;
-    border-radius: 1rem;
-    padding: .75rem 1.25rem;
+    border-radius: 16px;
+    padding: 12px 20px;
     font-weight: 600;
 }
 .btn-kid:hover { background: var(--brand-dark); color: #fff; }
@@ -63,52 +64,59 @@ body.body-manage { background: #eef1f4; }
 /* Thẻ hồ sơ bé */
 .child-card {
     border: 2px solid var(--brand-border);
-    border-radius: 1.25rem;
+    border-radius: 20px;
     background: #fff;
     transition: transform .1s ease;
 }
 .child-card:hover { transform: translateY(-3px); }
-.child-avatar { font-size: 3rem; line-height: 1; }
+.child-avatar { font-size: 48px; line-height: 1; }
 
 /* ===== Bảng điều khiển: thẻ khu (zone), số liệu (stat), khu quản lý ===== */
 .zone-card {
     border: 2px solid var(--brand-border);
-    border-radius: 1.25rem;
+    border-radius: 20px;
     background: #fff;
     transition: transform .1s ease, box-shadow .1s ease;
 }
-.zone-card:hover { transform: translateY(-3px); box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .08); }
+.zone-card:hover { transform: translateY(-3px); box-shadow: 0 8px 16px rgba(0, 0, 0, .08); }
 /* Khu của bé: to, nhiều màu, icon lớn */
-.zone-kid .zone-icon { font-size: 2.75rem; line-height: 1.2; }
+.zone-kid .zone-icon { font-size: 44px; line-height: 1.2; }
+/* 3 nút hoạt động: mỗi nút một gradient tươi, chữ trắng nổi bật (giống dải tiến độ) */
+.zone-kid.zone-a { background: linear-gradient(135deg, #4f8cff, #6a5cff); border: none; }
+.zone-kid.zone-b { background: linear-gradient(135deg, #ff7eb3, #ff5f8f); border: none; }
+.zone-kid.zone-c { background: linear-gradient(135deg, #ffb703, #fb8500); border: none; }
+.zone-kid.zone-a, .zone-kid.zone-b, .zone-kid.zone-c { color: #fff; }
+/* Chữ con (mô tả) trên nền màu: trắng dịu để vẫn đọc rõ */
+.zone-kid.zone-a .small, .zone-kid.zone-b .small, .zone-kid.zone-c .small { color: rgba(255, 255, 255, .9); }
 /* Khu quản lý: gọn hơn, tông trung tính để phân biệt với khu của bé */
 .zone-manage { border-color: #e2e6ea; }
 .zone-manage .manage-icon {
-    width: 2.75rem; height: 2.75rem;
+    width: 44px; height: 44px;
     display: flex; align-items: center; justify-content: center;
-    border-radius: .75rem;
+    border-radius: 12px;
     background: var(--brand-soft); color: var(--brand-dark);
-    font-size: 1.4rem; flex: 0 0 auto;
+    font-size: 22px; flex: 0 0 auto;
 }
 
 /* Thẻ số liệu tổng quan */
 .stat-card {
     border: 2px solid var(--brand-border);
-    border-radius: 1rem;
+    border-radius: 16px;
     background: #fff;
 }
-.stat-num { font-size: 1.75rem; font-weight: 700; color: var(--brand-dark); }
+.stat-num { font-size: 28px; font-weight: 700; color: var(--brand-dark); }
 
 /* ===== Tiến độ của bé (trang chủ khu bé) — sinh động, dễ thương ===== */
 /* Thẻ tiến độ nền gradient tươi */
 .progress-card {
     border: none;
-    border-radius: 1.5rem;
+    border-radius: 24px;
     background: linear-gradient(135deg, #fff6d5 0%, #ffe0ec 100%);
-    box-shadow: 0 .5rem 1.25rem rgba(255, 150, 100, .18);
+    box-shadow: 0 8px 20px rgba(255, 150, 100, .18);
 }
 /* Linh vật lớn dần: emoji TO cho bé nhìn rõ, nảy nhẹ khi vào trang */
 .pet-emoji {
-    font-size: 9rem;
+    font-size: 144px;
     line-height: 1;
     display: inline-block;
     animation: pet-bounce 2s ease-in-out infinite;
@@ -117,11 +125,11 @@ body.body-manage { background: #eef1f4; }
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-8px); }
 }
-.pet-name { font-weight: 800; color: #d96a00; font-size: 1.5rem; }
+.pet-name { font-weight: 800; color: #d96a00; font-size: 24px; }
 
 /* Số sao TO, vàng, có bóng cho nổi bật (bé nhìn rõ thành quả) */
 .stars-big {
-    font-size: 4rem;
+    font-size: 64px;
     font-weight: 800;
     color: #f59e0b;
     text-shadow: 0 2px 0 #fff, 0 3px 4px rgba(0, 0, 0, .1);
@@ -129,30 +137,30 @@ body.body-manage { background: #eef1f4; }
 }
 /* Icon ⭐ phóng to riêng, KHÔNG bị giới hạn theo cỡ số bên cạnh */
 .stars-big .star-icon {
-    font-size: 5rem;
+    font-size: 80px;
     vertical-align: middle;
 }
 
 /* Thanh tiến tới mốc linh vật kế tiếp */
 .pet-progress {
-    height: 1rem;
-    border-radius: 1rem;
+    height: 16px;
+    border-radius: 16px;
     background: rgba(255, 255, 255, .6);
     overflow: hidden;
 }
 .pet-progress-bar {
     height: 100%;
-    border-radius: 1rem;
+    border-radius: 16px;
     background: linear-gradient(90deg, #ffb703, #fb8500);
     transition: width .6s ease;
 }
 
 /* Lưới huy hiệu: các ô tròn trải thành KHỐI nhiều cột (tự xuống hàng), căn giữa */
-.badge-grid { display: flex; flex-wrap: wrap; gap: .75rem; justify-content: center; }
+.badge-grid { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
 .badge-chip {
-    width: 4rem; height: 4rem;
+    width: 64px; height: 64px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 2rem;
+    font-size: 32px;
     border-radius: 50%;
     background: #fff;
     border: 2px solid var(--brand-border);
@@ -164,7 +172,7 @@ body.body-manage { background: #eef1f4; }
 .badge-chip.earned {
     background: #fff3cd;
     border-color: #ffca3a;
-    box-shadow: 0 .2rem .5rem rgba(255, 200, 60, .4);
+    box-shadow: 0 3px 8px rgba(255, 200, 60, .4);
 }
 /* Chưa đạt → làm mờ CHỈ phần icon (không grayscale cả chip → tooltip vẫn rõ) + ổ khoá góc */
 .badge-icon { line-height: 1; }
@@ -173,29 +181,29 @@ body.body-manage { background: #eef1f4; }
 /* Ổ khoá là phần tử riêng (.badge-lock) — KHÔNG dùng ::after vì ::after dành cho mũi nhọn tooltip */
 .badge-lock {
     position: absolute; bottom: -2px; right: -2px;
-    font-size: .9rem;
+    font-size: 14px;
 }
 
 /* Tooltip ghi chú: hiện khi hover/focus vào chip (đẹp hơn title mặc định) */
 .badge-chip[data-tip]::before {
     content: attr(data-tip);
     position: absolute;
-    bottom: calc(100% + .6rem);
+    bottom: calc(100% + 10px);
     left: 50%;
     transform: translateX(-50%);
     /* Cho phép XUỐNG DÒNG để bao trọn câu khen dài (không cắt chữ) */
     white-space: normal;
     width: max-content;
-    max-width: 16rem;
+    max-width: 256px;
     text-align: center;
     line-height: 1.35;
     background: #2b2b2b;
     color: #ffd93b;             /* vàng nổi bật trên nền đậm cho bé dễ đọc */
-    font-size: 1rem;
+    font-size: 16px;
     font-weight: 700;
-    padding: .5rem .8rem;
-    border-radius: .6rem;
-    box-shadow: 0 .3rem .8rem rgba(0, 0, 0, .3);
+    padding: 8px 13px;
+    border-radius: 10px;
+    box-shadow: 0 5px 13px rgba(0, 0, 0, .3);
     opacity: 0;
     visibility: hidden;
     transition: opacity .15s ease;
@@ -207,10 +215,10 @@ body.body-manage { background: #eef1f4; }
 .badge-chip[data-tip]::after {
     content: '';
     position: absolute;
-    bottom: calc(100% + .2rem);
+    bottom: calc(100% + 3px);
     left: 50%;
     transform: translateX(-50%);
-    border: .4rem solid transparent;
+    border: 6px solid transparent;
     border-top-color: #2b2b2b;
     opacity: 0;
     visibility: hidden;
@@ -226,9 +234,9 @@ body.body-manage { background: #eef1f4; }
 
 /* Chip chuỗi ngày (streak) */
 .streak-chip {
-    display: inline-flex; align-items: center; gap: .25rem;
+    display: inline-flex; align-items: center; gap: 4px;
     font-weight: 700; color: #e5484d;
-    background: #fff0f0; border-radius: 1rem; padding: .2rem .7rem;
+    background: #fff0f0; border-radius: 16px; padding: 3px 11px;
 }
 
 /* ===== Hiệu ứng khích lệ cho bé (kidfx.js) — offline, thuần CSS ===== */
@@ -265,19 +273,19 @@ body.body-manage { background: #eef1f4; }
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: .25rem;
+    gap: 4px;
     text-align: center;
     animation: kidfx-pop-in .35s cubic-bezier(.2, 1.4, .4, 1) both,
                kidfx-pop-out .3s ease-in 1.1s forwards;
 }
-.kidfx-pop-emoji { font-size: 5rem; line-height: 1; filter: drop-shadow(0 4px 6px rgba(0,0,0,.15)); }
+.kidfx-pop-emoji { font-size: 80px; line-height: 1; filter: drop-shadow(0 4px 6px rgba(0,0,0,.15)); }
 .kidfx-pop-text {
-    font-size: 1.6rem;
+    font-size: 26px;
     font-weight: 800;
-    padding: .25rem .9rem;
-    border-radius: 1rem;
+    padding: 4px 14px;
+    border-radius: 16px;
     background: #fff;
-    box-shadow: 0 .4rem 1rem rgba(0, 0, 0, .15);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, .15);
 }
 .kidfx-good .kidfx-pop-text { color: #2f8f2f; }   /* đúng: xanh lá vui */
 .kidfx-soft .kidfx-pop-text { color: var(--brand-dark); } /* sai: xanh dịu, không đỏ gắt */
@@ -299,15 +307,15 @@ body.body-manage { background: #eef1f4; }
     text-align: center;
     background: #fff;
     border: 3px solid #ffca3a;
-    border-radius: 1.25rem;
-    padding: 1rem 1.5rem;
-    box-shadow: 0 .6rem 1.5rem rgba(0, 0, 0, .25);
+    border-radius: 20px;
+    padding: 16px 24px;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, .25);
     animation: kidfx-pop-in .4s cubic-bezier(.2, 1.4, .4, 1) both,
                kidfx-pop-out .3s ease-in 1.8s forwards;
 }
 .kidfx-badge-title { font-weight: 800; color: #d96a00; }
-.kidfx-badge-icon { font-size: 4rem; line-height: 1.2; }
-.kidfx-badge-name { font-weight: 800; font-size: 1.25rem; color: #333; }
+.kidfx-badge-icon { font-size: 64px; line-height: 1.2; }
+.kidfx-badge-name { font-weight: 800; font-size: 20px; color: #333; }
 .kidfx-badge-desc { color: #666; }
 
 /* Rung nhẹ khi chọn sai (gắn tạm class này vào phần tử muốn rung) */
