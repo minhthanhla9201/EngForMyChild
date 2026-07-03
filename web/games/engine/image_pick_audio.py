@@ -18,8 +18,8 @@ def build_round(words, count=5):
     """
     Mỗi câu: 1 hình đáp án + 4 lựa chọn audio (1 đúng, 3 nhiễu).
 
-    Trả {'questions': [{'answer_id', 'image_word_id', 'choices': [word_payload...]}]}.
-    image_word_id để client hiện hình; mỗi choice có id để client gọi API audio phát.
+    Trả {'questions': [{'answer_id', 'image_word_id', 'image', 'choices': [word_payload...]}]}.
+    'image' là URL hình đáp án để client hiện; mỗi choice có id để gọi API audio phát.
     """
     words = list(words)
     questions = []
@@ -37,6 +37,8 @@ def build_round(words, count=5):
         questions.append({
             'answer_id': target.pk,
             'image_word_id': target.pk,
+            # URL hình đáp án để client hiện ngay (không phải dò lại từ choices).
+            'image': target.image.url if target.image else '',
             'choices': [word_payload(w) for w in choices],
         })
     return {'questions': questions}

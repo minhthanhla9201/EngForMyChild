@@ -81,13 +81,20 @@ class EngineTests(TestCase):
         self.assertEqual(r['total'], 2)
 
     def test_image_pick_audio_build_and_score(self):
-        """Nhìn hình & chọn tiếng: mỗi câu có image_word_id + 4 audio lựa chọn."""
-        data = image_pick_audio.build_round(self.words, count=3)
+        """Nhìn hình & chọn tiếng: mỗi câu có image_word_id + URL hình + 4 audio."""
+        # Từ CÓ ảnh để kiểm URL hình đáp án (game này hiện hình → cần ảnh thật).
+        worded = [Word.objects.create(topic=self.topic, text_en=f'p{i}', text_vi=f'q{i}',
+                                      image=f'images/p{i}.png') for i in range(5)]
+        data = image_pick_audio.build_round(worded, count=3)
         self.assertEqual(len(data['questions']), 3)
         for q in data['questions']:
             self.assertEqual(len(q['choices']), 4)
             self.assertIn('image_word_id', q)
             self.assertIn(q['answer_id'], [c['id'] for c in q['choices']])
+            # Câu hỏi PHẢI có URL hình của đáp án (bug cũ: thiếu → <img> src rỗng).
+            self.assertTrue(q['image'], 'câu hỏi thiếu URL hình đáp án')
+            answer = next(c for c in q['choices'] if c['id'] == q['answer_id'])
+            self.assertEqual(q['image'], answer['image'])  # hình đúng của đáp án
         r = image_pick_audio.score_round(
             {'answers': [{'answer_id': 1, 'picked_id': 1}, {'answer_id': 2, 'picked_id': 2}]})
         self.assertEqual(r['score'], 2)
