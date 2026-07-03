@@ -61,6 +61,26 @@ class PronunciationViewTests(TestCase):
         self.assertIsInstance(data, list)
         self.assertTrue(all('text_en' in w for w in data))
 
+    def test_words_data_maps_real_image_per_word(self):
+        """
+        Mỗi từ phải mang ĐÚNG ảnh của chính nó (image = w.image.url), từ chưa có
+        ảnh thì rỗng — không dùng chung một icon cứng cho mọi từ.
+        """
+        import html
+        import json
+        import re
+        # Thêm 1 từ CÓ ảnh + đảm bảo 'cat' (không ảnh) vẫn rỗng.
+        Word.objects.create(topic=self.topic, text_en='dog', text_vi='con chó',
+                            image='images/dog.png')
+        self.client.login(username='parent', password='pass12345')
+        resp = self.client.get(reverse('pronunciation:practice', args=[self.child.pk, 'animals']))
+        m = re.search(r'id="words-data"[^>]*>(.*?)</script>', resp.content.decode(), re.S)
+        data = json.loads(html.unescape(m.group(1)))
+        by_en = {w['text_en']: w for w in data}
+        self.assertIn('image', by_en['dog'])
+        self.assertTrue(by_en['dog']['image'].endswith('images/dog.png'))  # ảnh đúng của 'dog'
+        self.assertEqual(by_en['cat']['image'], '')                        # 'cat' chưa có ảnh
+
     def test_practice_blocked_for_other_child(self):
         """Không luyện được trên bé của phụ huynh khác → 404."""
         self.client.login(username='parent', password='pass12345')

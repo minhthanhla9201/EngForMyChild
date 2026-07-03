@@ -41,12 +41,13 @@ def practice(request, child_id, slug):
 
     # Danh sách từ cho client (Alpine). Truyền list thuần — template dùng json_script
     # để serialize (KHÔNG json.dumps ở đây, tránh mã hoá 2 lần → client nhận chuỗi).
+    # Dùng ẢNH THẬT của từ (w.image) như bên games; template fallback icon khi từ chưa có ảnh.
     words_data = [{
         'id': w.pk,
         'text_en': w.text_en,
         'text_vi': w.text_vi,
         'phonetic': w.phonetic,
-        'emoji': '🔤',  # GĐ sau dùng ảnh thật nếu có; tạm dùng icon
+        'image': w.image.url if w.image else '',
     } for w in words]
 
     return render(request, 'pronunciation/practice.html', {

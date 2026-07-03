@@ -27,7 +27,16 @@
   </div>
 
   <div class="card child-card text-center p-4 mb-3">
-    <div class="display-1 mb-2" x-text="current.emoji">🔤</div>
+    {# Hình thật của từ (nếu có) để bé nhận ra nghĩa; chưa có ảnh thì icon chữ. #}
+    <div class="mb-2">
+      <template x-if="current.image">
+        <img :src="current.image" :alt="current.text_en"
+             class="img-fluid rounded" style="height:140px;object-fit:contain">
+      </template>
+      <template x-if="!current.image">
+        <div class="display-1">🔤</div>
+      </template>
+    </div>
     <div class="fs-2 fw-bold" x-text="current.text_en"></div>
     <div class="text-muted" x-show="current.phonetic" x-text="`/${current.phonetic}/`"></div>
     <div class="text-secondary mb-3" x-text="current.text_vi"></div>
