@@ -107,8 +107,22 @@
     setTimeout(function () { box.remove(); }, 1400);
   }
 
+  // Audio riêng cho câu hướng dẫn (không đè giọng động viên/từ vựng).
+  var hintAudio = new Audio();
+  hintAudio.volume = 1.0;
+
   // ================== API công khai ==================
   var kidFx = {
+    // Phát giọng đọc câu hướng dẫn khi vào màn chơi (url mp3 do server sinh sẵn).
+    // Rỗng/không có file → bỏ qua (chữ hướng dẫn vẫn hiển thị trong màn).
+    playHint: function (url) {
+      if (!url) return;
+      try {
+        hintAudio.src = url;
+        hintAudio.currentTime = 0;
+        hintAudio.play().catch(function () {});
+      } catch (e) {}
+    },
     correct: function () {
       confetti(28);
       popEmoji(pick(POP_EMOJI), 'kidfx-good');

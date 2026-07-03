@@ -16,7 +16,7 @@
     <div class="text-muted small mb-2">
       Ghép: <span x-text="matched"></span>/<span x-text="pairsTotal"></span> · Lật sai: <span x-text="mistakes"></span>
     </div>
-    <p class="mb-3">Lật 2 thẻ để tìm cặp Anh – Việt nhé!</p>
+    <p class="mb-3">{{ game.hint_vi }}</p>
 
     <div class="row g-2">
       <template x-for="(card, i) in cards" :key="i">
@@ -43,12 +43,16 @@
     </div>
   </div>
 </div>
+{{ hint_voice_url|json_script:"hint-url" }}
 {% endblock %}
 
 {% block extra_js %}
 <script>
   const SUBMIT_URL = "{% url 'games:submit' child.pk game.code topic.slug %}";
   function getCookie(n){const m=document.cookie.match('(^|;)\\s*'+n+'\\s*=\\s*([^;]+)');return m?m.pop():'';}
+  // Đọc câu hướng dẫn cho bé 1 lần khi vào màn.
+  (function(){ var u = JSON.parse(document.getElementById('hint-url').textContent);
+    window.addEventListener('load', function(){ if(window.kidFx) kidFx.playHint(u); }); })();
 
   function matchPairs() {
     return {

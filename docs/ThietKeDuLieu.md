@@ -151,6 +151,7 @@ erDiagram
         string code UK "max 50"
         string name_vi
         string icon
+        string hint_vi "câu hướng dẫn (đọc giọng)"
         string module "vd games.listen_pick"
         int min_words
         string needs_image "Y/N"
@@ -284,6 +285,7 @@ erDiagram
 | `code` | SlugField(max_length=50, unique) | định danh, vd `listen_pick`, `match_pairs`, `parrot` (unique → ≤191) |
 | `name_vi` | CharField | tên hiển thị cho bé |
 | `icon` | CharField | icon/emoji |
+| `hint_vi` | CharField(max_length=150, blank) | câu hướng dẫn tiếng Việt — đọc giọng (edge-tts) + hiện chữ khi bé vào màn (bé chưa biết chữ nghe hiểu). Sinh giọng qua `gen_praise`, phát bằng `kidFx.playHint` |
 | `module` | CharField | đường dẫn module xử lý (vd `games.listen_pick`) |
 | `min_words` | IntegerField | số từ tối thiểu để chơi được |
 | `needs_image` | CharField('Y'/'N') | game có cần hình không |

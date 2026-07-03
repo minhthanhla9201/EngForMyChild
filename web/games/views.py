@@ -60,6 +60,8 @@ def play(request, child_id, code, slug):
     return render(request, f'games/play_{game.module}.html', {
         'child': child, 'game': game, 'topic': topic,
         'round_data': round_data,
+        # URL mp3 giọng đọc câu hướng dẫn (rỗng nếu chưa sinh → chỉ hiện chữ).
+        'hint_voice_url': praise_service.hint_voice_url(game.hint_vi),
     })
 
 

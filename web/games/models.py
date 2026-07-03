@@ -17,6 +17,9 @@ class GameType(AuditedModel):
     code = models.SlugField('Mã game', max_length=50, unique=True)
     name_vi = models.CharField('Tên game', max_length=100)
     icon = models.CharField('Biểu tượng', max_length=50, blank=True, default='🎮')
+    # Câu hướng dẫn tiếng Việt đọc cho bé khi vào màn (bé chưa biết chữ → nghe hiểu).
+    # Sinh giọng bằng edge-tts (catalog.praise) + hiện chữ trong màn chơi.
+    hint_vi = models.CharField('Câu hướng dẫn', max_length=150, blank=True)
     # Module xử lý luật chơi, vd 'listen_pick' (nạp từ games/engine/<module>.py).
     module = models.CharField('Module xử lý', max_length=50)
     min_words = models.PositiveSmallIntegerField('Số từ tối thiểu', default=4)

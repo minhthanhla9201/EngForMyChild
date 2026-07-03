@@ -137,6 +137,15 @@ class GamesViewTests(TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertContains(resp, 'round-data')
 
+    def test_play_shows_hint_and_voice_url(self):
+        """Màn chơi hiện câu hướng dẫn (hint_vi) + nhúng hint-url để phát giọng."""
+        self.client.login(username='parent', password='pass12345')
+        resp = self.client.get(reverse('games:play', args=[self.child.pk, 'listen-pick', 'animals']))
+        # Câu hướng dẫn của game hiện trong màn (từ GameType.hint_vi seed).
+        self.assertContains(resp, self.game.hint_vi)
+        # Có phần tử hint-url để JS phát giọng (rỗng nếu chưa sinh mp3 — vẫn phải có thẻ).
+        self.assertContains(resp, 'hint-url')
+
     def test_round_data_is_object_not_double_encoded(self):
         """
         json_script phải nhúng round_data thành OBJECT, không phải chuỗi JSON lồng.

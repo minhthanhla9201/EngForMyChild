@@ -17,7 +17,7 @@
     <div class="text-muted small mb-2">Câu <span x-text="index + 1"></span> / <span x-text="questions.length"></span></div>
 
     <div class="card child-card text-center p-4 mb-3">
-      <p class="mb-3">Nghe rồi chạm vào hình đúng nhé!</p>
+      <p class="mb-3">{{ game.hint_vi }}</p>
       <div><button class="btn btn-kid btn-lg" @click="playAudio()">
         <i class="bi bi-volume-up-fill"></i> Nghe
       </button></div>
@@ -59,12 +59,16 @@
 
   <audio x-ref="player"></audio>
 </div>
+{{ hint_voice_url|json_script:"hint-url" }}
 {% endblock %}
 
 {% block extra_js %}
 <script>
   const SUBMIT_URL = "{% url 'games:submit' child.pk game.code topic.slug %}";
   function getCookie(n){const m=document.cookie.match('(^|;)\\s*'+n+'\\s*=\\s*([^;]+)');return m?m.pop():'';}
+  // Đọc câu hướng dẫn cho bé 1 lần khi vào màn.
+  (function(){ var u = JSON.parse(document.getElementById('hint-url').textContent);
+    window.addEventListener('load', function(){ if(window.kidFx) kidFx.playHint(u); }); })();
 
   function listenPickImage() {
     return {
@@ -74,7 +78,8 @@
         const data = JSON.parse(document.getElementById('round-data').textContent);
         this.questions = data.questions || [];
         if (!this.questions.length) { this.finished = true; }
-        else { this.$nextTick(() => this.playAudio()); }  // tự phát câu đầu cho bé
+        // KHÔNG tự phát audio câu đầu ở đây — để giọng hướng dẫn (kidFx.playHint) nói
+        // trước; bé bấm "Nghe" hoặc sang câu sau sẽ tự phát (playAudio ở pick()).
       },
       get current(){ return this.questions[this.index] || {choices: []}; },
       // Phát audio mẫu của từ đáp án (API catalog).

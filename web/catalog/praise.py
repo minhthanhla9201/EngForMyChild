@@ -119,6 +119,17 @@ def _badge_lines():
     return out
 
 
+def _hint_lines():
+    """Các câu hướng dẫn game (GameType.hint_vi) đang dùng — lấy từ DB, bỏ trùng/rỗng."""
+    from games.models import GameType
+    seen, out = set(), []
+    for hint in GameType.objects.filter(active='Y').values_list('hint_vi', flat=True):
+        if hint and hint not in seen:
+            seen.add(hint)
+            out.append(hint)
+    return out
+
+
 def generate_all(force=False):
     """
     Sinh mp3 cho MỌI câu động viên (giọng nữ) + lời khen huy hiệu (giọng nam).
@@ -128,11 +139,11 @@ def generate_all(force=False):
     badge_voice = getattr(settings, 'TTS_VOICE_BADGE', 'vi-VN-NamMinhNeural')
 
     generated = skipped = failed = 0
-    # Lời động viên game — giọng nữ.
-    for lines in PRAISE_LINES.values():
-        for text in lines:
-            r = generate_line(text, voice, force)
-            generated += r == 'gen'; skipped += r == 'skip'; failed += r == 'fail'
+    # Lời động viên game + câu hướng dẫn game — giọng nữ.
+    female_lines = [t for lines in PRAISE_LINES.values() for t in lines] + _hint_lines()
+    for text in female_lines:
+        r = generate_line(text, voice, force)
+        generated += r == 'gen'; skipped += r == 'skip'; failed += r == 'fail'
     # Lời khen huy hiệu — giọng nam (khác giọng động viên để bé thấy đặc biệt).
     for text in _badge_lines():
         r = generate_line(text, badge_voice, force)
@@ -163,3 +174,8 @@ def badge_voice_url(desc_vi):
     """URL mp3 giọng NAM đọc lời khen huy hiệu `desc_vi` (đã sinh), hoặc '' nếu chưa."""
     badge_voice = getattr(settings, 'TTS_VOICE_BADGE', 'vi-VN-NamMinhNeural')
     return _url_if_exists(desc_vi, badge_voice)
+
+
+def hint_voice_url(hint_vi):
+    """URL mp3 giọng NỮ đọc câu hướng dẫn game `hint_vi` (đã sinh), hoặc '' nếu chưa."""
+    return _url_if_exists(hint_vi, _default_voice())

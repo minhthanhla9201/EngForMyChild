@@ -291,8 +291,10 @@ class PraiseTests(TestCase):
     def test_generate_all_creates_and_is_idempotent(self):
         """Sinh mp3 cho mọi câu động viên + lời khen huy hiệu; chạy lại thì bỏ qua."""
         from catalog import praise
-        # Tổng = câu động viên (giọng nữ) + lời khen huy hiệu (giọng nam, lấy từ DB seed).
-        total = sum(len(v) for v in praise.PRAISE_LINES.values()) + len(praise._badge_lines())
+        # Tổng = câu động viên (nữ) + câu hướng dẫn game (nữ) + lời khen huy hiệu (nam).
+        # _badge_lines/_hint_lines lấy từ DB seed (Badge/GameType).
+        total = (sum(len(v) for v in praise.PRAISE_LINES.values())
+                 + len(praise._hint_lines()) + len(praise._badge_lines()))
         with mock.patch('catalog.praise.tts._edge_tts_save', side_effect=self._fake_edge):
             gen, skip, fail = praise.generate_all()
             self.assertEqual(gen, total)

@@ -17,7 +17,7 @@
     <div class="text-muted small mb-2">Câu <span x-text="index + 1"></span> / <span x-text="questions.length"></span></div>
 
     <div class="card child-card text-center p-4 mb-3">
-      <p class="mb-3">Nghe rồi chọn từ đúng nhé!</p>
+      <p class="mb-3">{{ game.hint_vi }}</p>
       <div><button class="btn btn-kid btn-lg" @click="playAudio()">
         <i class="bi bi-volume-up-fill"></i> Nghe
       </button></div>
@@ -58,12 +58,16 @@
 
   <audio x-ref="player"></audio>
 </div>
+{{ hint_voice_url|json_script:"hint-url" }}
 {% endblock %}
 
 {% block extra_js %}
 <script>
   const CHILD_ID = {{ child.pk }};
   const SUBMIT_URL = "{% url 'games:submit' child.pk game.code topic.slug %}";
+  // Đọc câu hướng dẫn cho bé 1 lần khi vào màn (bé chưa biết chữ → nghe hiểu).
+  (function(){ var u = JSON.parse(document.getElementById('hint-url').textContent);
+    window.addEventListener('load', function(){ if(window.kidFx) kidFx.playHint(u); }); })();
   function getCookie(n){const m=document.cookie.match('(^|;)\\s*'+n+'\\s*=\\s*([^;]+)');return m?m.pop():'';}
 
   function listenPick() {
