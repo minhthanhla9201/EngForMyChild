@@ -3,6 +3,9 @@
 {# Layout KHU CỦA BÉ: navbar xanh, to, nhiều màu. Chỉ Học/Phát âm/Trò chơi +
    nút nhỏ "Cho phụ huynh" (dẫn tới khu quản lý qua passcode). KHÔNG có Thoát/Quản lý. #}
 
+{# body-kid: phối màu "kẹo ngọt" + chữ to CHỈ áp cho khu bé (khu quản lý giữ tông xám). #}
+{% block body_class %}body-kid{% endblock %}
+
 {# Cấu hình URL cho kidFx (hiệu ứng khích lệ) — dùng tag static/url để
    đúng đường dẫn dù STATIC_URL/MEDIA_URL đổi. Đặt TRƯỚC khi kidfx.js chạy. #}
 {% block extra_head %}

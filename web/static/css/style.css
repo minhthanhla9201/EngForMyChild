@@ -1,12 +1,66 @@
 /* Style dùng chung — màu tươi, nút to, thân thiện bé 6–7 tuổi.
    (Đồng bộ biến màu khi tạo bản wireframe ở GĐ sau.)
    ĐƠN VỊ: dùng px cho mọi kích thước (KHÔNG dùng rem/em) — xem docs/CongNghe.md. */
+/* ===== THEME KHU BÉ =====
+   Mỗi theme = 1 bộ biến ĐẦY ĐỦ. Theme mặc định (Kẹo ngọt) ở :root.
+   2 theme khác ghi đè khi <body> có class .theme-ocean / .theme-garden
+   (JS gắn class theo lựa chọn lưu trong localStorage — xem kidtheme.js).
+   THÊM THEME MỚI: copy đủ 10 biến dưới đây sang một khối .theme-<tên> — thiếu biến
+   nào sẽ rơi về :root, dễ lệch tông. Nút chọn theme thêm ô màu ở navbar (base_kid). */
 :root {
-    --brand: #4f8cff;
-    --brand-dark: #2f6bdd;
-    --brand-soft: #eaf2ff;
-    --brand-border: #cfe0ff;
-    --accent: #ffb703;
+    /* Theme mặc định: "Kẹo ngọt" — tím-xanh vui + hồng kẹo + vàng điểm nhấn.
+       Giữ tên biến cũ để template/khu quản lý không phải sửa. */
+    --brand: #7b6cff;          /* tím-xanh: nút chính, navbar bé */
+    --brand-dark: #5b4de0;
+    --brand-soft: #f4f0ff;     /* nền pastel rất nhạt (mặc định mọi trang) */
+    --brand-border: #ffd6ec;   /* viền hồng kẹo */
+    --accent: #ffd93b;         /* vàng kẹo: điểm nhấn */
+    --candy-pink: #ff7eb3;
+    --candy-blue: #4f8cff;
+    --candy-green: #33d685;
+    --candy-orange: #ff924c;
+    --ink: #3a2e5c;            /* chữ: tím than, đọc rõ trên nền sáng */
+    /* Nền gradient khu bé (đưa vào biến để đổi theo theme) */
+    --kid-bg:
+        radial-gradient(1200px 500px at 15% -5%, #ffe3f3 0%, transparent 60%),
+        radial-gradient(1000px 500px at 90% 0%, #e2ecff 0%, transparent 55%),
+        linear-gradient(180deg, #fef1f9 0%, #eef4ff 100%);
+}
+
+/* Theme "Biển & trời" — xanh dương → xanh ngọc, điểm vàng nắng */
+body.theme-ocean {
+    --brand: #1e9fd8;
+    --brand-dark: #157aa8;
+    --brand-soft: #eaf7ff;
+    --brand-border: #bce6f5;
+    --accent: #ffd93b;
+    --candy-pink: #24c4c4;     /* xanh ngọc thay hồng */
+    --candy-blue: #2a8fe0;
+    --candy-green: #33d6a8;
+    --candy-orange: #ffb703;
+    --ink: #133b52;
+    --kid-bg:
+        radial-gradient(1200px 500px at 15% -5%, #d6f0ff 0%, transparent 60%),
+        radial-gradient(1000px 500px at 90% 0%, #d3f7ef 0%, transparent 55%),
+        linear-gradient(180deg, #eaf7ff 0%, #e2fbf4 100%);
+}
+
+/* Theme "Vườn cổ tích" — xanh lá + vàng + cam ấm (hợp linh vật cây lớn dần) */
+body.theme-garden {
+    --brand: #46b649;
+    --brand-dark: #2f8f32;
+    --brand-soft: #f2fbee;
+    --brand-border: #d6efc7;
+    --accent: #ffcf33;
+    --candy-pink: #ff9f68;     /* cam ấm thay hồng */
+    --candy-blue: #56b657;
+    --candy-green: #7bc043;
+    --candy-orange: #fb8500;
+    --ink: #2e4a24;
+    --kid-bg:
+        radial-gradient(1200px 500px at 15% -5%, #eafbdf 0%, transparent 60%),
+        radial-gradient(1000px 500px at 90% 0%, #fff3d1 0%, transparent 55%),
+        linear-gradient(180deg, #f3fbef 0%, #fdf6e3 100%);
 }
 
 body {
@@ -14,8 +68,35 @@ body {
     font-size: 17px;
 }
 
-.navbar-brand-bar {
+/* ===== KHU CỦA BÉ: nền theo theme + chữ TO cho dễ nhìn (chỉ .body-kid) ===== */
+body.body-kid {
+    background: var(--kid-bg);
+    background-attachment: fixed;
+    font-size: 19px;              /* chữ nền to hơn cho bé dễ đọc */
+    color: var(--ink);
+}
+body.body-kid h1 { font-size: 30px; }
+body.body-kid .fs-5 { font-size: 22px !important; }   /* nhãn nút hoạt động */
+body.body-kid .btn { font-size: 19px; }               /* nút to hơn toàn khu bé */
+body.body-kid .small { font-size: 15px; }
+/* Nút chọn đáp án trong game (Bootstrap btn-outline-primary) — bo tròn to, viền kẹo,
+   hover tô nền tím-xanh. Chỉ trong khu bé để không đụng khu quản lý. */
+body.body-kid .btn-outline-primary {
+    border-width: 2px;
+    border-color: var(--brand-border);
+    border-radius: 18px;
+    color: var(--ink);
+    background: #fff;
+}
+body.body-kid .btn-outline-primary:hover,
+body.body-kid .btn-outline-primary:focus {
     background: var(--brand);
+    border-color: var(--brand);
+    color: #fff;
+}
+
+.navbar-brand-bar {
+    background: linear-gradient(90deg, var(--candy-blue), var(--brand) 55%, var(--candy-pink));
 }
 .navbar-brand-bar .navbar-brand {
     color: #fff;
@@ -50,26 +131,30 @@ body.body-manage { background: #eef1f4; }
 /* Ô nhập passcode: to, dễ bấm, ẩn ký tự */
 .passcode-input { letter-spacing: 8px; text-align: center; font-size: 26px; }
 
-/* Nút to dễ bấm cho bé */
+/* Nút to dễ bấm cho bé — gradient vui + bóng màu "kẹo dẻo", nảy nhẹ khi hover */
 .btn-kid {
-    background: var(--brand);
+    background: linear-gradient(135deg, var(--candy-blue), var(--brand));
     color: #fff;
     border: none;
-    border-radius: 16px;
-    padding: 12px 20px;
-    font-weight: 600;
+    border-radius: 18px;
+    padding: 12px 22px;
+    font-weight: 700;
+    box-shadow: 0 6px 0 rgba(91, 77, 224, .35), 0 8px 16px rgba(123, 108, 255, .28);
+    transition: transform .1s ease, box-shadow .1s ease, filter .1s ease;
 }
-.btn-kid:hover { background: var(--brand-dark); color: #fff; }
+.btn-kid:hover { color: #fff; filter: brightness(1.05); transform: translateY(-2px); }
+.btn-kid:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(91, 77, 224, .35); }
 
-/* Thẻ hồ sơ bé */
+/* Thẻ hồ sơ bé / chủ đề — bo tròn, bóng hồng mềm, nảy nhẹ khi hover */
 .child-card {
     border: 2px solid var(--brand-border);
-    border-radius: 20px;
+    border-radius: 22px;
     background: #fff;
-    transition: transform .1s ease;
+    box-shadow: 0 6px 16px rgba(255, 126, 179, .12);
+    transition: transform .1s ease, box-shadow .1s ease;
 }
-.child-card:hover { transform: translateY(-3px); }
-.child-avatar { font-size: 48px; line-height: 1; }
+.child-card:hover { transform: translateY(-4px); box-shadow: 0 12px 22px rgba(255, 126, 179, .22); }
+.child-avatar { font-size: 52px; line-height: 1; }
 
 /* ===== Bảng điều khiển: thẻ khu (zone), số liệu (stat), khu quản lý ===== */
 .zone-card {
@@ -79,15 +164,21 @@ body.body-manage { background: #eef1f4; }
     transition: transform .1s ease, box-shadow .1s ease;
 }
 .zone-card:hover { transform: translateY(-3px); box-shadow: 0 8px 16px rgba(0, 0, 0, .08); }
-/* Khu của bé: to, nhiều màu, icon lớn */
-.zone-kid .zone-icon { font-size: 44px; line-height: 1.2; }
-/* 3 nút hoạt động: mỗi nút một gradient tươi, chữ trắng nổi bật (giống dải tiến độ) */
-.zone-kid.zone-a { background: linear-gradient(135deg, #4f8cff, #6a5cff); border: none; }
-.zone-kid.zone-b { background: linear-gradient(135deg, #ff7eb3, #ff5f8f); border: none; }
-.zone-kid.zone-c { background: linear-gradient(135deg, #ffb703, #fb8500); border: none; }
-.zone-kid.zone-a, .zone-kid.zone-b, .zone-kid.zone-c { color: #fff; }
+/* Khu của bé: to, nhiều màu, icon lớn nảy khi hover */
+.zone-kid .zone-icon { font-size: 52px; line-height: 1.2; transition: transform .15s ease; }
+.zone-kid:hover .zone-icon { transform: scale(1.15) rotate(-4deg); }
+/* 3 nút hoạt động: mỗi nút một gradient "kẹo" + bóng màu cùng tông, chữ trắng nổi */
+.zone-kid.zone-a, .zone-kid.zone-b, .zone-kid.zone-c {
+    color: #fff; border: none; border-radius: 24px;
+}
+.zone-kid.zone-a { background: linear-gradient(135deg, var(--candy-blue), var(--brand)); box-shadow: 0 10px 22px rgba(79, 140, 255, .35); }
+.zone-kid.zone-b { background: linear-gradient(135deg, #ff9ec7, var(--candy-pink)); box-shadow: 0 10px 22px rgba(255, 126, 179, .38); }
+.zone-kid.zone-c { background: linear-gradient(135deg, #ffcf5c, var(--candy-orange)); box-shadow: 0 10px 22px rgba(255, 146, 76, .38); }
+.zone-kid.zone-a:hover, .zone-kid.zone-b:hover, .zone-kid.zone-c:hover {
+    transform: translateY(-5px); filter: brightness(1.04);
+}
 /* Chữ con (mô tả) trên nền màu: trắng dịu để vẫn đọc rõ */
-.zone-kid.zone-a .small, .zone-kid.zone-b .small, .zone-kid.zone-c .small { color: rgba(255, 255, 255, .9); }
+.zone-kid.zone-a .small, .zone-kid.zone-b .small, .zone-kid.zone-c .small { color: rgba(255, 255, 255, .92); }
 /* Khu quản lý: gọn hơn, tông trung tính để phân biệt với khu của bé */
 .zone-manage { border-color: #e2e6ea; }
 .zone-manage .manage-icon {

@@ -75,6 +75,7 @@ Mục tiêu: mọi lần code đều theo cùng một khuôn để dễ đọc, 
 - Đều `{% extends 'base.html' %}`; đặt trong `web/templates/` hoặc `templates/` của app.
 - **Thân thiện trẻ em:** nút to, icon (Bootstrap Icons) + emoji, ít chữ; thao tác chính có nút 🔊 nghe hướng dẫn. Màu tươi qua biến CSS (`--brand`...).
 - **Đơn vị CSS = `px` (BẮT BUỘC):** mọi kích thước trong `web/static/css/style.css` (và style inline) dùng **`px`**, KHÔNG dùng `rem`/`em`. Quy đổi 1rem = 16px. (Giữ nguyên `%`, `vh/vw`, `s`, và số thuần như `line-height`/`scale`/`z-index`.)
+- **Phối màu "kẹo ngọt" cho khu bé:** dùng biến CSS ở `:root` — `--brand` (tím-xanh #7b6cff), `--candy-pink/blue/green/orange`, `--accent` (vàng #ffd93b), `--ink` (chữ #3a2e5c). Nút/thẻ khu bé dùng **gradient + bóng màu cùng tông**, bo tròn ~18–24px, chữ TO (nền 19px). Style riêng khu bé bọc trong `body.body-kid` (base_kid đặt `body_class = body-kid`) — **KHÔNG áp cho khu quản lý** (giữ tông xám trung tính). Thêm màu/nút mới → tái dùng biến, không hardcode hex rải rác.
 - Form POST luôn có `{% csrf_token %}`.
 - Link bằng `{% url 'app:name' %}`, KHÔNG hardcode đường dẫn.
 - Hiển thị cờ Y/N qua `get_<field>_display` hoặc property, không in thẳng `'Y'/'N'`.
