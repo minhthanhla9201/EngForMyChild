@@ -31,8 +31,11 @@ trên cùng để **về mục lục** hoặc xem **màn trước/sau**. Không 
   - Luyện phát âm — chọn bé & chủ đề
   - Luyện phát âm — đọc theo & ghi âm
   - Trò chơi — chọn bé, game & chủ đề
-  - Game: Nghe & chọn
+  - Game: Nghe & chọn (hình + chữ)
   - Game: Lật thẻ tìm cặp (+ màn kết quả ⭐)
+  - Game: Nghe & chọn hình 👂🖼️ (bé chưa biết chữ)
+  - Game: Nhìn hình & chọn tiếng 🖼️🔊
+  - Game: Ghép hình với tiếng 🃏🔊
   - Game: chủ đề chưa đủ từ
 
   **🔒 Vào khu quản lý (passcode)** — lớp khoá thứ 2 sau đăng nhập
@@ -53,12 +56,19 @@ trên cùng để **về mục lục** hoặc xem **màn trước/sau**. Không 
 >
 > Các màn động (game, luyện phát âm) hiển thị ở **một trạng thái đại diện** (đang chơi/đã ghi âm) để xem bố cục — wireframe là bản tĩnh, không chạy logic Alpine/JS thật.
 
-## Đồng bộ giao diện
-Wireframe chỉ là bản tĩnh để xem trước, **không** được app dùng khi chạy. Khi đổi `web/static/css/style.css`
-hoặc nâng phiên bản thư viện trong `web/static/vendor/`, hãy copy lại sang `wireframe/assets/`
-để wireframe khớp với giao diện thật:
+## Đồng bộ giao diện (BẮT BUỘC sau khi sửa UI)
+Wireframe chỉ là bản tĩnh để xem trước, **không** được app dùng khi chạy — nên phải **chủ động đồng bộ**
+sau mỗi lần đổi giao diện, nếu không wireframe sẽ lệch với app thật. Ba trường hợp:
 
-```powershell
-Copy-Item web\static\css\style.css wireframe\assets\style.css -Force
-Copy-Item web\static\vendor\* wireframe\assets\vendor\ -Recurse -Force
-```
+1. **Đổi `web/static/css/style.css` hoặc nâng version thư viện `web/static/vendor/`** → copy lại sang `assets/`:
+   ```powershell
+   Copy-Item web\static\css\style.css wireframe\assets\style.css -Force
+   Copy-Item web\static\vendor\* wireframe\assets\vendor\ -Recurse -Force
+   ```
+2. **Sửa bố cục một màn có sẵn** (đổi template khu bé/quản lý) → cập nhật file wireframe tương ứng cho khớp
+   (tra bảng *Map wireframe ↔ chức năng* trong `docs/ThietKeCoBan.md` mục 10 để biết file nào ↔ template nào).
+3. **Thêm màn/game mới** → thêm 1 file `<tên-màn>.html`, đăng ký vào `assets/wf-frame.js` (mảng `WF_SCREENS`)
+   và thêm thẻ vào `index.html`; đồng thời bổ sung dòng vào bảng map ở `docs/ThietKeCoBan.md` mục 10.
+
+> Wireframe là bản tĩnh — màn động (game, luyện phát âm) chỉ minh hoạ **một trạng thái đại diện**; hình ảnh
+> của từ dùng emoji thay cho ảnh thật (`w.image`) của app.

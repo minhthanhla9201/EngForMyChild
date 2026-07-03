@@ -279,8 +279,11 @@ Wireframe ([wireframe/](../wireframe/), mở [index.html](../wireframe/index.htm
 | [speak-choose.html](../wireframe/speak-choose.html) | Phát âm: chọn bé & chủ đề (5.3) | `/speak/` → `choose` | `pronunciation/choose.html` |
 | [speak-practice.html](../wireframe/speak-practice.html) | Phát âm: đọc theo & ghi âm (5.3) | `/speak/<child>/<slug>/` → `practice` (+ `.../word/<word>/save/` → `save_attempt`) | `pronunciation/practice.html` |
 | [game-choose.html](../wireframe/game-choose.html) | Trò chơi: chọn bé/game/chủ đề (5.4) | `/games/` → `choose` | `games/choose.html` |
-| [game-listen.html](../wireframe/game-listen.html) | Game *Nghe & chọn* 👂 (5.4) | `/games/<child>/<code>/<slug>/` → `play` (module `listen_pick`) | `games/play_listen_pick.html` |
+| [game-listen.html](../wireframe/game-listen.html) | Game *Nghe & chọn* 👂 (hình + chữ) (5.4) | `/games/<child>/<code>/<slug>/` → `play` (module `listen_pick`) | `games/play_listen_pick.html` |
 | [game-match.html](../wireframe/game-match.html) | Game *Lật thẻ tìm cặp* 🃏 + kết quả ⭐ (5.4) | `/games/<child>/<code>/<slug>/` → `play` (module `match_pairs`) | `games/play_match_pairs.html` |
+| [game-listen-image.html](../wireframe/game-listen-image.html) | Game *Nghe & chọn hình* 👂🖼️ (bé chưa biết chữ) (5.4) | `/games/<child>/<code>/<slug>/` → `play` (module `listen_pick_image`) | `games/play_listen_pick_image.html` |
+| [game-image-audio.html](../wireframe/game-image-audio.html) | Game *Nhìn hình & chọn tiếng* 🖼️🔊 (5.4) | `/games/<child>/<code>/<slug>/` → `play` (module `image_pick_audio`) | `games/play_image_pick_audio.html` |
+| [game-match-image.html](../wireframe/game-match-image.html) | Game *Ghép hình với tiếng* 🃏🔊 (5.4) | `/games/<child>/<code>/<slug>/` → `play` (module `match_image_audio`) | `games/play_match_image_audio.html` |
 | [game-empty.html](../wireframe/game-empty.html) | Trạng thái chủ đề chưa đủ từ (5.4) | nhánh của `play` khi `words < min_words` | `games/play_empty.html` |
 
 ### 🔒 Vào khu quản lý — passcode
@@ -303,7 +306,7 @@ Wireframe ([wireframe/](../wireframe/), mở [index.html](../wireframe/index.htm
 | [progress.html](../wireframe/progress.html) | Tiến độ của bé (5.1) | `/manage/progress/` → `progress` | `accounts/progress.html` |
 
 ### Ghi chú map
-- **22 file wireframe** phủ toàn bộ chức năng đã làm (GĐ 0/1/2/4). Chưa có wireframe cho **GĐ 3** (chấm điểm phát âm) và **GĐ 5** (ngữ pháp/huy hiệu) vì chưa làm.
+- **22 file wireframe** (chưa kể `index.html`) phủ toàn bộ chức năng đã làm (GĐ 0/1/2/4), gồm **5 game**: Nghe & chọn, Lật thẻ tìm cặp, và 3 game nhận dạng cho bé chưa biết chữ (Nghe & chọn hình, Nhìn hình & chọn tiếng, Ghép hình với tiếng). Chưa có wireframe cho **GĐ 3** (chấm điểm phát âm) và **GĐ 5** (ngữ pháp/huy hiệu) vì chưa làm.
 - **Trang chủ khu bé** (`kid_home.html`) không có thẻ riêng ở mục lục wireframe — điều hướng vào từ chính các thẻ khu của bé.
 - **Màn "đặt" và "nhập" passcode** dùng **chung 1 URL** (`/manage/unlock/`): view tự chọn form theo `ManagePasscode.is_set`. Wireframe tách 2 file để xem cả 2 trạng thái.
 - **Form chủ đề** không có thẻ mục lục riêng (gộp ý trong màn Quản lý chủ đề) nhưng template thật `topic_form.html` vẫn tồn tại — nếu cần wireframe riêng, thêm `topicform.html` cho đối xứng với `wordform.html`.

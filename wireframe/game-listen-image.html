@@ -3,43 +3,43 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Wireframe — Game: Nghe & chọn</title>
+<title>Wireframe — Game: Nghe & chọn hình</title>
 <!-- Wireframe ĐỘC LẬP, chạy offline: asset trong assets/ cạnh file này. -->
 <link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
 <link href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
 <link href="assets/style.css" rel="stylesheet">
 <link href="assets/wf-frame.css" rel="stylesheet">
 </head>
-<body data-screen="game-listen">
+<body data-screen="game-listen-image">
 
 <!-- Thanh điều hướng wireframe (về mục lục + màn trước/sau) — wf-frame.js dựng -->
 <div class="wf-bar" id="wf-bar"></div>
 
-<section class="wf-screen" id="game-listen">
-  <div class="wf-label"><i class="bi bi-ear"></i> Game: Nghe & chọn <span class="wf-url">/games/1/listen-pick/animals/</span></div>
+<section class="wf-screen" id="game-listen-image">
+  <div class="wf-label"><i class="bi bi-images"></i> Game: Nghe & chọn hình <span class="wf-url">/games/1/listen-pick-image/animals/</span></div>
   <div class="wf-frame">
     <div class="wf-nav-kid"></div>
     <main class="container py-4">
       <div class="d-flex align-items-center justify-content-between mb-3">
-        <h1 class="h5 m-0">👂 🐥 Bi — Động vật</h1>
+        <h1 class="h5 m-0">👂🖼️ 🐥 Bi — Động vật</h1>
         <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Thoát</button>
       </div>
       <div class="text-muted small mb-2">Câu 2 / 5</div>
       <div class="card child-card text-center p-4 mb-3">
-        <p class="mb-3">Nghe rồi chọn từ đúng nhé!</p>
+        <p class="mb-3">Nghe rồi chạm vào hình đúng nhé!</p>
         <div><button class="btn btn-kid btn-lg"><i class="bi bi-volume-up-fill"></i> Nghe</button></div>
       </div>
-      <!-- Lựa chọn: hình lớn + chữ nhỏ (vừa chữ vừa hình cho bé chưa biết chữ) -->
+      <!-- Lựa chọn là HÌNH (không chữ) — dành cho bé chưa biết chữ -->
       <div class="row g-3">
-        <div class="col-6"><button class="btn btn-outline-primary w-100 p-2"><div style="font-size:3rem">🐱</div><div class="fs-5">cat</div><div class="small text-muted">con mèo</div></button></div>
-        <div class="col-6"><button class="btn btn-outline-primary w-100 p-2"><div style="font-size:3rem">🐶</div><div class="fs-5">dog</div><div class="small text-muted">con chó</div></button></div>
-        <div class="col-6"><button class="btn btn-outline-primary w-100 p-2"><div style="font-size:3rem">🐦</div><div class="fs-5">bird</div><div class="small text-muted">con chim</div></button></div>
-        <div class="col-6"><button class="btn btn-outline-primary w-100 p-2"><div style="font-size:3rem">🐟</div><div class="fs-5">fish</div><div class="small text-muted">con cá</div></button></div>
+        <div class="col-6"><button class="btn btn-outline-primary w-100 p-2" style="min-height:140px"><div style="font-size:5rem">🐱</div></button></div>
+        <div class="col-6"><button class="btn btn-outline-primary w-100 p-2" style="min-height:140px"><div style="font-size:5rem">🐶</div></button></div>
+        <div class="col-6"><button class="btn btn-outline-primary w-100 p-2" style="min-height:140px"><div style="font-size:5rem">🐦</div></button></div>
+        <div class="col-6"><button class="btn btn-outline-primary w-100 p-2" style="min-height:140px"><div style="font-size:5rem">🐟</div></button></div>
       </div>
       <div class="mt-3 text-center"><div class="alert alert-success mb-0">🎉 Đúng rồi!</div></div>
     </main>
   </div>
-  <div class="wf-note">Nghe audio → chọn 1 trong 4. Phản hồi đúng/sai ngay. Hết câu → màn kết quả hiện ⭐ (xem dưới).</div>
+  <div class="wf-note">Nghe audio → chạm HÌNH đúng trong 4 hình (không cần biết chữ). Tự phát audio mỗi câu. Đúng/sai có hiệu ứng kidFx (confetti + giọng động viên). Module <code>listen_pick_image</code>, cần từ có ảnh.</div>
 </section>
 
 <script src="assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
