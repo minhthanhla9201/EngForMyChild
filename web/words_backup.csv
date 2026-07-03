@@ -1,0 +1,438 @@
+﻿topic,topic_vi,text_en,text_vi,phonetic,level,image
+Actions,Hành động,clap,vỗ tay,klæp,1,images/1F44F.svg
+Actions,Hành động,cry,khóc,kraɪ,1,images/1F622.svg
+Actions,Hành động,dance,nhảy múa,dæns,1,images/1F483.svg
+Actions,Hành động,draw,vẽ,drɔ,1,images/1F3A8.svg
+Actions,Hành động,drink,uống,drɪŋk,1,images/1F964.svg
+Actions,Hành động,eat,ăn,it,1,images/1F37D.svg
+Actions,Hành động,jump,nhảy,ʤəmp,1,images/1F938.svg
+Actions,Hành động,laugh,cười,læf,1,images/1F604.svg
+Actions,Hành động,listen,nghe,ˈlɪsən,2,images/1F442.svg
+Actions,Hành động,read,đọc,rɛd,1,images/1F4D6.svg
+Actions,Hành động,run,chạy,rən,1,images/1F3C3.svg
+Actions,Hành động,sing,hát,sɪŋ,1,images/1F3A4.svg
+Actions,Hành động,sit,ngồi,sɪt,1,images/1FA91.svg
+Actions,Hành động,sleep,ngủ,slip,1,images/1F634.svg
+Actions,Hành động,stand,đứng,stænd,1,images/1F9CD.svg
+Actions,Hành động,swim,bơi,swɪm,1,images/1F3CA.svg
+Actions,Hành động,walk,đi bộ,wɔk,1,images/1F6B6.svg
+Actions,Hành động,write,viết,raɪt,1,images/270D.svg
+Animals,Động vật,bear,con gấu,bɛr,1,images/1F43B.svg
+Animals,Động vật,bird,con chim,bərd,1,images/1F426.svg
+Animals,Động vật,cat,con mèo,kæt,1,images/openmoji/1F431.svg
+Animals,Động vật,cow,con bò,kaʊ,1,images/1F42E.svg
+Animals,Động vật,deer,con hươu,dɪr,1,images/1F98C.svg
+Animals,Động vật,dog,con chó,dɔg,1,images/openmoji/1F436.svg
+Animals,Động vật,duck,con vịt,dək,1,images/1F986.svg
+Animals,Động vật,elephant,con voi,ˈɛləfənt,1,images/openmoji/1F418.svg
+Animals,Động vật,fish,con cá,fɪʃ,1,images/1F41F.svg
+Animals,Động vật,fox,con cáo,fɑks,1,images/openmoji/1F98A.svg
+Animals,Động vật,giraffe,con hươu cao cổ,ʤəræf,1,images/1F992.svg
+Animals,Động vật,horse,con ngựa,hɔrs,1,images/1F434.svg
+Animals,Động vật,kangaroo,con chuột túi,ˌkæŋgərˈu,1,images/1F998.svg
+Animals,Động vật,koala,con gấu túi,koʊˈɑlə,1,images/1F428.svg
+Animals,Động vật,lion,con sư tử,laɪən,1,images/openmoji/1F981.svg
+Animals,Động vật,monkey,con khỉ,ˈməŋki,1,images/1F435.svg
+Animals,Động vật,panda,con gấu trúc,ˈpændə,1,images/1F43C.svg
+Animals,Động vật,penguin,chim cánh cụt,ˈpɛŋgwən,1,images/1F427.svg
+Animals,Động vật,pig,con lợn,pɪg,1,images/1F437.svg
+Animals,Động vật,rabbit,con thỏ,ˈræbɪt,1,images/openmoji/1F430.svg
+Animals,Động vật,sheep,con cừu,ʃip,1,images/1F411.svg
+Animals,Động vật,tiger,con hổ,ˈtaɪgər,1,images/1F42F.svg
+Animals,Động vật,wolf,con sói,wʊlf,1,images/1F43A.svg
+Animals,Động vật,zebra,con ngựa vằn,ˈzibrə,1,images/1F993.svg
+Bathroom,Phòng tắm,comb,cái lược,koʊm,1,images/1F488.svg
+Bathroom,Phòng tắm,mirror,cái gương,ˈmɪrər,1,images/1FA9E.svg
+Bathroom,Phòng tắm,shampoo,dầu gội,ʃæmˈpu,2,images/1F9F4.svg
+Bathroom,Phòng tắm,shower,vòi sen,ʃaʊər,1,images/1F6BF.svg
+Bathroom,Phòng tắm,sink,bồn rửa,sɪŋk,1,images/1F6B0.svg
+Bathroom,Phòng tắm,soap,xà phòng,soʊp,1,images/1F9FC.svg
+Bathroom,Phòng tắm,sponge,miếng bọt biển,spənʤ,2,images/1F9FD.svg
+Bathroom,Phòng tắm,toothbrush,bàn chải đánh răng,ˈtuθbrəʃ,1,images/1FAA5.svg
+Bathroom,Phòng tắm,toothpaste,kem đánh răng,ˈtuθˌpeɪst,2,images/1FAA5.svg
+Bathroom,Phòng tắm,towel,khăn tắm,taʊəl,1,images/1F9FB.svg
+Birds,Loài chim,chick,gà con,ʧɪk,1,images/1F424.svg
+Birds,Loài chim,chicken,con gà,ˈʧɪkən,1,images/1F414.svg
+Birds,Loài chim,crow,con quạ,kroʊ,1,images/1F426.svg
+Birds,Loài chim,dove,bồ câu,dəv,1,images/1F54A.svg
+Birds,Loài chim,eagle,đại bàng,ˈigəl,1,images/1F985.svg
+Birds,Loài chim,flamingo,hồng hạc,fləˈmɪŋgoʊ,1,images/1F9A9.svg
+Birds,Loài chim,hummingbird,chim ruồi,ˈhəmɪŋˌbərd,2,images/1F426.svg
+Birds,Loài chim,ostrich,đà điểu,ˈɔstrɪʧ,2,images/1F9A4.svg
+Birds,Loài chim,owl,con cú,aʊl,1,images/openmoji/1F989.svg
+Birds,Loài chim,parrot,con vẹt,ˈpɛrət,1,images/1F99C.svg
+Birds,Loài chim,peacock,con công,ˈpiˌkɑk,1,images/1F99A.svg
+Birds,Loài chim,pigeon,bồ câu,ˈpɪʤɪn,1,images/1F54A.svg
+Birds,Loài chim,rooster,con gà trống,ˈrustər,1,images/1F413.svg
+Birds,Loài chim,seagull,mòng biển,ˈsiˌgəl,2,images/1F426.svg
+Birds,Loài chim,sparrow,chim sẻ,ˈspɛroʊ,2,images/1F426.svg
+Birds,Loài chim,swan,thiên nga,swɔn,1,images/1F9A2.svg
+Birds,Loài chim,turkey,gà tây,ˈtərki,1,images/1F983.svg
+Birds,Loài chim,woodpecker,chim gõ kiến,ˈwʊdˌpɛkər,2,images/1F426.svg
+Body,Cơ thể,arm,cánh tay,ɑrm,1,images/1F4AA.svg
+Body,Cơ thể,bone,khúc xương,boʊn,1,images/1F9B4.svg
+Body,Cơ thể,brain,bộ não,breɪn,1,images/1F9E0.svg
+Body,Cơ thể,cheek,má,ʧik,1,images/1F60A.svg
+Body,Cơ thể,chin,cằm,ʧɪn,1,images/1F600.svg
+Body,Cơ thể,ear,cái tai,ɪr,1,images/1F442.svg
+Body,Cơ thể,elbow,khuỷu tay,ˈɛlˌboʊ,2,images/1F4AA.svg
+Body,Cơ thể,eye,con mắt,aɪ,1,images/1F441.svg
+Body,Cơ thể,finger,ngón tay,ˈfɪŋgər,1,images/1F446.svg
+Body,Cơ thể,foot,bàn chân,fʊt,1,images/1F9B6.svg
+Body,Cơ thể,hair,tóc,hɛr,1,images/1F487.svg
+Body,Cơ thể,hand,bàn tay,hænd,1,images/270B.svg
+Body,Cơ thể,knee,đầu gối,ni,1,images/1F9B5.svg
+Body,Cơ thể,leg,cái chân,lɛg,1,images/1F9B5.svg
+Body,Cơ thể,mouth,cái miệng,maʊθ,1,images/1F444.svg
+Body,Cơ thể,neck,cổ,nɛk,1,images/1F9E3.svg
+Body,Cơ thể,nose,cái mũi,noʊz,1,images/1F443.svg
+Body,Cơ thể,shoulder,vai,ˈʃoʊldər,1,images/1F4AA.svg
+Body,Cơ thể,thumb,ngón cái,θəm,1,images/1F44D.svg
+Body,Cơ thể,toe,ngón chân,toʊ,1,images/1F9B6.svg
+Body,Cơ thể,tongue,cái lưỡi,təŋ,1,images/1F445.svg
+Body,Cơ thể,tooth,cái răng,tuθ,1,images/1F9B7.svg
+Clothes,Quần áo,boots,ủng,buts,1,images/1F462.svg
+Clothes,Quần áo,cap,mũ lưỡi trai,kæp,1,images/1F9E2.svg
+Clothes,Quần áo,coat,áo khoác,koʊt,1,images/1F9E5.svg
+Clothes,Quần áo,crown,vương miện,kraʊn,1,images/1F451.svg
+Clothes,Quần áo,dress,váy,drɛs,1,images/1F457.svg
+Clothes,Quần áo,glasses,kính mắt,ˈglæsɪz,1,images/1F453.svg
+Clothes,Quần áo,gloves,găng tay,gləvz,1,images/1F9E4.svg
+Clothes,Quần áo,hat,mũ,hæt,1,images/1F452.svg
+Clothes,Quần áo,pants,quần dài,pænts,1,images/1F456.svg
+Clothes,Quần áo,ring,nhẫn,rɪŋ,1,images/1F48D.svg
+Clothes,Quần áo,scarf,khăn quàng,skɑrf,1,images/1F9E3.svg
+Clothes,Quần áo,shirt,áo sơ mi,ʃərt,1,images/1F455.svg
+Clothes,Quần áo,shoe,giày,ʃu,1,images/1F45F.svg
+Clothes,Quần áo,socks,tất,sɑks,1,images/1F9E6.svg
+Colors,Màu sắc,black,màu đen,blæk,1,images/26AB.svg
+Colors,Màu sắc,blue,màu xanh dương,blu,1,images/1F535.svg
+Colors,Màu sắc,brown,màu nâu,braʊn,1,images/1F7E4.svg
+Colors,Màu sắc,gold,màu vàng kim,goʊld,2,images/1F947.svg
+Colors,Màu sắc,gray,màu xám,greɪ,1,images/1F32B.svg
+Colors,Màu sắc,green,màu xanh lá,grin,1,images/1F7E2.svg
+Colors,Màu sắc,orange,màu cam,ˈɔrɪnʤ,1,images/1F34A.svg
+Colors,Màu sắc,pink,màu hồng,pɪŋk,1,images/1F338.svg
+Colors,Màu sắc,purple,màu tím,ˈpərpəl,1,images/1F7E3.svg
+Colors,Màu sắc,rainbow,cầu vồng,ˈreɪnˌboʊ,1,images/openmoji/1F308.svg
+Colors,Màu sắc,red,màu đỏ,rɛd,1,images/1F534.svg
+Colors,Màu sắc,silver,màu bạc,ˈsɪlvər,2,images/1F948.svg
+Colors,Màu sắc,turquoise,màu ngọc lam,ˈtərkwɔɪz,2,images/1F535.svg
+Colors,Màu sắc,violet,màu tím than,ˈvaɪəlɪt,2,images/1F7E3.svg
+Colors,Màu sắc,white,màu trắng,waɪt,1,images/26AA.svg
+Colors,Màu sắc,yellow,màu vàng,ˈjɛloʊ,1,images/1F7E1.svg
+Drinks,Đồ uống,cocoa,ca cao,ˈkoʊkoʊ,1,images/2615.svg
+Drinks,Đồ uống,coconut water,nước dừa,ˈkoʊkəˌnət ˈwɔtər,2,images/1F965.svg
+Drinks,Đồ uống,coffee,cà phê,ˈkɔfi,1,images/2615.svg
+Drinks,Đồ uống,hot chocolate,sô cô la nóng,hɑt ˈʧɔklət,2,images/2615.svg
+Drinks,Đồ uống,ice,đá lạnh,aɪs,1,images/openmoji/1F9CA.svg
+Drinks,Đồ uống,juice,nước ép,ʤus,1,images/1F9C3.svg
+Drinks,Đồ uống,lemonade,nước chanh,ˈlɛməˈneɪd,1,images/1F34B.svg
+Drinks,Đồ uống,milk,sữa,mɪlk,1,images/1F95B.svg
+Drinks,Đồ uống,milkshake,sữa lắc,ˈmɪlkˌʃeɪk,2,images/1F964.svg
+Drinks,Đồ uống,smoothie,sinh tố,,2,images/1F964.svg
+Drinks,Đồ uống,soda,nước ngọt,ˈsoʊdə,1,images/1F964.svg
+Drinks,Đồ uống,tea,trà,ti,1,images/1F375.svg
+Drinks,Đồ uống,water,nước,ˈwɔtər,1,images/1F4A7.svg
+Drinks,Đồ uống,yogurt,sữa chua,ˈjoʊgərt,1,images/1F95B.svg
+Family,Gia đình,aunt,cô/dì,ɔnt,1,images/1F469.svg
+Family,Gia đình,baby,em bé,ˈbeɪbi,1,images/1F476.svg
+Family,Gia đình,boy,bạn trai,bɔɪ,1,images/1F466.svg
+Family,Gia đình,brother,anh em trai,ˈbrəðər,1,images/1F466.svg
+Family,Gia đình,cousin,anh chị em họ,ˈkəzən,2,images/1F9D2.svg
+Family,Gia đình,daughter,con gái,ˈdɔtər,1,images/1F467.svg
+Family,Gia đình,family,gia đình,ˈfæməli,1,images/1F468-200D-1F469-200D-1F467-200D-1F466.svg
+Family,Gia đình,father,bố,ˈfɑðər,1,images/1F468.svg
+Family,Gia đình,girl,bạn gái,gərl,1,images/1F467.svg
+Family,Gia đình,grandfather,ông,ˈgrænˌfɑðər,1,images/1F474.svg
+Family,Gia đình,grandmother,bà,ˈgrændˌməðər,1,images/1F475.svg
+Family,Gia đình,husband,chồng,ˈhəzbənd,2,images/1F935.svg
+Family,Gia đình,mother,mẹ,ˈməðər,1,images/1F469.svg
+Family,Gia đình,parents,bố mẹ,ˈpɛrənts,1,images/1F46B.svg
+Family,Gia đình,sister,chị em gái,ˈsɪstər,1,images/1F467.svg
+Family,Gia đình,son,con trai,sən,1,images/1F466.svg
+Family,Gia đình,twins,sinh đôi,twɪnz,1,images/1F46F.svg
+Family,Gia đình,uncle,chú/bác,ˈəŋkəl,1,images/1F468.svg
+Family,Gia đình,wife,vợ,waɪf,2,images/1F470.svg
+Feelings,Cảm xúc,angry,tức giận,ˈæŋgri,1,images/1F620.svg
+Feelings,Cảm xúc,bored,chán,bɔrd,2,images/1F611.svg
+Feelings,Cảm xúc,excited,phấn khích,ɪkˈsaɪtɪd,2,images/1F929.svg
+Feelings,Cảm xúc,happy,vui,ˈhæpi,1,images/1F60A.svg
+Feelings,Cảm xúc,hungry,đói,ˈhəŋgri,1,images/1F60B.svg
+Feelings,Cảm xúc,love,yêu thương,ləv,1,images/2764.svg
+Feelings,Cảm xúc,proud,tự hào,praʊd,2,images/1F60C.svg
+Feelings,Cảm xúc,sad,buồn,sæd,1,images/1F622.svg
+Feelings,Cảm xúc,scared,sợ hãi,skɛrd,1,images/1F628.svg
+Feelings,Cảm xúc,shy,ngại ngùng,ʃaɪ,2,images/1F633.svg
+Feelings,Cảm xúc,sleepy,buồn ngủ,sˈlipi,1,images/1F634.svg
+Feelings,Cảm xúc,surprised,ngạc nhiên,səˈpraɪzd,2,images/1F632.svg
+Feelings,Cảm xúc,thirsty,khát,ˈθərsti,1,images/1F975.svg
+Feelings,Cảm xúc,tired,mệt,taɪərd,1,images/1F62B.svg
+Food,Đồ ăn,bread,bánh mì,brɛd,1,images/1F35E.svg
+Food,Đồ ăn,cake,bánh kem,keɪk,1,images/openmoji/1F370.svg
+Food,Đồ ăn,candy,kẹo,ˈkændi,1,images/1F36C.svg
+Food,Đồ ăn,cheese,phô mai,ʧiz,1,images/1F9C0.svg
+Food,Đồ ăn,chocolate,sô cô la,ˈʧɔklət,1,images/1F36B.svg
+Food,Đồ ăn,cookie,bánh quy,ˈkʊki,1,images/1F36A.svg
+Food,Đồ ăn,egg,quả trứng,ɛg,1,images/1F95A.svg
+Food,Đồ ăn,hamburger,bánh hăm bơ gơ,ˈhæmbərgər,1,images/1F354.svg
+Food,Đồ ăn,honey,mật ong,ˈhəni,1,images/1F36F.svg
+Food,Đồ ăn,noodles,mì,ˈnudəlz,1,images/1F35C.svg
+Food,Đồ ăn,pizza,bánh pizza,ˈpitsə,1,images/openmoji/1F355.svg
+Food,Đồ ăn,popcorn,bỏng ngô,ˈpɑpˌkɔrn,1,images/1F37F.svg
+Food,Đồ ăn,rice,cơm,raɪs,1,images/1F35A.svg
+Food,Đồ ăn,sandwich,bánh kẹp,ˈsænwɪʧ,1,images/1F96A.svg
+Fruits,Trái cây,apple,quả táo,ˈæpəl,1,images/openmoji/1F34E.svg
+Fruits,Trái cây,avocado,quả bơ,ˌævəˈkɑdoʊ,1,images/1F951.svg
+Fruits,Trái cây,banana,quả chuối,bəˈnænə,1,images/openmoji/1F34C.svg
+Fruits,Trái cây,blueberries,quả việt quất,ˈbluˌbɛriz,1,images/1FAD0.svg
+Fruits,Trái cây,cherry,quả anh đào,ˈʧɛri,1,images/1F352.svg
+Fruits,Trái cây,coconut,quả dừa,ˈkoʊkəˌnət,1,images/1F965.svg
+Fruits,Trái cây,grape,quả nho,greɪp,1,images/1F347.svg
+Fruits,Trái cây,kiwi,quả kiwi,ˈkiwi,1,images/1F95D.svg
+Fruits,Trái cây,lemon,quả chanh,ˈlɛmən,1,images/1F34B.svg
+Fruits,Trái cây,mango,quả xoài,ˈmæŋgoʊ,1,images/1F96D.svg
+Fruits,Trái cây,melon,quả dưa lưới,ˈmɛlən,1,images/1F348.svg
+Fruits,Trái cây,orange,quả cam,ˈɔrɪnʤ,1,images/1F34A.svg
+Fruits,Trái cây,peach,quả đào,piʧ,1,images/1F351.svg
+Fruits,Trái cây,pear,quả lê,pɛr,1,images/1F350.svg
+Fruits,Trái cây,pineapple,quả dứa,ˈpaɪˌnæpəl,1,images/1F34D.svg
+Fruits,Trái cây,strawberry,quả dâu,ˈstrɔˌbɛri,1,images/openmoji/1F353.svg
+Fruits,Trái cây,watermelon,quả dưa hấu,ˈwɔtərˌmɛlən,1,images/openmoji/1F349.svg
+House,Đồ trong nhà,bathtub,bồn tắm,ˈbæθtəb,1,images/1F6C1.svg
+House,Đồ trong nhà,bed,giường,bɛd,1,images/1F6CF.svg
+House,Đồ trong nhà,broom,cây chổi,brum,1,images/1F9F9.svg
+House,Đồ trong nhà,candle,cây nến,ˈkændəl,1,images/1F56F.svg
+House,Đồ trong nhà,chair,cái ghế,ʧɛr,1,images/1FA91.svg
+House,Đồ trong nhà,clock,đồng hồ,klɑk,1,images/1F550.svg
+House,Đồ trong nhà,door,cửa,dɔr,1,images/1F6AA.svg
+House,Đồ trong nhà,house,ngôi nhà,haʊs,1,images/openmoji/1F3E0.svg
+House,Đồ trong nhà,key,chìa khóa,ki,1,images/1F511.svg
+House,Đồ trong nhà,lamp,đèn,læmp,1,images/1F4A1.svg
+House,Đồ trong nhà,plate,cái đĩa,pleɪt,1,images/1F37D.svg
+House,Đồ trong nhà,spoon,cái thìa,spun,1,images/1F944.svg
+House,Đồ trong nhà,toilet,bồn cầu,ˈtɔɪlət,1,images/1F6BD.svg
+House,Đồ trong nhà,window,cửa sổ,ˈwɪndoʊ,1,images/1FA9F.svg
+Insects,Côn trùng,ant,con kiến,ænt,1,images/1F41C.svg
+Insects,Côn trùng,bee,con ong,bi,1,images/1F41D.svg
+Insects,Côn trùng,beetle,con bọ cánh cứng,ˈbitəl,1,images/1FAB2.svg
+Insects,Côn trùng,butterfly,con bướm,ˈbətərˌflaɪ,1,images/openmoji/1F98B.svg
+Insects,Côn trùng,caterpillar,con sâu bướm,ˈkætəˌpɪlər,1,images/1F41B.svg
+Insects,Côn trùng,cricket,con dế,ˈkrɪkɪt,1,images/1F997.svg
+Insects,Côn trùng,dragonfly,chuồn chuồn,,2,images/1F98B.svg
+Insects,Côn trùng,firefly,đom đóm,ˈfaɪərˌflaɪ,2,images/1F41B.svg
+Insects,Côn trùng,fly,con ruồi,flaɪ,1,images/1FAB0.svg
+Insects,Côn trùng,grasshopper,châu chấu,ˈgræsˌhɑpər,2,images/1F997.svg
+Insects,Côn trùng,ladybug,con bọ rùa,ˈleɪdiˌbəg,1,images/1F41E.svg
+Insects,Côn trùng,mosquito,con muỗi,məˈskitoʊ,1,images/1F99F.svg
+Insects,Côn trùng,moth,con bướm đêm,mɔθ,2,images/1F98B.svg
+Insects,Côn trùng,snail,con ốc sên,sneɪl,1,images/1F40C.svg
+Insects,Côn trùng,spider,con nhện,ˈspaɪdər,1,images/1F577.svg
+Insects,Côn trùng,termite,con mối,ˈtərmaɪt,2,images/1F41C.svg
+Insects,Côn trùng,wasp,ong bắp cày,wɑsp,2,images/1F41D.svg
+Insects,Côn trùng,worm,con giun,wərm,1,images/1FAB1.svg
+Jobs,Nghề nghiệp,astronaut,phi hành gia,ˈæstrəˌnɑt,2,images/1F680.svg
+Jobs,Nghề nghiệp,chef,đầu bếp,ʃɛf,1,images/1F468-200D-1F373.svg
+Jobs,Nghề nghiệp,dentist,nha sĩ,ˈdɛntɪst,2,images/1F9B7.svg
+Jobs,Nghề nghiệp,doctor,bác sĩ,ˈdɔktər,1,images/1FA7A.svg
+Jobs,Nghề nghiệp,driver,tài xế,ˈdraɪvər,1,images/1F697.svg
+Jobs,Nghề nghiệp,farmer,nông dân,ˈfɑrmər,1,images/1F468-200D-1F33E.svg
+Jobs,Nghề nghiệp,firefighter,lính cứu hỏa,ˈfaɪrˌfaɪtər,2,images/1F468-200D-1F692.svg
+Jobs,Nghề nghiệp,nurse,y tá,nərs,1,images/1F489.svg
+Jobs,Nghề nghiệp,painter,họa sĩ,ˈpeɪnər,1,images/1F3A8.svg
+Jobs,Nghề nghiệp,pilot,phi công,ˈpaɪlət,1,images/1F6E9.svg
+Jobs,Nghề nghiệp,police officer,cảnh sát,pəˈlis ˈɔfɪsər,2,images/1F46E.svg
+Jobs,Nghề nghiệp,singer,ca sĩ,ˈsɪŋər,1,images/1F3A4.svg
+Jobs,Nghề nghiệp,teacher,giáo viên,ˈtiʧər,1,images/1F469-200D-1F3EB.svg
+Jobs,Nghề nghiệp,vet,bác sĩ thú y,vɛt,2,images/1F43E.svg
+Music,Nhạc cụ,bell,chuông,bɛl,1,images/1F514.svg
+Music,Nhạc cụ,drum,cái trống,drəm,1,images/1F941.svg
+Music,Nhạc cụ,flute,sáo,flut,1,images/1F3B6.svg
+Music,Nhạc cụ,guitar,đàn ghi ta,gɪˈtɑr,1,images/openmoji/1F3B8.svg
+Music,Nhạc cụ,harp,đàn hạc,hɑrp,2,images/1F3B5.svg
+Music,Nhạc cụ,piano,đàn piano,piˈænə,1,images/1F3B9.svg
+Music,Nhạc cụ,tambourine,trống lục lạc,ˌtæmbərˈin,2,images/1FA98.svg
+Music,Nhạc cụ,trumpet,kèn trumpet,ˈtrəmpət,2,images/1F3BA.svg
+Music,Nhạc cụ,violin,đàn vi ô lông,vaɪəˈlɪn,2,images/1F3BB.svg
+Music,Nhạc cụ,xylophone,đàn phím gỗ,ˈzaɪləˌfoʊn,2,images/1F3B6.svg
+Nature,Thiên nhiên,cactus,xương rồng,ˈkæktəs,1,images/1F335.svg
+Nature,Thiên nhiên,fire,lửa,faɪər,1,images/1F525.svg
+Nature,Thiên nhiên,flower,bông hoa,flaʊər,1,images/openmoji/1F338.svg
+Nature,Thiên nhiên,grass,cỏ,græs,1,images/1F331.svg
+Nature,Thiên nhiên,leaf,chiếc lá,lif,1,images/1F343.svg
+Nature,Thiên nhiên,mountain,ngọn núi,ˈmaʊntən,1,images/26F0.svg
+Nature,Thiên nhiên,palm tree,cây cọ,pɑm tri,1,images/1F334.svg
+Nature,Thiên nhiên,rock,hòn đá,rɑk,1,images/1FAA8.svg
+Nature,Thiên nhiên,rose,hoa hồng,roʊz,1,images/1F339.svg
+Nature,Thiên nhiên,seedling,mầm cây,ˈsidlɪŋ,1,images/1F331.svg
+Nature,Thiên nhiên,tree,cái cây,tri,1,images/openmoji/1F333.svg
+Nature,Thiên nhiên,volcano,núi lửa,vɑlˈkeɪnoʊ,1,images/1F30B.svg
+Numbers,Con số,eight,số tám,eɪt,1,images/38-20E3.svg
+Numbers,Con số,eleven,số mười một,ˈilɛvən,2,
+Numbers,Con số,fifty,số năm mươi,ˈfɪfti,2,
+Numbers,Con số,first,thứ nhất,fərst,2,images/1F947.svg
+Numbers,Con số,five,số năm,faɪv,1,images/35-20E3.svg
+Numbers,Con số,four,số bốn,fɔr,1,images/34-20E3.svg
+Numbers,Con số,hundred,số một trăm,ˈhənərd,2,images/1F4AF.svg
+Numbers,Con số,nine,số chín,naɪn,1,images/39-20E3.svg
+Numbers,Con số,one,số một,wən,1,images/31-20E3.svg
+Numbers,Con số,second,thứ hai,ˈsɛkənd,2,images/1F948.svg
+Numbers,Con số,seven,số bảy,ˈsɛvən,1,images/37-20E3.svg
+Numbers,Con số,six,số sáu,sɪks,1,images/36-20E3.svg
+Numbers,Con số,ten,số mười,tɛn,1,images/1F51F.svg
+Numbers,Con số,thirteen,số mười ba,ˈθərˈtin,2,
+Numbers,Con số,three,số ba,θri,1,images/33-20E3.svg
+Numbers,Con số,twelve,số mười hai,twɛlv,2,
+Numbers,Con số,twenty,số hai mươi,tˈwɛnti,2,
+Numbers,Con số,two,số hai,tu,1,images/32-20E3.svg
+Numbers,Con số,zero,số không,ˈziroʊ,1,images/30-20E3.svg
+Reptiles,Bò sát,alligator,cá sấu mõm ngắn,ˈæləˌgeɪtər,2,images/1F40A.svg
+Reptiles,Bò sát,chameleon,con tắc kè hoa,kəˈmiliən,2,images/1F98E.svg
+Reptiles,Bò sát,cobra,rắn hổ mang,ˈkoʊbrə,2,images/1F40D.svg
+Reptiles,Bò sát,crocodile,cá sấu,ˈkrɑkəˌdaɪl,1,images/1F40A.svg
+Reptiles,Bò sát,dinosaur,khủng long,ˈdaɪnəˌsɔr,1,images/1F995.svg
+Reptiles,Bò sát,dragon,con rồng,ˈdrægən,1,images/1F409.svg
+Reptiles,Bò sát,frog,con ếch,frɑg,1,images/1F438.svg
+Reptiles,Bò sát,gecko,con tắc kè,ˈgɛkoʊ,2,images/1F98E.svg
+Reptiles,Bò sát,iguana,kỳ nhông,ˌɪgˈwɑnə,2,images/1F98E.svg
+Reptiles,Bò sát,lizard,con thằn lằn,ˈlɪzərd,1,images/1F98E.svg
+Reptiles,Bò sát,python,trăn,ˈpaɪθɑn,2,images/1F40D.svg
+Reptiles,Bò sát,snake,con rắn,sneɪk,1,images/1F40D.svg
+Reptiles,Bò sát,tortoise,rùa cạn,ˈtɔrtəs,2,images/1F422.svg
+Reptiles,Bò sát,turtle,con rùa,ˈtərtəl,1,images/1F422.svg
+School,Trường học,abacus,bàn tính,ˈæbəkəs,1,images/1F9EE.svg
+School,Trường học,backpack,ba lô,ˈbækˌpæk,1,images/1F392.svg
+School,Trường học,bell,chuông,bɛl,1,images/1F514.svg
+School,Trường học,book,quyển sách,bʊk,1,images/openmoji/1F4DA.svg
+School,Trường học,crayon,bút màu sáp,kreɪɑn,1,images/1F58D.svg
+School,Trường học,globe,quả địa cầu,gloʊb,1,images/1F30D.svg
+School,Trường học,microscope,kính hiển vi,ˈmaɪkrəˌskoʊp,1,images/1F52C.svg
+School,Trường học,notebook,vở,ˈnoʊtˌbʊk,1,images/1F4D3.svg
+School,Trường học,paint,màu vẽ,peɪnt,1,images/1F3A8.svg
+School,Trường học,paperclip,kẹp giấy,,1,images/1F4CE.svg
+School,Trường học,pen,bút mực,pɛn,1,images/1F58A.svg
+School,Trường học,pencil,bút chì,ˈpɛnsəl,1,images/270F.svg
+School,Trường học,ruler,thước kẻ,ˈrulər,1,images/1F4CF.svg
+School,Trường học,scissors,cái kéo,ˈsɪzərz,1,images/2702.svg
+Sea animals,Động vật biển,blowfish,cá nóc,ˈbloʊfɪʃ,1,images/1F421.svg
+Sea animals,Động vật biển,crab,con cua,kræb,1,images/1F980.svg
+Sea animals,Động vật biển,dolphin,cá heo,ˈdɑlfən,1,images/1F42C.svg
+Sea animals,Động vật biển,jellyfish,con sứa,ˈʤɛliˌfɪʃ,1,images/1F390.svg
+Sea animals,Động vật biển,lobster,tôm hùm,ˈlɑbstər,1,images/1F99E.svg
+Sea animals,Động vật biển,octopus,bạch tuộc,ˈɑktəˌpʊs,1,images/1F419.svg
+Sea animals,Động vật biển,otter,rái cá,ˈɑtər,1,images/1F9A6.svg
+Sea animals,Động vật biển,seal,hải cẩu,sil,1,images/1F9AD.svg
+Sea animals,Động vật biển,shark,cá mập,ʃɑrk,1,images/1F988.svg
+Sea animals,Động vật biển,shrimp,con tôm,ʃrɪmp,1,images/1F990.svg
+Sea animals,Động vật biển,squid,mực ống,skwɪd,1,images/1F991.svg
+Sea animals,Động vật biển,tropical fish,cá nhiệt đới,ˈtrɑpɪkəl fɪʃ,1,images/1F420.svg
+Sea animals,Động vật biển,turtle,con rùa,ˈtərtəl,1,images/1F422.svg
+Sea animals,Động vật biển,whale,cá voi,weɪl,1,images/1F433.svg
+Shapes,Hình khối,arrow,mũi tên,ˈɛroʊ,1,images/27A1.svg
+Shapes,Hình khối,circle,hình tròn,ˈsərkəl,1,images/2B55.svg
+Shapes,Hình khối,cone,hình nón,koʊn,2,images/1F366.svg
+Shapes,Hình khối,cross,dấu thập,krɔs,1,images/274C.svg
+Shapes,Hình khối,cube,hình lập phương,kjub,2,images/1F9CA.svg
+Shapes,Hình khối,cylinder,hình trụ,ˈsɪlɪndər,2,images/1F96B.svg
+Shapes,Hình khối,diamond,hình thoi,ˈdaɪmənd,1,images/1F537.svg
+Shapes,Hình khối,heart,hình trái tim,hɑrt,1,images/openmoji/2764.svg
+Shapes,Hình khối,line,đường thẳng,laɪn,1,images/2796.svg
+Shapes,Hình khối,oval,hình bầu dục,ˈoʊvəl,2,images/2B55.svg
+Shapes,Hình khối,pentagon,hình ngũ giác,ˈpɛnɪˌgɑn,2,images/1F537.svg
+Shapes,Hình khối,rectangle,hình chữ nhật,ˈrɛktæŋgəl,1,images/1F7EA.svg
+Shapes,Hình khối,square,hình vuông,skwɛr,1,images/1F7E5.svg
+Shapes,Hình khối,star,hình ngôi sao,stɑr,1,images/openmoji/2B50.svg
+Shapes,Hình khối,triangle,hình tam giác,ˈtraɪˌæŋgəl,1,images/1F53A.svg
+Sports,Thể thao,baseball,bóng chày,ˈbeɪsˈbɔl,1,images/26BE.svg
+Sports,Thể thao,basketball,bóng rổ,ˈbæskətˌbɔl,1,images/1F3C0.svg
+Sports,Thể thao,bowling,bóng gỗ,ˈboʊlɪŋ,1,images/1F3B3.svg
+Sports,Thể thao,boxing,quyền anh,ˈbɑksɪŋ,1,images/1F94A.svg
+Sports,Thể thao,cycling,đạp xe,ˈsaɪkəlɪŋ,1,images/1F6B4.svg
+Sports,Thể thao,medal,huy chương,ˈmɛdəl,1,images/1F3C5.svg
+Sports,Thể thao,running,chạy bộ,ˈrənɪŋ,1,images/1F3C3.svg
+Sports,Thể thao,skiing,trượt tuyết,skiɪŋ,1,images/26F7.svg
+Sports,Thể thao,soccer,bóng đá,ˈsɑkər,1,images/26BD.svg
+Sports,Thể thao,swimming,bơi lội,sˈwɪmɪŋ,1,images/1F3CA.svg
+Sports,Thể thao,tennis,quần vợt,ˈtɛnɪs,1,images/1F3BE.svg
+Sports,Thể thao,trophy,cúp,ˈtroʊfi,1,images/1F3C6.svg
+Sports,Thể thao,volleyball,bóng chuyền,ˈvɑliˌbɔl,1,images/1F3D0.svg
+Time,Thời gian,Friday,thứ Sáu,ˈfraɪˌdeɪ,2,images/1F4C5.svg
+Time,Thời gian,Monday,thứ Hai,ˈmənˌdeɪ,2,images/1F4C5.svg
+Time,Thời gian,Saturday,thứ Bảy,ˈsæˌtɪˌdeɪ,2,images/1F4C5.svg
+Time,Thời gian,Sunday,Chủ nhật,ˈsənˌdi,2,images/1F4C5.svg
+Time,Thời gian,Thursday,thứ Năm,ˈθərzˌdeɪ,2,images/1F4C5.svg
+Time,Thời gian,Tuesday,thứ Ba,ˈtuzˌdeɪ,2,images/1F4C5.svg
+Time,Thời gian,Wednesday,thứ Tư,ˈwɛnzˌdeɪ,2,images/1F4C5.svg
+Time,Thời gian,afternoon,buổi chiều,ˌæftərˈnun,1,images/1F324.svg
+Time,Thời gian,month,tháng,mənθ,1,images/1F5D3.svg
+Time,Thời gian,morning,buổi sáng,ˈmɔrnɪŋ,1,images/1F305.svg
+Time,Thời gian,night,ban đêm,naɪt,1,images/1F303.svg
+Time,Thời gian,today,hôm nay,təˈdeɪ,1,images/1F4C5.svg
+Time,Thời gian,tomorrow,ngày mai,təˈmɑˌroʊ,2,images/1F4C6.svg
+Time,Thời gian,week,tuần,wik,1,images/1F4C5.svg
+Time,Thời gian,year,năm,jɪr,1,images/1F4C6.svg
+Time,Thời gian,yesterday,hôm qua,ˈjɛstərˌdeɪ,2,images/1F5D3.svg
+Toys,Đồ chơi,ball,quả bóng,bɔl,1,images/openmoji/26BD.svg
+Toys,Đồ chơi,balloon,bóng bay,bəˈlun,1,images/1F388.svg
+Toys,Đồ chơi,blocks,khối xếp hình,blɑks,1,images/1F9F1.svg
+Toys,Đồ chơi,dice,xúc xắc,daɪs,1,images/1F3B2.svg
+Toys,Đồ chơi,doll,búp bê,dɑl,1,images/1FA86.svg
+Toys,Đồ chơi,drum,cái trống,drəm,1,images/1F941.svg
+Toys,Đồ chơi,kite,con diều,kaɪt,1,images/1FA81.svg
+Toys,Đồ chơi,marbles,viên bi,ˈmɑrbəlz,1,images/1F535.svg
+Toys,Đồ chơi,puzzle,trò xếp hình,ˈpəzəl,1,images/1F9E9.svg
+Toys,Đồ chơi,robot,người máy,ˈroʊˌbət,1,images/openmoji/1F916.svg
+Toys,Đồ chơi,scooter,xe trượt scooter,ˈskutər,2,images/1F6F4.svg
+Toys,Đồ chơi,slide,cầu trượt,slaɪd,1,images/1F6DD.svg
+Toys,Đồ chơi,spinning top,con quay,ˈspɪnɪŋ tɔp,2,images/1F51D.svg
+Toys,Đồ chơi,swing,xích đu,swɪŋ,1,images/1F3A0.svg
+Toys,Đồ chơi,teddy bear,gấu bông,ˈtɛdi bɛr,1,images/openmoji/1F9F8.svg
+Toys,Đồ chơi,toy car,xe đồ chơi,tɔɪ kɑr,1,images/1F697.svg
+Toys,Đồ chơi,train set,bộ tàu hỏa,treɪn sɛt,2,images/1F682.svg
+Toys,Đồ chơi,yo-yo,con quay yo-yo,,1,images/1FA80.svg
+Vegetables,Rau củ,broccoli,bông cải xanh,ˈbrɑkəli,1,images/1F966.svg
+Vegetables,Rau củ,cabbage,bắp cải,ˈkæbɪʤ,1,images/1F96C.svg
+Vegetables,Rau củ,carrot,củ cà rốt,ˈkɛrət,1,images/openmoji/1F955.svg
+Vegetables,Rau củ,celery,cần tây,ˈsɛləri,2,images/1F96C.svg
+Vegetables,Rau củ,corn,bắp ngô,kɔrn,1,images/1F33D.svg
+Vegetables,Rau củ,cucumber,quả dưa chuột,ˈkjukəmbər,1,images/1F952.svg
+Vegetables,Rau củ,eggplant,quả cà tím,ˈɛgˌplænt,1,images/1F346.svg
+Vegetables,Rau củ,garlic,củ tỏi,ˈgɑrlɪk,1,images/1F9C4.svg
+Vegetables,Rau củ,lettuce,rau xà lách,ˈlɛtəs,1,images/1F96C.svg
+Vegetables,Rau củ,mushroom,nấm,ˈməʃrum,1,images/1F344.svg
+Vegetables,Rau củ,onion,củ hành,ˈənjən,1,images/1F9C5.svg
+Vegetables,Rau củ,peanut,hạt lạc,ˈpiˌnət,1,images/1F95C.svg
+Vegetables,Rau củ,pepper,quả ớt,ˈpɛpər,1,images/1F336.svg
+Vegetables,Rau củ,potato,củ khoai tây,pəˈteɪˌtoʊ,1,images/1F954.svg
+Vegetables,Rau củ,pumpkin,quả bí ngô,ˈpəmpkɪn,1,images/1F383.svg
+Vegetables,Rau củ,radish,củ cải,ˈrædɪʃ,2,images/1F955.svg
+Vegetables,Rau củ,spinach,rau chân vịt,ˈspɪnəʧ,2,images/1F96C.svg
+Vegetables,Rau củ,tomato,quả cà chua,təˈmɑˌtoʊ,1,images/1F345.svg
+Vehicles,Phương tiện,airplane,máy bay,ˈɛrˌpleɪn,1,images/openmoji/2708.svg
+Vehicles,Phương tiện,ambulance,xe cứu thương,ˈæmbjələns,1,images/1F691.svg
+Vehicles,Phương tiện,bicycle,xe đạp,ˈbaɪsɪkəl,1,images/1F6B2.svg
+Vehicles,Phương tiện,boat,thuyền,boʊt,1,images/26F5.svg
+Vehicles,Phương tiện,bus,xe buýt,bəs,1,images/1F68C.svg
+Vehicles,Phương tiện,car,ô tô,kɑr,1,images/openmoji/1F697.svg
+Vehicles,Phương tiện,fire engine,xe cứu hỏa,faɪər ˈɪnʤən,1,images/1F692.svg
+Vehicles,Phương tiện,helicopter,trực thăng,ˈhɛlɪˌkɑptər,1,images/1F681.svg
+Vehicles,Phương tiện,motorcycle,xe máy,ˈmoʊtərˌsaɪkəl,1,images/1F3CD.svg
+Vehicles,Phương tiện,police car,xe cảnh sát,pəˈlis kɑr,1,images/1F693.svg
+Vehicles,Phương tiện,rocket,tên lửa,ˈrɑkət,1,images/openmoji/1F680.svg
+Vehicles,Phương tiện,ship,tàu thủy,ʃɪp,1,images/1F6A2.svg
+Vehicles,Phương tiện,taxi,xe taxi,ˈtæksi,1,images/1F695.svg
+Vehicles,Phương tiện,tractor,máy kéo,ˈtræktər,1,images/1F69C.svg
+Vehicles,Phương tiện,train,tàu hỏa,treɪn,1,images/1F686.svg
+Vehicles,Phương tiện,truck,xe tải,trək,1,images/1F69A.svg
+Weather,Thời tiết,cloud,đám mây,klaʊd,1,images/2601.svg
+Weather,Thời tiết,fog,sương mù,fɔg,1,images/1F32B.svg
+Weather,Thời tiết,lightning,tia chớp,ˈlaɪtnɪŋ,1,images/26A1.svg
+Weather,Thời tiết,moon,mặt trăng,mun,1,images/openmoji/1F319.svg
+Weather,Thời tiết,rain,mưa,reɪn,1,images/1F327.svg
+Weather,Thời tiết,snow,tuyết,snoʊ,1,images/2744.svg
+Weather,Thời tiết,snowman,người tuyết,sˈnoʊˌmæn,1,images/26C4.svg
+Weather,Thời tiết,star,ngôi sao,stɑr,1,images/openmoji/2B50.svg
+Weather,Thời tiết,sun,mặt trời,sən,1,images/openmoji/2600.svg
+Weather,Thời tiết,tornado,lốc xoáy,tɔrˈneɪˌdoʊ,1,images/1F32A.svg
+Weather,Thời tiết,umbrella,cái ô,ˈəmˌbrɛlə,1,images/2602.svg
+Weather,Thời tiết,wind,gió,wɪnd,1,images/1F4A8.svg

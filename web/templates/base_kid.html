@@ -1,6 +1,18 @@
 {% extends 'base.html' %}
+{% load static %}
 {# Layout KHU CỦA BÉ: navbar xanh, to, nhiều màu. Chỉ Học/Phát âm/Trò chơi +
    nút nhỏ "Cho phụ huynh" (dẫn tới khu quản lý qua passcode). KHÔNG có Thoát/Quản lý. #}
+
+{# Cấu hình URL cho kidFx (hiệu ứng khích lệ) — dùng tag static/url để
+   đúng đường dẫn dù STATIC_URL/MEDIA_URL đổi. Đặt TRƯỚC khi kidfx.js chạy. #}
+{% block extra_head %}
+<script>
+  window.KIDFX = {
+    sfxBase: "{% static 'sfx/' %}",
+    praiseManifestUrl: "{% url 'catalog:praise_manifest' %}",
+  };
+</script>
+{% endblock %}
 
 {% block navbar %}
 <nav class="navbar navbar-expand-lg navbar-brand-bar">

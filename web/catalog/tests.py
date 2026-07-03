@@ -16,6 +16,7 @@ from django.urls import reverse
 
 from accounts.models import ManagePasscode
 
+from . import imports as import_service
 from .models import AudioClip, Topic, Word
 
 
@@ -124,7 +125,7 @@ class CatalogManageViewTests(TestCase):
         """Chưa mở khoá → mọi màn quản lý chuyển về màn nhập passcode."""
         self.client.login(username='parent', password='pass12345')
         ManagePasscode.get_solo().set_passcode(self.PASSCODE)
-        for name in ('topic_manage', 'topic_add', 'word_manage', 'word_add', 'word_import'):
+        for name in ('topic_manage', 'topic_add', 'word_manage', 'word_add', 'word_import', 'word_export'):
             resp = self.client.get(reverse(f'catalog_manage:{name}'))
             self.assertEqual(resp.status_code, 302, name)
             self.assertIn(reverse('accounts:manage_unlock'), resp.url, name)
@@ -206,3 +207,126 @@ class CatalogManageViewTests(TestCase):
         resp = self.client.post(reverse('catalog_manage:word_import'), {'csv_file': upload})
         self.assertEqual(resp.status_code, 200)
         self.assertContains(resp, '.csv')
+
+    # --- Xuất CSV (backup) ---
+    def test_word_export_downloads_csv_with_data(self):
+        """Xuất CSV: trả file đính kèm, có tiêu đề đúng cột + dữ liệu từ."""
+        self._unlock()
+        resp = self.client.get(reverse('catalog_manage:word_export'))
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('attachment', resp['Content-Disposition'])
+        self.assertIn('words_backup.csv', resp['Content-Disposition'])
+        body = resp.content.decode('utf-8-sig')  # bỏ BOM
+        self.assertIn('topic,topic_vi,text_en,text_vi,phonetic,level,image', body)
+        self.assertIn('cat', body)
+        self.assertIn('con mèo', body)
+
+    def test_export_includes_image_path(self):
+        """Từ có hình → cột image trong CSV chứa đường dẫn file (images/...)."""
+        self._unlock()
+        self.word.image = 'images/cat.jpg'
+        self.word.save(update_fields=['image'])
+        csv_text = import_service.export_words()
+        self.assertIn('images/cat.jpg', csv_text)
+
+    def test_export_then_import_roundtrip(self):
+        """Round-trip: xuất ra CSV rồi nhập lại KHÔNG tạo trùng (khôi phục đúng)."""
+        self._unlock()
+        Word.objects.create(topic=self.topic, text_en='dog', text_vi='con chó')
+        before_topics, before_words = Topic.objects.count(), Word.objects.count()
+
+        csv_text = import_service.export_words()
+        upload = SimpleUploadedFile('backup.csv', csv_text.encode('utf-8'),
+                                    content_type='text/csv')
+        resp = self.client.post(reverse('catalog_manage:word_import'), {'csv_file': upload})
+        self.assertRedirects(resp, reverse('catalog_manage:word_manage'))
+        # Nạp lại chính dữ liệu vừa xuất → số chủ đề/từ không đổi (idempotent).
+        self.assertEqual(Topic.objects.count(), before_topics)
+        self.assertEqual(Word.objects.count(), before_words)
+
+    def test_import_sets_image_path(self):
+        """CSV có cột image → gán đường dẫn hình cho từ (tạo mới và cập nhật)."""
+        self._unlock()
+        # Tạo mới kèm hình.
+        csv_bytes = ('topic,text_en,text_vi,image\n'
+                     'Animals,dog,con chó,images/dog.png\n').encode('utf-8')
+        upload = SimpleUploadedFile('w.csv', csv_bytes, content_type='text/csv')
+        with mock.patch('catalog.imports.ipa_service.to_ipa', return_value=''):
+            self.client.post(reverse('catalog_manage:word_import'), {'csv_file': upload})
+        dog = Word.objects.get(text_en='dog')
+        self.assertEqual(dog.image.name, 'images/dog.png')
+
+        # Nhập lại với hình khác → cập nhật (idempotent, không tạo trùng).
+        csv2 = ('topic,text_en,text_vi,image\n'
+                'Animals,dog,con chó,images/dog2.png\n').encode('utf-8')
+        upload2 = SimpleUploadedFile('w2.csv', csv2, content_type='text/csv')
+        with mock.patch('catalog.imports.ipa_service.to_ipa', return_value=''):
+            self.client.post(reverse('catalog_manage:word_import'), {'csv_file': upload2})
+        dog.refresh_from_db()
+        self.assertEqual(dog.image.name, 'images/dog2.png')
+        self.assertEqual(Word.objects.filter(text_en='dog').count(), 1)
+
+
+class PraiseTests(TestCase):
+    """Giọng động viên (edge-tts mock): sinh + cache + manifest + API."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user('parent', password='pass12345')
+
+    def setUp(self):
+        # Cache giọng vào thư mục tạm để không đụng media thật của dự án.
+        self._tmp = tempfile.mkdtemp()
+        self._override = self.settings(MEDIA_ROOT=self._tmp)
+        self._override.enable()
+
+    def tearDown(self):
+        self._override.disable()
+
+    def _fake_edge(self, text, out_path, voice):
+        """Giả lập edge-tts: ghi file mp3 rỗng (không gọi mạng)."""
+        from pathlib import Path
+        Path(out_path).write_bytes(b'ID3')
+
+    def test_generate_all_creates_and_is_idempotent(self):
+        """Sinh mp3 cho mọi câu; chạy lại thì bỏ qua (không sinh trùng)."""
+        from catalog import praise
+        with mock.patch('catalog.praise.tts._edge_tts_save', side_effect=self._fake_edge):
+            gen, skip, fail = praise.generate_all()
+            total = sum(len(v) for v in praise.PRAISE_LINES.values())
+            self.assertEqual(gen, total)
+            self.assertEqual(fail, 0)
+            # Lần 2: đã có file → bỏ qua hết, không sinh mới.
+            gen2, skip2, fail2 = praise.generate_all()
+            self.assertEqual(gen2, 0)
+            self.assertEqual(skip2, total)
+
+    def test_generate_no_pyttsx3_fallback_on_failure(self):
+        """edge-tts thất bại hẳn → tính là lỗi, KHÔNG tạo file (tránh giọng OS)."""
+        from catalog import praise
+        with mock.patch('catalog.praise.tts._edge_tts_save', side_effect=Exception('net')):
+            gen, skip, fail = praise.generate_all()
+            self.assertEqual(gen, 0)
+            self.assertTrue(fail > 0)
+
+    def test_manifest_lists_only_existing(self):
+        """Manifest chỉ chứa URL của file đã sinh; chưa sinh → danh sách rỗng."""
+        from catalog import praise
+        empty = praise.manifest()
+        self.assertEqual(empty['correct'], [])
+        with mock.patch('catalog.praise.tts._edge_tts_save', side_effect=self._fake_edge):
+            praise.generate_all()
+        full = praise.manifest()
+        self.assertTrue(len(full['correct']) > 0)
+        self.assertTrue(all(u.endswith('.mp3') for u in full['correct']))
+
+    def test_manifest_api_requires_login_and_returns_json(self):
+        """API manifest: cần đăng nhập; trả JSON đúng cấu trúc."""
+        url = reverse('catalog:praise_manifest')
+        self.assertEqual(self.client.get(url).status_code, 302)  # chưa login → redirect
+        self.client.login(username='parent', password='pass12345')
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertTrue(data['ok'])
+        self.assertIn('correct', data['lines'])

@@ -12,7 +12,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Count
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.text import slugify
 
@@ -21,6 +21,7 @@ from core.decorators import manage_required
 from . import audio as audio_service
 from . import imports as import_service
 from . import ipa as ipa_service
+from . import praise as praise_service
 from .forms import TopicForm, WordForm, WordImportForm
 from .models import Topic, Word
 
@@ -54,6 +55,15 @@ def word_audio(request, pk):
         # Không sinh được (vd offline và pyttsx3 lỗi) → báo nhẹ nhàng, không 500.
         return JsonResponse({'ok': False, 'message': 'Chưa nghe được, thử lại sau nhé.'}, status=503)
     return JsonResponse({'ok': True, 'url': clip.file.url})
+
+
+@login_required
+def praise_manifest(request):
+    """
+    Trả danh sách URL mp3 giọng động viên đã sinh (theo tình huống).
+    Client (kidFx) bốc ngẫu nhiên 1 câu để phát. Rỗng → client bỏ qua giọng.
+    """
+    return JsonResponse({'ok': True, 'lines': praise_service.manifest()})
 
 
 # =====================================================================
@@ -122,6 +132,20 @@ def word_form(request, pk=None):
         messages.success(request, f'Đã lưu từ "{obj.text_en}".')
         return redirect('catalog_manage:word_manage')
     return render(request, 'catalog/manage/word_form.html', {'form': form, 'is_add': word is None})
+
+
+@manage_required
+def word_export(request):
+    """
+    Xuất TẤT CẢ từ vựng ra file CSV để tải về (backup) — nạp lại được qua màn Nhập CSV.
+
+    Tải toàn bộ (không theo bộ lọc) để restore đầy đủ. Trả file đính kèm (download).
+    """
+    csv_text = import_service.export_words()
+    resp = HttpResponse(csv_text, content_type='text/csv; charset=utf-8')
+    resp['Content-Disposition'] = 'attachment; filename="words_backup.csv"'
+    logger.info('Xuất CSV từ vựng (%s từ).', Word.objects.count())
+    return resp
 
 
 @manage_required

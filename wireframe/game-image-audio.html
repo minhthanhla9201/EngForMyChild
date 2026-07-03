@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wireframe — Game: Nhìn hình & chọn tiếng</title>
+<!-- Wireframe ĐỘC LẬP, chạy offline: asset trong assets/ cạnh file này. -->
+<link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+<link href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
+<link href="assets/style.css" rel="stylesheet">
+<link href="assets/wf-frame.css" rel="stylesheet">
+</head>
+<body data-screen="game-image-audio">
+
+<!-- Thanh điều hướng wireframe (về mục lục + màn trước/sau) — wf-frame.js dựng -->
+<div class="wf-bar" id="wf-bar"></div>
+
+<section class="wf-screen" id="game-image-audio">
+  <div class="wf-label"><i class="bi bi-volume-up"></i> Game: Nhìn hình & chọn tiếng <span class="wf-url">/games/1/image-pick-audio/animals/</span></div>
+  <div class="wf-frame">
+    <div class="wf-nav-kid"></div>
+    <main class="container py-4">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h1 class="h5 m-0">🖼️🔊 🐥 Bi — Động vật</h1>
+        <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Thoát</button>
+      </div>
+      <div class="text-muted small mb-2">Câu 2 / 5</div>
+      <!-- Hiện 1 HÌNH lớn, bé nghe 4 audio (chạm loa) rồi chọn tiếng đúng -->
+      <div class="card child-card text-center p-4 mb-3">
+        <p class="mb-2">Nhìn hình, chạm loa để nghe rồi chọn tiếng đúng nhé!</p>
+        <div style="font-size:6rem">🐱</div>
+      </div>
+      <div class="row g-3">
+        <div class="col-6"><button class="btn btn-outline-primary w-100 p-4 fs-3"><i class="bi bi-volume-up-fill"></i></button></div>
+        <div class="col-6"><button class="btn btn-warning w-100 p-4 fs-3"><i class="bi bi-volume-up-fill"></i></button></div>
+        <div class="col-6"><button class="btn btn-outline-primary w-100 p-4 fs-3"><i class="bi bi-volume-up-fill"></i></button></div>
+        <div class="col-6"><button class="btn btn-outline-primary w-100 p-4 fs-3"><i class="bi bi-volume-up-fill"></i></button></div>
+      </div>
+      <div class="text-center mt-3">
+        <button class="btn btn-kid"><i class="bi bi-check-lg"></i> Chọn tiếng này</button>
+        <div class="small text-muted mt-1">Đã chọn loa 2</div>
+      </div>
+    </main>
+  </div>
+  <div class="wf-note">Nhìn 1 hình lớn → chạm từng nút loa để nghe 4 audio → chọn tiếng đọc đúng tên hình (không cần biết chữ). Module <code>image_pick_audio</code>, cần từ có ảnh.</div>
+</section>
+
+<script src="assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+<script src="assets/wf-frame.js"></script>
+</body>
+</html>

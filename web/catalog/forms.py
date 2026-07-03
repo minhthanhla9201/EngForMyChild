@@ -61,7 +61,7 @@ class WordImportForm(forms.Form):
     csv_file = forms.FileField(
         label='Tệp CSV',
         widget=forms.ClearableFileInput(attrs={'class': 'form-control', 'accept': '.csv'}),
-        help_text='Cột bắt buộc: text_en. Cột tuỳ chọn: topic, text_vi, topic_vi, level.',
+        help_text='Cột bắt buộc: text_en. Cột tuỳ chọn: topic, text_vi, topic_vi, level, image.',
     )
     make_audio = forms.BooleanField(
         label='Sinh sẵn audio phát âm (chậm hơn, cần TTS)',

@@ -22,6 +22,7 @@
 | Tương tác nhẹ | **HTMX** | 1.x | Cập nhật từng mảnh trang không cần viết nhiều JS |
 | Tương tác client | **Alpine.js** | 3.x | Trạng thái nhỏ phía client cho game (lật thẻ, đếm giờ, kéo–thả) — nhẹ ~15KB, không build tool |
 | Ghi âm | Web Audio API (`MediaRecorder`) | trình duyệt | Thu giọng bé, không cài thêm gì |
+| Hiệu ứng khích lệ | `static/js/kidfx.js` (thuần) | — | Khi bé làm đúng/sai: confetti + emoji nảy (CSS), **âm thanh WAV** (file sinh sẵn `static/sfx/*.wav` — lệnh `gen_sfx`), **giọng động viên tiếng Việt** (mp3 Neural do edge-tts sinh — lệnh `gen_praise`, lấy qua API `praise/manifest/`). Offline sau khi sinh, không thư viện ngoài. Dùng chung: `kidFx.correct()/wrong()/cheer()` — nạp cuối `base.html`, gọi từ game/phát âm |
 
 ## 3. Audio (phát âm mẫu) — miễn phí, offline khi học
 - **TTS sinh tự động:** [`edge-tts`](https://github.com/rany2/edge-tts) — giọng Microsoft Neural chất lượng cao, **miễn phí**. Cần internet *lúc sinh*; sinh xong **cache mp3 vào `media/audio/`**, sau đó học offline.

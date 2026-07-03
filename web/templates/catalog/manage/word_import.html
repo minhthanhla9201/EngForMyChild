@@ -42,9 +42,25 @@
         <li><code>topic</code> — tên chủ đề (tiếng Anh); tự tạo nếu chưa có</li>
         <li><code>topic_vi</code> — tên chủ đề tiếng Việt (tuỳ chọn)</li>
         <li><code>level</code> — độ khó, mặc định 1 (tuỳ chọn)</li>
+        <li><code>image</code> — đường dẫn hình trong <code>media/</code>, vd <code>images/cat.jpg</code> (tuỳ chọn)</li>
       </ul>
-      <div class="small text-muted">Nhập lại cùng file sẽ không tạo trùng (cập nhật nghĩa nếu đổi).
-        IPA tự sinh khi để trống.</div>
+      <div class="small text-muted">Nhập lại cùng file sẽ không tạo trùng (cập nhật nghĩa/hình nếu đổi).
+        IPA tự sinh khi để trống. Cột <code>image</code> chỉ trỏ tới file — hãy đặt sẵn file hình vào
+        <code>web/media/images/</code> (nhập không tự tải hình về).</div>
+    </div>
+
+    {# Backup: xuất toàn bộ từ ra CSV đúng định dạng này → nạp lại được để khôi phục. #}
+    <div class="card child-card p-2">
+      <div class="card-body d-flex align-items-center justify-content-between gap-3">
+        <div>
+          <div class="fw-bold">💾 Sao lưu từ vựng</div>
+          <div class="small text-muted">Tải toàn bộ từ hiện có ra file CSV. Khi cần khôi phục,
+            dùng chính file này ở ô Nhập phía trên.</div>
+        </div>
+        <a href="{% url 'catalog_manage:word_export' %}" class="btn btn-outline-primary text-nowrap">
+          <i class="bi bi-download"></i> Xuất CSV
+        </a>
+      </div>
     </div>
   </div>
 </div>

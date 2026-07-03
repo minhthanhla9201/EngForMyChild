@@ -75,19 +75,31 @@ def import_rows(reader, make_audio=True, on_progress=None):
         if t_created:
             stats['created_topics'] += 1
 
+        # 'image' = đường dẫn file hình trong media (vd 'images/cat.jpg') — chỉ lưu
+        # tham chiếu, KHÔNG copy file (file ảnh phải tự đặt sẵn trong media/).
+        image_path = (row.get('image') or '').strip()
+
         # Idempotent: tìm theo (topic, text_en); có thì cập nhật nghĩa, chưa có thì tạo.
         word, w_created = Word.objects.get_or_create(
             topic=topic, text_en=text_en,
             defaults={'text_vi': (row.get('text_vi') or '').strip(),
-                      'level': _to_int(row.get('level'), 1)},
+                      'level': _to_int(row.get('level'), 1),
+                      'image': image_path},
         )
         if w_created:
             stats['created_words'] += 1
         else:
+            # Cập nhật nghĩa và/hoặc hình nếu CSV có giá trị mới (khác giá trị cũ).
+            changed = []
             new_vi = (row.get('text_vi') or '').strip()
             if new_vi and new_vi != word.text_vi:
                 word.text_vi = new_vi
-                word.save(update_fields=['text_vi'])
+                changed.append('text_vi')
+            if image_path and image_path != word.image.name:
+                word.image = image_path
+                changed.append('image')
+            if changed:
+                word.save(update_fields=changed)
                 stats['updated_words'] += 1
 
         # Sinh IPA nếu chưa có.
@@ -130,3 +142,41 @@ def import_csv_file(file_obj, make_audio=True, on_progress=None):
 
     reader = csv.DictReader(stream)
     return import_rows(reader, make_audio=make_audio, on_progress=on_progress)
+
+
+# --- Xuất (backup) ---
+# Cột xuất khớp ĐÚNG cột import (mục 8 trên) → file xuất ra nạp lại được ngay.
+# 'phonetic' để backup đầy đủ IPA; 'image' là ĐƯỜNG DẪN file hình trong media
+# (vd 'images/cat.jpg') — restore chỉ trỏ lại tham chiếu, KHÔNG copy file ảnh
+# (file ảnh phải còn trong media/). Khi nhập lại, import bỏ qua phonetic (tự sinh nếu
+# trống) nhưng vẫn giữ được các cột khi mở bằng Excel.
+EXPORT_FIELDS = ['topic', 'topic_vi', 'text_en', 'text_vi', 'phonetic', 'level', 'image']
+
+
+def export_words(queryset=None):
+    """
+    Xuất từ vựng ra chuỗi CSV (có BOM cho Excel), khớp định dạng nhập → restore được.
+
+    queryset: QuerySet Word tuỳ chọn; mặc định TẤT CẢ từ (kể cả active='N') để
+    backup đầy đủ. Sắp theo chủ đề rồi từ cho ổn định (dễ so sánh giữa các lần xuất).
+    """
+    if queryset is None:
+        queryset = Word.objects.all()
+    queryset = queryset.select_related('topic').order_by('topic__order', 'topic__name_en', 'text_en')
+
+    buf = io.StringIO()
+    writer = csv.DictWriter(buf, fieldnames=EXPORT_FIELDS)
+    writer.writeheader()
+    for w in queryset:
+        writer.writerow({
+            'topic': w.topic.name_en,
+            'topic_vi': w.topic.name_vi,
+            'text_en': w.text_en,
+            'text_vi': w.text_vi,
+            'phonetic': w.phonetic,
+            'level': w.level,
+            # w.image.name = đường dẫn tương đối trong media (rỗng nếu chưa có hình).
+            'image': w.image.name if w.image else '',
+        })
+    # BOM utf-8-sig để Excel mở đúng tiếng Việt; import đã bỏ BOM khi đọc lại.
+    return '﻿' + buf.getvalue()

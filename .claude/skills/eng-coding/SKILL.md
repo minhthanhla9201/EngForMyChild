@@ -124,6 +124,11 @@ Mục tiêu: mọi lần code đều theo cùng một khuôn để dễ đọc, 
 - **Khi đổi nghiệp vụ / mô hình dữ liệu / yêu cầu / stack:** cập nhật tài liệu liên quan — `docs/YeuCau.md`, `docs/ThietKeDuLieu.md`, `docs/CongNghe.md`. Tài liệu và code KHÔNG được mâu thuẫn.
 - **Khi đổi model (thêm/bớt bảng, field, quan hệ):** cập nhật **sơ đồ ERD Mermaid** trong `docs/ThietKeDuLieu.md` (mục 1) cho khớp — bảng/field/quan hệ trong ERD phải đúng với model thực tế. ERD lược bỏ cột audit cho gọn (mọi bảng nghiệp vụ đều có do `AuditedModel`).
 - Thêm game/khuôn chơi mới → cập nhật bảng game trong `docs/ThietKeDuLieu.md`.
+- **Khi sửa GIAO DIỆN (template khu bé/quản lý, `style.css`, thêm màn/game mới) → ĐỒNG BỘ WIREFRAME** (`wireframe/`, xem `wireframe/README.md` mục "Đồng bộ giao diện"):
+  1. Đổi `web/static/css/style.css` hoặc `web/static/vendor/*` → copy sang `wireframe/assets/` (2 lệnh `Copy-Item` trong README).
+  2. Sửa bố cục màn có sẵn → cập nhật file wireframe tương ứng (tra bảng map ở `docs/ThietKeCoBan.md` mục 10).
+  3. Thêm màn/game mới → thêm file `wireframe/<tên>.html` + đăng ký vào `wireframe/assets/wf-frame.js` (mảng `WF_SCREENS`) + thẻ trong `wireframe/index.html` + dòng vào bảng map `docs/ThietKeCoBan.md` mục 10.
+  Wireframe là bản tĩnh: hình của từ minh hoạ bằng emoji (thay `w.image` thật); màn động chỉ vẽ một trạng thái đại diện.
 
 ## 14. Checklist trước khi báo "xong"
 1. `web\manage.py check` không lỗi.
@@ -135,3 +140,4 @@ Mục tiêu: mọi lần code đều theo cùng một khuôn để dễ đọc, 
 7. Template kế thừa `base.html`, có CSRF, dùng `{% url %}`, tiếng Việt, thân thiện trẻ em.
 8. Đã viết test cho phần mới và `manage.py test` chạy xanh (TTS/ASR mock).
 9. Tài liệu `docs/*.md` khớp với thay đổi (mục 13); nếu đổi model → **đã cập nhật sơ đồ ERD Mermaid** trong `docs/ThietKeDuLieu.md`.
+10. Nếu sửa giao diện (template/`style.css`/thêm màn) → **đã đồng bộ wireframe** (mục 13: copy `style.css`, cập nhật/thêm file wireframe, `wf-frame.js`, `index.html`, bảng map mục 10).

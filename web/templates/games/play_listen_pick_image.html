@@ -1,12 +1,12 @@
 {% extends 'base_kid.html' %}
-{% block title %}Nghe & chọn — {{ topic.name_vi }}{% endblock %}
+{% block title %}Nghe & chọn hình — {{ topic.name_vi }}{% endblock %}
 
 {% block content %}
 {{ round_data|json_script:"round-data" }}
 
-<div x-data="listenPick()" x-init="init()">
+<div x-data="listenPickImage()" x-init="init()">
   <div class="d-flex align-items-center justify-content-between mb-3">
-    <h1 class="h5 m-0">👂 {{ child.avatar }} {{ child.name }} — {{ topic.name_vi }}</h1>
+    <h1 class="h5 m-0">👂🖼️ {{ child.avatar }} {{ child.name }} — {{ topic.name_vi }}</h1>
     <a href="{% url 'games:choose' %}" class="btn btn-outline-secondary btn-sm">
       <i class="bi bi-arrow-left"></i> Thoát
     </a>
@@ -17,7 +17,7 @@
     <div class="text-muted small mb-2">Câu <span x-text="index + 1"></span> / <span x-text="questions.length"></span></div>
 
     <div class="card child-card text-center p-4 mb-3">
-      <p class="mb-3">Nghe rồi chọn từ đúng nhé!</p>
+      <p class="mb-3">Nghe rồi chạm vào hình đúng nhé!</p>
       <div><button class="btn btn-kid btn-lg" @click="playAudio()">
         <i class="bi bi-volume-up-fill"></i> Nghe
       </button></div>
@@ -26,15 +26,16 @@
     <div class="row g-3">
       <template x-for="choice in current.choices" :key="choice.id">
         <div class="col-6">
-          <button class="btn btn-outline-primary w-100 p-2"
+          <button class="btn btn-outline-primary w-100 p-2" style="min-height:140px"
                   @click="pick(choice.id)" :disabled="answered">
-            {# Hình lớn để bé chưa biết chữ vẫn chọn được; chữ nhỏ bên dưới để làm quen mặt chữ. #}
             <template x-if="choice.image">
               <img :src="choice.image" :alt="choice.text_en"
-                   class="img-fluid rounded mb-2" style="height:110px;object-fit:contain">
+                   class="img-fluid rounded" style="height:120px;object-fit:contain">
             </template>
-            <div class="fs-5" x-text="choice.text_en"></div>
-            <div class="small text-muted" x-text="choice.text_vi"></div>
+            {# Không ảnh (hiếm) → hiện chữ để không bí. #}
+            <template x-if="!choice.image">
+              <span class="fs-5" x-text="choice.text_en"></span>
+            </template>
           </button>
         </div>
       </template>
@@ -62,11 +63,10 @@
 
 {% block extra_js %}
 <script>
-  const CHILD_ID = {{ child.pk }};
   const SUBMIT_URL = "{% url 'games:submit' child.pk game.code topic.slug %}";
   function getCookie(n){const m=document.cookie.match('(^|;)\\s*'+n+'\\s*=\\s*([^;]+)');return m?m.pop():'';}
 
-  function listenPick() {
+  function listenPickImage() {
     return {
       questions: [], index: 0, answered: false, lastCorrect: false,
       score: 0, finished: false, answers: [], starText: '',
@@ -74,6 +74,7 @@
         const data = JSON.parse(document.getElementById('round-data').textContent);
         this.questions = data.questions || [];
         if (!this.questions.length) { this.finished = true; }
+        else { this.$nextTick(() => this.playAudio()); }  // tự phát câu đầu cho bé
       },
       get current(){ return this.questions[this.index] || {choices: []}; },
       // Phát audio mẫu của từ đáp án (API catalog).
@@ -89,12 +90,14 @@
         this.answered = true;
         this.lastCorrect = (pickedId === this.current.answer_id);
         if (this.lastCorrect) this.score++;
+        // Hiệu ứng khích lệ đa giác quan (dùng chung kidFx): đúng vui, sai nhẹ nhàng.
         if (window.kidFx) { this.lastCorrect ? kidFx.correct() : kidFx.wrong(); }
         this.answers.push({answer_id: this.current.answer_id, picked_id: pickedId});
-        // Sang câu sau (hoặc kết thúc) sau 0.9s để bé thấy phản hồi.
         setTimeout(() => {
-          if (this.index < this.questions.length - 1) { this.index++; this.answered = false; }
-          else { this.submit(); }
+          if (this.index < this.questions.length - 1) {
+            this.index++; this.answered = false;
+            this.$nextTick(() => this.playAudio());  // tự phát câu tiếp
+          } else { this.submit(); }
         }, 900);
       },
       async submit() {
@@ -108,7 +111,7 @@
           this.starText = '⭐'.repeat(d.stars || 0) || '🌱';
         } catch(e){ this.starText = '🌱'; }
         this.finished = true;
-        if (window.kidFx) kidFx.cheer();
+        if (window.kidFx) kidFx.cheer();  // reo mừng khi xong ván
       },
     };
   }

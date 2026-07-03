@@ -1,12 +1,12 @@
 {% extends 'base_kid.html' %}
-{% block title %}Lật thẻ tìm cặp — {{ topic.name_vi }}{% endblock %}
+{% block title %}Ghép hình với tiếng — {{ topic.name_vi }}{% endblock %}
 
 {% block content %}
 {{ round_data|json_script:"round-data" }}
 
-<div x-data="matchPairs()" x-init="init()">
+<div x-data="matchImageAudio()" x-init="init()">
   <div class="d-flex align-items-center justify-content-between mb-3">
-    <h1 class="h5 m-0">🃏 {{ child.avatar }} {{ child.name }} — {{ topic.name_vi }}</h1>
+    <h1 class="h5 m-0">🖼️🔊 {{ child.avatar }} {{ child.name }} — {{ topic.name_vi }}</h1>
     <a href="{% url 'games:choose' %}" class="btn btn-outline-secondary btn-sm">
       <i class="bi bi-arrow-left"></i> Thoát
     </a>
@@ -16,17 +16,25 @@
     <div class="text-muted small mb-2">
       Ghép: <span x-text="matched"></span>/<span x-text="pairsTotal"></span> · Lật sai: <span x-text="mistakes"></span>
     </div>
-    <p class="mb-3">Lật 2 thẻ để tìm cặp Anh – Việt nhé!</p>
+    <p class="mb-3">Lật thẻ hình và thẻ loa để ghép đúng nhé! Chạm thẻ loa để nghe.</p>
 
     <div class="row g-2">
       <template x-for="(card, i) in cards" :key="i">
-        <div class="col-3 col-md-2">
-          <button class="btn w-100 p-3"
+        <div class="col-4 col-md-3">
+          <button class="btn w-100 p-2 d-flex align-items-center justify-content-center"
                   :class="card.done ? 'btn-success' : (isUp(i) ? 'btn-warning' : 'btn-outline-primary')"
-                  style="min-height:64px"
+                  style="min-height:96px"
                   @click="flip(i)" :disabled="card.done || busy">
-            <span x-show="card.done || isUp(i)" x-text="card.text"></span>
-            <span x-show="!card.done && !isUp(i)">❓</span>
+            {# Úp: dấu hỏi. Lật/đã ghép: hình hoặc nút loa tuỳ mặt thẻ. #}
+            <template x-if="!card.done && !isUp(i)">
+              <span class="fs-2">❓</span>
+            </template>
+            <template x-if="(card.done || isUp(i)) && card.face === 'image'">
+              <img :src="card.image" class="img-fluid rounded" style="height:80px;object-fit:contain" alt="">
+            </template>
+            <template x-if="(card.done || isUp(i)) && card.face === 'audio'">
+              <span class="fs-1"><i class="bi bi-volume-up-fill"></i></span>
+            </template>
           </button>
         </div>
       </template>
@@ -42,6 +50,8 @@
       <button class="btn btn-kid" @click="location.reload()">Chơi lại</button>
     </div>
   </div>
+
+  <audio x-ref="player"></audio>
 </div>
 {% endblock %}
 
@@ -50,7 +60,7 @@
   const SUBMIT_URL = "{% url 'games:submit' child.pk game.code topic.slug %}";
   function getCookie(n){const m=document.cookie.match('(^|;)\\s*'+n+'\\s*=\\s*([^;]+)');return m?m.pop():'';}
 
-  function matchPairs() {
+  function matchImageAudio() {
     return {
       cards: [], up: [], matched: 0, mistakes: 0, pairsTotal: 0,
       busy: false, finished: false, starText: '',
@@ -61,24 +71,32 @@
         if (!this.pairsTotal) { this.finished = true; }
       },
       isUp(i){ return this.up.includes(i); },
+      // Phát audio của thẻ loa khi lật.
+      async playCard(card) {
+        if (card.face !== 'audio') return;
+        try {
+          const r = await fetch(`/learn/word/${card.word_id}/audio/`);
+          const d = await r.json();
+          if (d.ok) { this.$refs.player.src = d.url; await this.$refs.player.play(); }
+        } catch(e){}
+      },
       flip(i) {
         if (this.busy || this.cards[i].done || this.isUp(i)) return;
         this.up.push(i);
+        this.playCard(this.cards[i]);  // lật thẻ loa thì nghe ngay
         if (this.up.length === 2) {
           this.busy = true;
           const [a, b] = this.up;
           if (this.cards[a].pair_id === this.cards[b].pair_id) {
-            // Đúng cặp → giữ lật.
             this.cards[a].done = true; this.cards[b].done = true;
             this.matched++;
-            if (window.kidFx) kidFx.correct();
+            if (window.kidFx) kidFx.correct();  // ghép đúng cặp → khích lệ
             this.up = []; this.busy = false;
             if (this.matched === this.pairsTotal) this.submit();
           } else {
-            // Sai → úp lại sau 0.8s.
             this.mistakes++;
-            if (window.kidFx) kidFx.wrong();
-            setTimeout(() => { this.up = []; this.busy = false; }, 800);
+            if (window.kidFx) kidFx.wrong();    // lật sai → nhẹ nhàng, không phạt
+            setTimeout(() => { this.up = []; this.busy = false; }, 900);
           }
         }
       },

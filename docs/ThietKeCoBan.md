@@ -58,7 +58,9 @@ EngForMyChild/
    ├─ manage.py
    ├─ .env / .env.example    # Cấu hình theo máy (DEBUG, DATABASE_URL, TTS_VOICE...)
    ├─ db.sqlite3             # CSDL SQLite
-   ├─ sample_words.csv       # File từ vựng mẫu để nhập
+   ├─ sample_words.csv       # File từ vựng mẫu nhỏ (thử định dạng)
+   ├─ words_backup.csv       # Bộ từ vựng đầy đủ (~430 từ / 28 chủ đề) — nhập/restore
+
    ├─ config/                # ⚙️ Cấu hình dự án
    │  ├─ settings.py         #   Toàn bộ cấu hình (đọc .env)
    │  ├─ urls.py             #   Định tuyến gốc (map các khu)
@@ -70,9 +72,10 @@ EngForMyChild/
    ├─ accounts/              # 👤 Tài khoản, hồ sơ bé, passcode, trang chủ bé, tiến độ
    ├─ catalog/               # 📚 Nội dung học: chủ đề, từ vựng, audio, nhập CSV
    │  ├─ audio.py / tts.py / ipa.py     # service sinh audio, TTS, phiên âm IPA
-   │  ├─ imports.py                     # service nhập CSV (dùng chung web + CLI)
+   │  ├─ imports.py                     # service nhập/xuất CSV (dùng chung web + CLI)
+   │  ├─ emoji_map.py                   # bảng map từ → emoji để tự tải hình minh hoạ
    │  ├─ urls.py / urls_manage.py       # URL khu bé / khu quản lý
-   │  └─ management/commands/import_words.py   # lệnh nhập CSV qua dòng lệnh
+   │  └─ management/commands/           # import_words, export_words, fetch_images
    ├─ pronunciation/         # 🎤 Luyện phát âm (ghi âm) → Attempt
    ├─ games/                 # 🎮 Trò chơi
    │  └─ engine/             #   Luật chơi tách theo module (listen_pick, match_pairs...)
@@ -154,7 +157,7 @@ ManagePasscode (singleton pk=1)
 | `/manage/progress/` | `progress` | Tiến độ (kết quả chơi + lần luyện) |
 
 **catalog — khu bé** ([urls.py](../web/catalog/urls.py)): `/learn/` (chủ đề), `/learn/topic/<slug>/` (từ), `/learn/word/<pk>/audio/` (lấy URL audio, JSON).
-**catalog — khu quản lý** ([urls_manage.py](../web/catalog/urls_manage.py)): `/manage/topics/`, `.../add|edit`, `/manage/words/`, `.../add|edit`, `/manage/import/`.
+**catalog — khu quản lý** ([urls_manage.py](../web/catalog/urls_manage.py)): `/manage/topics/`, `.../add|edit`, `/manage/words/`, `.../add|edit`, `/manage/import/` (nhập CSV), `/manage/export/` (xuất CSV backup → `word_export`).
 **pronunciation** ([urls.py](../web/pronunciation/urls.py)): `/speak/` (chọn), `/speak/<child>/<slug>/` (luyện), `/speak/<child>/word/<word>/save/` (POST bản ghi).
 **games** ([urls.py](../web/games/urls.py)): `/games/` (chọn), `/games/<child>/<code>/<slug>/` (chơi), `.../submit/` (POST kết quả).
 
@@ -184,6 +187,11 @@ ManagePasscode (singleton pk=1)
 - **Sinh IPA** ([ipa.py](../web/catalog/ipa.py)) — tự điền `phonetic` khi để trống.
 - **Quản lý nội dung (khu quản lý)** — CRUD chủ đề (slug tự sinh), CRUD từ vựng (lọc theo chủ đề + tìm `?q=` + phân trang), **nhập CSV**.
 - **Nhập CSV — service dùng chung** ([imports.py](../web/catalog/imports.py)) — dùng cho cả web lẫn lệnh `import_words`. **Idempotent** (chạy lại không trùng nhờ unique `(topic,text_en)`), tự tạo chủ đề, tự sinh IPA, tuỳ chọn sinh audio (`--no-audio` để bỏ khi offline). Trả dict thống kê.
+- **Xuất CSV (backup/restore)** ([imports.py](../web/catalog/imports.py) `export_words()` + view `word_export`) — nút **Xuất CSV** ở màn quản lý từ vựng & màn Nhập CSV tải toàn bộ từ ra file `words_backup.csv`. **Cột xuất khớp đúng cột nhập** (`topic, topic_vi, text_en, text_vi, phonetic, level, image`, kèm BOM cho Excel) → **upload lại chính file này để khôi phục** (idempotent, không tạo trùng). Có lệnh CLI đối xứng `export_words [path]`. Lưu ý: import bỏ qua cột `phonetic` (tự sinh khi trống) — cột này chỉ để backup đầy đủ/đọc bằng Excel.
+- **Cột `image` trong CSV** — là **đường dẫn file hình trong media** (vd `images/cat.jpg`), không phải ảnh nhúng. Import chỉ **lưu tham chiếu** (không copy/tải file) → file hình phải tự đặt sẵn trong `media/images/`. Nhập lại có giá trị mới sẽ **cập nhật** đường dẫn hình (giống `text_vi`). Hình vẫn có thể upload tay ở màn sửa từ như trước.
+- **Hình minh hoạ tự động** ([emoji_map.py](../web/catalog/emoji_map.py) + lệnh `fetch_images`) — map mỗi `text_en` → emoji phù hợp, tải **SVG** về `media/images/` **một lần** rồi gán vào `Word.image`. Sau đó **học offline** (file đã ở máy). Lệnh idempotent; `--force` gán lại tất cả, `--offline` chỉ dùng SVG có sẵn, `--words a,b,c` chỉ áp cho từ chỉ định. Bộ dữ liệu hiện gán hình cho ~99% từ (còn lại là số ≥11 — emoji không có).
+  - **Hai bộ hình** qua `--style`: `twemoji` (mặc định, khối màu đầy, CC-BY 4.0) lưu `images/`; `openmoji` (vẽ tay, nét mảnh, CC BY-SA 4.0) lưu `images/openmoji/` — hai bộ tách thư mục nên không đè nhau. Hiện ~33 từ tiêu biểu đã đổi sang OpenMoji.
+  - **Thứ tự ưu tiên hiển thị:** ảnh upload tay > emoji SVG (Twemoji/OpenMoji) > icon 🔤 tạm.
 
 ### 5.3. Luyện phát âm (app `pronunciation`) — GĐ 2
 - **Luồng:** chọn bé + chủ đề → màn luyện hiện từng từ → bé **Nghe mẫu** (dùng lại API audio catalog) → **Thu giọng** (MediaRecorder trình duyệt) → POST multipart → lưu `Attempt` → từ kế tiếp.
@@ -214,6 +222,7 @@ Nhóm template theo app: `templates/accounts/`, `catalog/` (+ `catalog/manage/`)
 ## 7. Cấu hình & vận hành
 
 - **Cấu hình theo máy:** `web/.env` (mẫu `.env.example`). Mục quan trọng: `DEBUG`, `DATABASE_URL`, `SESSION_DAYS`, `MANAGE_UNLOCK_MINUTES`, `TTS_VOICE`, `ASR_URL`, `LOG_LEVEL`.
+- **Đổi giọng đọc mẫu:** sửa `TTS_VOICE` trong `.env` → khởi động lại server → xoá audio cũ (`media/audio/*.mp3` + `AudioClip` trong Admin) để sinh lại bằng giọng mới. Hướng dẫn chi tiết + danh sách giọng: [README.md](../README.md) mục "Đổi giọng đọc".
 - **Đổi CSDL SQLite ↔ MySQL:** chỉ sửa `DATABASE_URL`, không sửa code (settings đọc qua `dj_database_url`). File SQLite neo tuyệt đối vào `web/` để tránh lệch DB theo thư mục chạy lệnh.
 - **Media** (`media/audio|images|recordings/`) và **DB** giữ qua các lần chạy; khi dùng Docker gắn volume.
 - **Chạy:** `.\.venv\Scripts\python.exe web\manage.py runserver` → http://127.0.0.1:8000 (đăng nhập `admin`). Chi tiết & cheat-sheet: [README.md](../README.md).
@@ -270,8 +279,11 @@ Wireframe ([wireframe/](../wireframe/), mở [index.html](../wireframe/index.htm
 | [speak-choose.html](../wireframe/speak-choose.html) | Phát âm: chọn bé & chủ đề (5.3) | `/speak/` → `choose` | `pronunciation/choose.html` |
 | [speak-practice.html](../wireframe/speak-practice.html) | Phát âm: đọc theo & ghi âm (5.3) | `/speak/<child>/<slug>/` → `practice` (+ `.../word/<word>/save/` → `save_attempt`) | `pronunciation/practice.html` |
 | [game-choose.html](../wireframe/game-choose.html) | Trò chơi: chọn bé/game/chủ đề (5.4) | `/games/` → `choose` | `games/choose.html` |
-| [game-listen.html](../wireframe/game-listen.html) | Game *Nghe & chọn* 👂 (5.4) | `/games/<child>/<code>/<slug>/` → `play` (module `listen_pick`) | `games/play_listen_pick.html` |
+| [game-listen.html](../wireframe/game-listen.html) | Game *Nghe & chọn* 👂 (hình + chữ) (5.4) | `/games/<child>/<code>/<slug>/` → `play` (module `listen_pick`) | `games/play_listen_pick.html` |
 | [game-match.html](../wireframe/game-match.html) | Game *Lật thẻ tìm cặp* 🃏 + kết quả ⭐ (5.4) | `/games/<child>/<code>/<slug>/` → `play` (module `match_pairs`) | `games/play_match_pairs.html` |
+| [game-listen-image.html](../wireframe/game-listen-image.html) | Game *Nghe & chọn hình* 👂🖼️ (bé chưa biết chữ) (5.4) | `/games/<child>/<code>/<slug>/` → `play` (module `listen_pick_image`) | `games/play_listen_pick_image.html` |
+| [game-image-audio.html](../wireframe/game-image-audio.html) | Game *Nhìn hình & chọn tiếng* 🖼️🔊 (5.4) | `/games/<child>/<code>/<slug>/` → `play` (module `image_pick_audio`) | `games/play_image_pick_audio.html` |
+| [game-match-image.html](../wireframe/game-match-image.html) | Game *Ghép hình với tiếng* 🃏🔊 (5.4) | `/games/<child>/<code>/<slug>/` → `play` (module `match_image_audio`) | `games/play_match_image_audio.html` |
 | [game-empty.html](../wireframe/game-empty.html) | Trạng thái chủ đề chưa đủ từ (5.4) | nhánh của `play` khi `words < min_words` | `games/play_empty.html` |
 
 ### 🔒 Vào khu quản lý — passcode
@@ -290,11 +302,11 @@ Wireframe ([wireframe/](../wireframe/), mở [index.html](../wireframe/index.htm
 | *(dùng chung form)* | Thêm/sửa chủ đề (5.2) | `/manage/topics/add|<pk>/edit/` → `topic_form` | `catalog/manage/topic_form.html` |
 | [words.html](../wireframe/words.html) | Quản lý từ vựng: lọc + tìm + phân trang (5.2) | `/manage/words/` → `word_manage` | `catalog/manage/word_list.html` |
 | [wordform.html](../wireframe/wordform.html) | Form thêm/sửa từ (5.2) | `/manage/words/add|<pk>/edit/` → `word_form` | `catalog/manage/word_form.html` |
-| [import.html](../wireframe/import.html) | Nhập CSV (5.2) | `/manage/import/` → `word_import` | `catalog/manage/word_import.html` |
+| [import.html](../wireframe/import.html) | Nhập CSV + **Xuất CSV** (backup) (5.2) | `/manage/import/` → `word_import`; nút Xuất → `/manage/export/` → `word_export` | `catalog/manage/word_import.html` |
 | [progress.html](../wireframe/progress.html) | Tiến độ của bé (5.1) | `/manage/progress/` → `progress` | `accounts/progress.html` |
 
 ### Ghi chú map
-- **22 file wireframe** phủ toàn bộ chức năng đã làm (GĐ 0/1/2/4). Chưa có wireframe cho **GĐ 3** (chấm điểm phát âm) và **GĐ 5** (ngữ pháp/huy hiệu) vì chưa làm.
+- **22 file wireframe** (chưa kể `index.html`) phủ toàn bộ chức năng đã làm (GĐ 0/1/2/4), gồm **5 game**: Nghe & chọn, Lật thẻ tìm cặp, và 3 game nhận dạng cho bé chưa biết chữ (Nghe & chọn hình, Nhìn hình & chọn tiếng, Ghép hình với tiếng). Chưa có wireframe cho **GĐ 3** (chấm điểm phát âm) và **GĐ 5** (ngữ pháp/huy hiệu) vì chưa làm.
 - **Trang chủ khu bé** (`kid_home.html`) không có thẻ riêng ở mục lục wireframe — điều hướng vào từ chính các thẻ khu của bé.
 - **Màn "đặt" và "nhập" passcode** dùng **chung 1 URL** (`/manage/unlock/`): view tự chọn form theo `ManagePasscode.is_set`. Wireframe tách 2 file để xem cả 2 trạng thái.
 - **Form chủ đề** không có thẻ mục lục riêng (gộp ý trong màn Quản lý chủ đề) nhưng template thật `topic_form.html` vẫn tồn tại — nếu cần wireframe riêng, thêm `topicform.html` cho đối xứng với `wordform.html`.

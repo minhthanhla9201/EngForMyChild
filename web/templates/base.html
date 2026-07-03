@@ -10,6 +10,7 @@
     <link href="{% static 'vendor/bootstrap/bootstrap.min.css' %}" rel="stylesheet">
     <link href="{% static 'vendor/bootstrap-icons/bootstrap-icons.min.css' %}" rel="stylesheet">
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    {% block extra_head %}{% endblock %}
 </head>
 {# Lớp body theo khu (kid/manage) để tô màu nền/nav khác nhau — base con đặt qua block. #}
 <body class="{% block body_class %}{% endblock %}">
@@ -33,6 +34,8 @@
     <script src="{% static 'vendor/bootstrap/bootstrap.bundle.min.js' %}"></script>
     <script src="{% static 'vendor/htmx/htmx.min.js' %}"></script>
     <script defer src="{% static 'vendor/alpine/alpine.min.js' %}"></script>
+    {# Hiệu ứng khích lệ cho bé (kidFx toàn cục) — dùng chung cho game/phát âm #}
+    <script src="{% static 'js/kidfx.js' %}"></script>
     {# Script trang phụ thuộc bootstrap PHẢI đặt trong block này (render sau bundle) #}
     {% block extra_js %}{% endblock %}
 </body>

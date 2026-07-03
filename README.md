@@ -106,26 +106,86 @@ Tất cả lệnh chạy từ thư mục gốc dự án, dùng Python trong `.ve
 | Chạy kiểm thử (test) | `.\.venv\Scripts\python.exe web\manage.py test core accounts catalog pronunciation games` |
 | Nhập từ vựng từ file CSV | `.\.venv\Scripts\python.exe web\manage.py import_words web\sample_words.csv` |
 | Nhập từ vựng KHÔNG cần mạng (không sinh audio) | `.\.venv\Scripts\python.exe web\manage.py import_words web\sample_words.csv --no-audio` |
+| Sao lưu (xuất) toàn bộ từ vựng ra CSV | `.\.venv\Scripts\python.exe web\manage.py export_words web\words_backup.csv` |
+| Tạo âm thanh hiệu ứng game (WAV, offline) | `.\.venv\Scripts\python.exe web\manage.py gen_sfx` |
+| Tạo giọng động viên tiếng Việt (mp3 Neural, cần mạng 1 lần) | `.\.venv\Scripts\python.exe web\manage.py gen_praise` |
 
 ### Nhập từ vựng (thu thập dữ liệu dần)
 Tạo file CSV (mở bằng Excel/Google Sheet rồi lưu dạng CSV) với các cột:
 ```csv
-topic,topic_vi,text_en,text_vi,level
-Animals,Động vật,cat,con mèo,1
-Colors,Màu sắc,red,màu đỏ,1
+topic,topic_vi,text_en,text_vi,level,image
+Animals,Động vật,cat,con mèo,1,images/cat.jpg
+Colors,Màu sắc,red,màu đỏ,1,
 ```
+Cột `image` (tuỳ chọn) là **đường dẫn file hình trong `web\media\`**, vd `images/cat.jpg`. Nhập
+**không tự tải hình về** — hãy đặt sẵn file hình vào `web\media\images\` rồi ghi đường dẫn tương ứng.
+Để trống nếu chưa có hình.
 Có **2 cách nhập**:
 1. **Qua web (dễ nhất):** vào khu quản lý (**👨‍👩‍👧 Cho phụ huynh** → nhập passcode) → **Nội dung → Nhập từ CSV**, chọn file rồi bấm Nhập.
 2. **Qua dòng lệnh:** chạy lệnh `import_words` (xem bảng trên).
 
 Cả 2 cách dùng chung một bộ xử lý: tự tạo chủ đề, tự sinh phiên âm IPA và (tuỳ chọn) **tự sinh audio** cho từng từ.
 - Thêm/sửa thủ công từng chủ đề, từng từ cũng làm ngay trong khu quản lý (menu **Nội dung**).
-- File mẫu có sẵn: `web\sample_words.csv`.
+- File mẫu nhỏ: `web\sample_words.csv` (vài từ để thử định dạng).
+- **Bộ từ đầy đủ sẵn dùng:** `web\words_backup.csv` — hơn **430 từ / 28 chủ đề** (động vật, màu sắc, hành động, cảm xúc, nghề nghiệp, thời gian...). Nhập nhanh: `.\.venv\Scripts\python.exe web\manage.py import_words web\words_backup.csv --no-audio`.
 - **Mạng yếu/không có mạng:** thêm `--no-audio` để chỉ nhập từ (audio sẽ được tạo sau, ngay khi bé bấm "Nghe" lần đầu — lúc đó cần mạng một lần; nếu vẫn không có mạng, hệ thống tự đọc bằng giọng máy của Windows).
 - Chạy lại lệnh nhiều lần **không tạo trùng** (an toàn).
 
+### Sao lưu & khôi phục từ vựng (backup/restore)
+Muốn giữ lại toàn bộ từ vựng đã nhập (phòng khi cài lại/đổi máy):
+1. **Xuất ra CSV:** vào khu quản lý → **Nội dung → Nhập từ CSV**, bấm **📥 Xuất CSV** (hoặc ở màn **Từ vựng** bấm **Xuất CSV**). File `words_backup.csv` tải về gồm tất cả từ, đúng định dạng nhập.
+   - Qua dòng lệnh: `.\.venv\Scripts\python.exe web\manage.py export_words web\words_backup.csv`
+2. **Khôi phục:** dùng chính file vừa xuất, nhập lại ở màn **Nhập từ CSV** (hoặc lệnh `import_words ... --no-audio`). Nhập lại **không tạo trùng** — chỉ bổ sung/cập nhật, nên an toàn.
+
+### Hình minh hoạ cho từ vựng
+Mỗi từ có thể kèm **hình minh hoạ sinh động** (emoji nhiều màu kiểu Twemoji — dễ thương, hợp trẻ em).
+Bộ dữ liệu sẵn có **đã gán hình cho ~99% số từ**. Hình là file SVG lưu trong `web\media\images\`
+→ **chạy học hoàn toàn offline** (không gọi mạng khi bé học).
+
+**Tự tải/gán hình hàng loạt** (vd sau khi thêm từ mới) bằng lệnh:
+```powershell
+.\.venv\Scripts\python.exe web\manage.py fetch_images
+```
+- Lệnh map mỗi từ → emoji phù hợp (bảng ở `web\catalog\emoji_map.py`), tải SVG về `media\images\` **một lần** (cần mạng lúc chạy lệnh này), rồi gán vào từ. Chạy lại không tải trùng.
+- `--force`: gán lại cho cả từ đã có hình. `--offline`: chỉ dùng SVG có sẵn, không tải mạng.
+- **Thêm hình cho từ mới:** thêm 1 dòng `'tu_moi': '😊',` vào đúng nhóm trong `emoji_map.py` rồi chạy lại lệnh.
+- Từ nào chưa có hình vẫn hiển thị icon 🔤 tạm — không lỗi.
+
+**Hai bộ hình để chọn (`--style`):**
+- `twemoji` (mặc định) — emoji Twitter, khối màu đầy đặn.
+- `openmoji` — emoji **vẽ tay** phong cách hoạt hình, nét mảnh dễ thương. Lưu riêng ở `media\images\openmoji\` nên không đè bộ kia.
+
+Muốn **đổi vài từ sang bộ vẽ đẹp hơn** (OpenMoji), chỉ áp cho từ chỉ định:
+```powershell
+.\.venv\Scripts\python.exe web\manage.py fetch_images --style openmoji --force --words "cat,dog,apple,car"
+```
+Bộ dữ liệu hiện đã đổi sẵn ~33 từ tiêu biểu (con vật, trái cây, đồ vật) sang OpenMoji để so sánh phong cách; phần còn lại dùng Twemoji.
+
+**Dùng ảnh riêng (ảnh chụp/tranh vẽ) cho một từ:** vào khu quản lý → **Từ vựng → Sửa** → chọn file ở ô *Hình minh hoạ*. Ảnh upload tay **ưu tiên cao nhất**, ghi đè hình emoji.
+
+> Cột `image` trong file CSV backup lưu **đường dẫn** tới hình (vd `images/1F431.svg`), không phải ảnh nhúng. Khi khôi phục/đổi máy, nhớ mang theo cả thư mục `web\media\images\`.
+
 ### Học từ vựng & nghe phát âm
 Sau khi đăng nhập, bấm **Học từ vựng** ở trang chủ → chọn chủ đề → bấm 🔊 **Nghe** ở mỗi từ. Lần đầu nghe một từ, hệ thống sinh audio rồi lưu lại; các lần sau phát ngay.
+
+#### File âm thanh được tạo ra thế nào?
+- **Lần đầu nghe một từ:** hệ thống sinh audio bằng `edge-tts` (giọng Microsoft, **cần mạng một lần**). Nếu không có mạng → tự dùng giọng máy của Windows (`pyttsx3`, **offline**). File lưu ở `web\media\audio\word_<id>.mp3` và ghi nhớ lại (cache).
+- **Các lần sau:** dùng lại file đã lưu → **phát ngay, không cần mạng**.
+- Muốn tạo sẵn audio lúc nhập từ (bé khỏi chờ lần đầu): tick **Sinh sẵn audio** khi nhập CSV qua web, hoặc chạy `import_words` **không** kèm `--no-audio`.
+
+#### Đổi giọng đọc (TTS_VOICE)
+Giọng đọc do một dòng trong **`web\.env`** quyết định: `TTS_VOICE` (mặc định `en-US-AnaNeural` — giọng bé gái Mỹ). Đổi giọng:
+1. Mở `web\.env` bằng Notepad, sửa dòng `TTS_VOICE=` thành mã giọng khác, ví dụ `TTS_VOICE=en-GB-MaisieNeural`.
+2. **Khởi động lại server** (`Ctrl + C` rồi chạy lại `runserver`) — `.env` chỉ đọc lúc khởi động.
+3. **Xoá audio cũ để nghe giọng mới:** giọng mới chỉ áp dụng cho từ **chưa có** audio; từ đã nghe rồi vẫn dùng file cũ. Muốn áp cho tất cả:
+   - Xoá file: `Remove-Item web\media\audio\*.mp3`
+   - Xoá bản ghi audio trong DB: vào **http://127.0.0.1:8000/admin → Audio phát âm →** chọn tất cả → Delete.
+   - Lần sau bé bấm 🔊, hệ thống sinh lại bằng giọng mới.
+
+Vài giọng tiếng Anh hợp cho bé: `en-US-AnaNeural` (bé gái Mỹ), `en-US-JennyNeural` (nữ Mỹ), `en-GB-MaisieNeural` (bé gái Anh), `en-GB-SoniaNeural` (nữ Anh), `en-AU-NatashaNeural` (nữ Úc).
+**Xem toàn bộ giọng** (cần mạng): `.\.venv\Scripts\python.exe -m edge_tts --list-voices` (lọc các mã bắt đầu bằng `en-`).
+
+> `TTS_VOICE` chỉ áp cho `edge-tts` (cần mạng). Khi chạy offline dùng giọng Windows — đổi ở **Cài đặt Windows → Thời gian & Ngôn ngữ → Giọng nói**, không qua `.env`.
 
 ### Luyện phát âm (ghi âm)
 Bấm **Luyện phát âm** ở trang chủ → chọn bé → chọn chủ đề. Ở mỗi từ: bé bấm **Nghe mẫu**, rồi bấm **Thu giọng** để đọc theo (bấm lần nữa để dừng). Bản ghi được lưu lại; phụ huynh xem ở khu quản lý **→ Tiến độ** (chi tiết bản ghi xem trong Django Admin).
@@ -157,7 +217,8 @@ Các thiết lập đổi theo máy nằm trong **`web\.env`** (đã tạo sẵn
 
 - `DEBUG=True` — chế độ phát triển (hiện lỗi chi tiết). Khi chạy thật để `False`.
 - `DATABASE_URL=sqlite:///db.sqlite3` — đang dùng **SQLite** (một file, không cần cài gì). Có thể đổi sang MySQL sau (xem mục 7).
-- `TTS_VOICE`, `ASR_URL` — dùng cho phần phát âm ở giai đoạn sau.
+- `TTS_VOICE=en-US-AnaNeural` — giọng đọc mẫu (edge-tts). Cách đổi giọng: xem mục **Đổi giọng đọc** ở phần 4.
+- `ASR_URL` — địa chỉ dịch vụ chấm phát âm, dùng ở Giai đoạn 3 (chưa bật).
 
 > File `.env.example` là bản mẫu để tham khảo; **`.env`** mới là bản đang dùng thật.
 
