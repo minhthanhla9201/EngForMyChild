@@ -2,37 +2,117 @@
 {% block title %}Bé học tiếng Anh{% endblock %}
 
 {% block content %}
-<div class="text-center mb-4">
-  <h1 class="h3">🦜 Chào bé! Hôm nay học gì nào?</h1>
-</div>
 
-<div class="row g-3 justify-content-center">
-  <div class="col-6 col-md-4">
-    <a href="{% url 'catalog:topic_list' %}" class="text-decoration-none">
-      <div class="card zone-card zone-kid text-center h-100"><div class="card-body py-4">
-        <div class="zone-icon">📚</div>
-        <div class="fw-bold fs-5 text-dark">Học từ vựng</div>
-        <div class="text-muted small">Nghe & xem từ mới</div>
-      </div></div>
-    </a>
+{% if not active_child %}
+  {# Chưa chọn bé (có nhiều bé) → hiện màn chọn bé bằng avatar to #}
+  <div class="text-center mb-4">
+    <h1 class="h3">🦜 Bé nào đang học nào?</h1>
   </div>
-  <div class="col-6 col-md-4">
-    <a href="{% url 'pronunciation:choose' %}" class="text-decoration-none">
-      <div class="card zone-card zone-kid text-center h-100"><div class="card-body py-4">
-        <div class="zone-icon">🎤</div>
-        <div class="fw-bold fs-5 text-dark">Luyện phát âm</div>
-        <div class="text-muted small">Đọc theo & ghi âm</div>
-      </div></div>
+  {% if children %}
+    <div class="row g-3 justify-content-center">
+      {% for child in children %}
+      <div class="col-6 col-md-3">
+        <a href="{% url 'accounts:set_active_child' child.pk %}" class="text-decoration-none">
+          <div class="card child-card text-center h-100"><div class="card-body py-4">
+            <div class="child-avatar mb-2">{{ child.avatar }}</div>
+            <div class="fw-bold fs-5 text-dark">{{ child.name }}</div>
+          </div></div>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="card child-card text-center p-4">
+      <p class="mb-2">Chưa có hồ sơ bé nào.</p>
+      <div><a href="{% url 'accounts:child_add' %}" class="btn btn-kid">Thêm bé</a></div>
+    </div>
+  {% endif %}
+
+{% else %}
+  {# Đã chọn bé → dải tiến độ sinh động + 3 hoạt động #}
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h1 class="h4 m-0">🦜 Chào {{ active_child.avatar }} {{ active_child.name }}!</h1>
+    {% if children.count > 1 %}
+    <a href="{% url 'accounts:home' %}?switch=1" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-people"></i> Đổi bé
     </a>
+    {% endif %}
   </div>
-  <div class="col-6 col-md-4">
-    <a href="{% url 'games:choose' %}" class="text-decoration-none">
-      <div class="card zone-card zone-kid text-center h-100"><div class="card-body py-4">
-        <div class="zone-icon">🎮</div>
-        <div class="fw-bold fs-5 text-dark">Trò chơi</div>
-        <div class="text-muted small">Vừa chơi vừa học</div>
-      </div></div>
-    </a>
+
+  {# ---- Dải tiến độ: linh vật + sao (hàng trên), huy hiệu (hàng riêng full-width) ---- #}
+  <div class="card progress-card p-3 mb-4">
+    <div class="row align-items-center g-3">
+      {# Linh vật lớn dần theo sao #}
+      <div class="col-6 text-center">
+        <div class="pet-emoji">{{ progress.pet_emoji }}</div>
+        <div class="pet-name">{{ progress.pet_name }}</div>
+        {% if progress.pet_remain_stars %}
+        <div class="pet-progress mt-2">
+          {# % tiến tới mốc kế: dựa trên sao hiện tại / ngưỡng mốc kế #}
+          <div class="pet-progress-bar" style="width: {{ progress.pet_percent }}%"></div>
+        </div>
+        <div class="small text-muted mt-1">Còn {{ progress.pet_remain_stars }} ⭐ để lớn hơn!</div>
+        {% else %}
+        <div class="small text-muted mt-2">Đã lớn hết cỡ rồi, giỏi quá! 🎉</div>
+        {% endif %}
+      </div>
+
+      {# Tổng sao + chuỗi ngày #}
+      <div class="col-6 text-center">
+        <div class="stars-big"><span class="star-icon">⭐</span> {{ progress.total_stars }}</div>
+        <div class="text-muted fw-bold">Tổng số sao</div>
+        {% if progress.streak_days %}
+        <div class="mt-2"><span class="streak-chip">🔥 {{ progress.streak_days }} ngày</span></div>
+        {% endif %}
+      </div>
+    </div>
+
+    {# Huy hiệu (mở khoá dần) — hàng riêng full-width để trải thành KHỐI nhiều cột #}
+    <hr class="my-3">
+    <div class="text-center fw-bold text-dark mb-2">
+      🏅 Huy hiệu {{ progress.badges_earned|length }}/{{ progress.badges_total }}
+    </div>
+    <div class="badge-grid">
+      {% for item in progress.badges_all %}
+      {# tabindex=0 để hover VÀ focus (bàn phím/chạm) đều hiện tooltip #}
+      <div class="badge-chip {% if item.earned %}earned{% else %}locked{% endif %}" tabindex="0"
+           data-tip="{{ item.badge.name_vi }}{% if item.badge.desc_vi %} — {{ item.badge.desc_vi }}{% endif %}{% if not item.earned %} (chưa đạt){% endif %}">
+        <span class="badge-icon">{{ item.badge.icon }}</span>
+        {% if not item.earned %}<span class="badge-lock">🔒</span>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
   </div>
-</div>
+
+  {# ---- 3 hoạt động lớn ---- #}
+  <div class="row g-3 justify-content-center">
+    <div class="col-6 col-md-4">
+      <a href="{% url 'catalog:topic_list' %}" class="text-decoration-none">
+        <div class="card zone-card zone-kid text-center h-100"><div class="card-body py-4">
+          <div class="zone-icon">📚</div>
+          <div class="fw-bold fs-5 text-dark">Học từ vựng</div>
+          <div class="text-muted small">Nghe & xem từ mới</div>
+        </div></div>
+      </a>
+    </div>
+    <div class="col-6 col-md-4">
+      <a href="{% url 'pronunciation:choose' %}" class="text-decoration-none">
+        <div class="card zone-card zone-kid text-center h-100"><div class="card-body py-4">
+          <div class="zone-icon">🎤</div>
+          <div class="fw-bold fs-5 text-dark">Luyện phát âm</div>
+          <div class="text-muted small">Đọc theo & ghi âm</div>
+        </div></div>
+      </a>
+    </div>
+    <div class="col-6 col-md-4">
+      <a href="{% url 'games:choose' %}" class="text-decoration-none">
+        <div class="card zone-card zone-kid text-center h-100"><div class="card-body py-4">
+          <div class="zone-icon">🎮</div>
+          <div class="fw-bold fs-5 text-dark">Trò chơi</div>
+          <div class="text-muted small">Vừa chơi vừa học</div>
+        </div></div>
+      </a>
+    </div>
+  </div>
+{% endif %}
 {% endblock %}

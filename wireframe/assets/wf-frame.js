@@ -8,6 +8,7 @@
 // Thứ tự các màn (khớp danh sách trong index.html) để nút Trước/Sau hoạt động.
 const WF_SCREENS = [
   { id: 'login',          file: 'login.html',          title: '0. Đăng nhập' },
+  { id: 'kid-home',       file: 'kid-home.html',       title: 'Trang chủ khu bé (tiến độ)' },
   { id: 'learn-topics',   file: 'learn-topics.html',   title: 'Học: chọn chủ đề' },
   { id: 'learn-words',    file: 'learn-words.html',    title: 'Học: từ trong chủ đề' },
   { id: 'speak-choose',   file: 'speak-choose.html',   title: 'Phát âm: chọn bé & chủ đề' },

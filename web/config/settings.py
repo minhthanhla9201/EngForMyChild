@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'catalog',
     'pronunciation',
     'games',
+    'progress',
 ]
 
 MIDDLEWARE = [
@@ -168,6 +169,8 @@ ASR_URL = os.getenv('ASR_URL', 'http://asr:9000')
 TTS_VOICE = os.getenv('TTS_VOICE', 'en-US-AnaNeural')  # giọng trẻ em, rõ ràng
 # Giọng tiếng Việt (Neural, tự nhiên) cho lời động viên khi bé chơi game.
 TTS_VOICE_VI = os.getenv('TTS_VOICE_VI', 'vi-VN-HoaiMyNeural')
+# Giọng KHÁC (nam) cho lời khen khi mở huy hiệu — để bé thấy "đặc biệt" hơn.
+TTS_VOICE_BADGE = os.getenv('TTS_VOICE_BADGE', 'vi-VN-NamMinhNeural')
 
 
 # --- Logging ---

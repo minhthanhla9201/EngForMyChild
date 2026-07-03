@@ -126,7 +126,40 @@
       playSfx('cheer');
       speakPraise('cheer');
     },
+    // Hiện các huy hiệu VỪA mở khoá, lần lượt (list: [{icon, name_vi, desc_vi, voice_url}]).
+    // Mỗi huy hiệu: banner giữa màn + confetti + đọc lời khen bằng GIỌNG NAM edge-tts
+    // (voice_url — khác giọng động viên game). Thiếu mp3 thì bỏ qua giọng, vẫn có banner.
+    badges: function (list) {
+      if (!list || !list.length) return;
+      list.forEach(function (b, i) {
+        setTimeout(function () {
+          showBadge(b);
+          confetti(24);
+          playSfx('cheer');
+          if (b.voice_url) {
+            try {
+              var a = new Audio(b.voice_url);
+              a.play().catch(function () {});
+            } catch (e) {}
+          }
+        }, i * 2200);  // cách nhau để bé kịp xem từng cái
+      });
+    },
   };
+
+  // Banner huy hiệu mới giữa màn (tự biến mất).
+  function showBadge(b) {
+    var L = fxLayer();
+    var box = document.createElement('div');
+    box.className = 'kidfx-badge';
+    box.innerHTML =
+      '<div class="kidfx-badge-title">🎉 Huy hiệu mới!</div>' +
+      '<div class="kidfx-badge-icon">' + (b.icon || '🏅') + '</div>' +
+      '<div class="kidfx-badge-name">' + (b.name_vi || '') + '</div>' +
+      (b.desc_vi ? '<div class="kidfx-badge-desc">' + b.desc_vi + '</div>' : '');
+    L.appendChild(box);
+    setTimeout(function () { box.remove(); }, 2100);
+  }
 
   // Preload âm thanh + tải manifest giọng ngay khi có thể.
   function init() {

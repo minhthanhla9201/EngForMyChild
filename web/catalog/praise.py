@@ -55,14 +55,22 @@ PRAISE_LINES = {
 }
 
 
-def _slug(text):
-    """Tên file ổn định theo nội dung câu (hash ngắn) → sinh lại không tạo trùng."""
-    return hashlib.md5(text.encode('utf-8')).hexdigest()[:12]
+def _default_voice():
+    return getattr(settings, 'TTS_VOICE_VI', 'vi-VN-HoaiMyNeural')
 
 
-def filename_for(text):
-    """Đường dẫn tương đối (so với MEDIA_ROOT) của file mp3 cho một câu."""
-    return f'{PRAISE_DIR}/{_slug(text)}.mp3'
+def _slug(text, voice):
+    """
+    Tên file ổn định theo (nội dung câu + giọng) → sinh lại không tạo trùng, và
+    CÙNG câu đọc bằng giọng khác nhau ra file khác nhau (vd lời khen huy hiệu
+    dùng giọng nam, không đè lên giọng động viên nữ).
+    """
+    return hashlib.md5(f'{voice}|{text}'.encode('utf-8')).hexdigest()[:12]
+
+
+def filename_for(text, voice=None):
+    """Đường dẫn tương đối (so với MEDIA_ROOT) của file mp3 cho một câu + giọng."""
+    return f'{PRAISE_DIR}/{_slug(text, voice or _default_voice())}.mp3'
 
 
 def _edge_only(text, out_path, voice):
@@ -83,47 +91,75 @@ def _edge_only(text, out_path, voice):
     return False
 
 
+def generate_line(text, voice, force=False):
+    """
+    Sinh mp3 cho MỘT câu bằng `voice` (nếu chưa có). Trả 'gen'/'skip'/'fail'.
+
+    Dùng chung cho lời động viên (giọng nữ) và lời khen huy hiệu (giọng nam) —
+    không lặp logic. Idempotent theo (câu+giọng).
+    """
+    if not text:
+        return 'skip'
+    out_path = _media_root() / filename_for(text, voice)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    if out_path.exists() and not force:
+        return 'skip'
+    return 'gen' if _edge_only(text, out_path, voice) else 'fail'
+
+
+def _badge_lines():
+    """Các lời khen huy hiệu (desc_vi) đang dùng — lấy từ DB, bỏ trùng/rỗng."""
+    # Import trong hàm để tránh vòng import (progress phụ thuộc catalog nhẹ).
+    from progress.models import Badge
+    seen, out = set(), []
+    for desc in Badge.objects.filter(active='Y').values_list('desc_vi', flat=True):
+        if desc and desc not in seen:
+            seen.add(desc)
+            out.append(desc)
+    return out
+
+
 def generate_all(force=False):
     """
-    Sinh mp3 cho MỌI câu động viên (nếu chưa có). Trả (đã_sinh, bỏ_qua, lỗi).
-
-    Dùng bởi management command `gen_praise`. Idempotent: file đã có thì bỏ qua
-    (trừ khi force). Giọng lấy từ settings.TTS_VOICE_VI. CHỈ dùng edge-tts (có
-    retry) — không rơi về giọng OS.
+    Sinh mp3 cho MỌI câu động viên (giọng nữ) + lời khen huy hiệu (giọng nam).
+    Trả (đã_sinh, bỏ_qua, lỗi). Dùng bởi lệnh `gen_praise`. CHỈ edge-tts (retry).
     """
-    voice = getattr(settings, 'TTS_VOICE_VI', 'vi-VN-HoaiMyNeural')
-    out_dir = _media_root() / PRAISE_DIR
-    out_dir.mkdir(parents=True, exist_ok=True)
+    voice = _default_voice()
+    badge_voice = getattr(settings, 'TTS_VOICE_BADGE', 'vi-VN-NamMinhNeural')
 
     generated = skipped = failed = 0
+    # Lời động viên game — giọng nữ.
     for lines in PRAISE_LINES.values():
         for text in lines:
-            out_path = _media_root() / filename_for(text)
-            if out_path.exists() and not force:
-                skipped += 1
-                continue
-            if _edge_only(text, out_path, voice):
-                generated += 1
-            else:
-                failed += 1
+            r = generate_line(text, voice, force)
+            generated += r == 'gen'; skipped += r == 'skip'; failed += r == 'fail'
+    # Lời khen huy hiệu — giọng nam (khác giọng động viên để bé thấy đặc biệt).
+    for text in _badge_lines():
+        r = generate_line(text, badge_voice, force)
+        generated += r == 'gen'; skipped += r == 'skip'; failed += r == 'fail'
     return generated, skipped, failed
+
+
+def _url_if_exists(text, voice):
+    """URL mp3 của (câu+giọng) nếu đã sinh, ngược lại ''."""
+    rel = filename_for(text, voice)
+    # default_storage.url → có '/' đầu đúng (như FileField.url của audio từ).
+    return default_storage.url(rel) if (_media_root() / rel).exists() else ''
 
 
 def manifest():
     """
-    Trả manifest cho client: {tình_huống: [url_mp3_đã_có, ...]}.
-
-    Chỉ liệt kê file THỰC SỰ tồn tại (đã sinh) → client bốc ngẫu nhiên 1 câu để
-    phát; nếu chưa sinh (danh sách rỗng) thì client bỏ qua phần giọng, vẫn có
-    confetti + âm thanh.
+    Trả manifest lời động viên game (giọng nữ): {tình_huống: [url_mp3_đã_có, ...]}.
+    Rỗng → client bỏ qua giọng, vẫn có confetti + âm thanh.
     """
+    voice = _default_voice()
     data = {}
     for key, lines in PRAISE_LINES.items():
-        urls = []
-        for text in lines:
-            rel = filename_for(text)
-            if (_media_root() / rel).exists():
-                # default_storage.url → có '/' đầu đúng (như FileField.url của audio từ).
-                urls.append(default_storage.url(rel))
-        data[key] = urls
+        data[key] = [u for u in (_url_if_exists(t, voice) for t in lines) if u]
     return data
+
+
+def badge_voice_url(desc_vi):
+    """URL mp3 giọng NAM đọc lời khen huy hiệu `desc_vi` (đã sinh), hoặc '' nếu chưa."""
+    badge_voice = getattr(settings, 'TTS_VOICE_BADGE', 'vi-VN-NamMinhNeural')
+    return _url_if_exists(desc_vi, badge_voice)

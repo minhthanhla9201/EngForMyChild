@@ -63,7 +63,7 @@
   function matchImageAudio() {
     return {
       cards: [], up: [], matched: 0, mistakes: 0, pairsTotal: 0,
-      busy: false, finished: false, starText: '',
+      busy: false, finished: false, starText: '', newBadges: [],
       init() {
         const data = JSON.parse(document.getElementById('round-data').textContent);
         this.cards = (data.cards || []).map(c => ({...c, done: false}));
@@ -109,9 +109,10 @@
           });
           const d = await r.json();
           this.starText = '⭐'.repeat(d.stars || 0) || '🌱';
+          this.newBadges = d.badges || [];   // huy hiệu vừa mở (hiện sau khi reo)
         } catch(e){ this.starText = '🌱'; }
         this.finished = true;
-        if (window.kidFx) kidFx.cheer();
+        if (window.kidFx) { kidFx.cheer(); kidFx.badges(this.newBadges); }
       },
     };
   }

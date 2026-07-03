@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wireframe — Trang chủ khu bé (tiến độ)</title>
+<!-- Wireframe ĐỘC LẬP, chạy offline: asset trong assets/ cạnh file này. -->
+<link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+<link href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
+<link href="assets/style.css" rel="stylesheet">
+<link href="assets/wf-frame.css" rel="stylesheet">
+</head>
+<body data-screen="kid-home">
+
+<!-- Thanh điều hướng wireframe (về mục lục + màn trước/sau) — wf-frame.js dựng -->
+<div class="wf-bar" id="wf-bar"></div>
+
+<section class="wf-screen" id="kid-home">
+  <div class="wf-label"><i class="bi bi-house-heart"></i> Trang chủ khu bé — tiến độ <span class="wf-url">/</span></div>
+  <div class="wf-frame">
+    <div class="wf-nav-kid"></div>
+    <main class="container py-4">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h1 class="h4 m-0">🦜 Chào 🐥 Bi!</h1>
+        <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-people"></i> Đổi bé</button>
+      </div>
+
+      <!-- Dải tiến độ: linh vật + sao (hàng trên), huy hiệu (hàng riêng full-width) -->
+      <div class="card progress-card p-3 mb-4">
+        <div class="row align-items-center g-3">
+          <div class="col-6 text-center">
+            <div class="pet-emoji">🌳</div>
+            <div class="pet-name">Cây lớn</div>
+            <div class="pet-progress mt-2"><div class="pet-progress-bar" style="width:64%"></div></div>
+            <div class="small text-muted mt-1">Còn 18 ⭐ để lớn hơn!</div>
+          </div>
+          <div class="col-6 text-center">
+            <div class="stars-big"><span class="star-icon">⭐</span> 62</div>
+            <div class="text-muted fw-bold">Tổng số sao</div>
+            <div class="mt-2"><span class="streak-chip">🔥 4 ngày</span></div>
+          </div>
+        </div>
+        <!-- Huy hiệu: hàng riêng, trải thành khối; hover/focus hiện tooltip; chưa đạt thì mờ -->
+        <hr class="my-3">
+        <div class="text-center fw-bold text-dark mb-2">🏅 Huy hiệu 4/10</div>
+        <div class="badge-grid">
+          <div class="badge-chip earned" tabindex="0" data-tip="Ngôi sao đầu tiên — Bé được sao đầu tiên rồi!"><span class="badge-icon">⭐</span></div>
+          <div class="badge-chip earned" tabindex="0" data-tip="Mười ngôi sao — Bé đã có 10 sao, giỏi quá!"><span class="badge-icon">🌟</span></div>
+          <div class="badge-chip earned" tabindex="0" data-tip="Chơi lần đầu — Bé đã chơi game đầu tiên!"><span class="badge-icon">🎮</span></div>
+          <div class="badge-chip earned" tabindex="0" data-tip="Tập nói — Bé luyện nói lần đầu, hay lắm!"><span class="badge-icon">🎤</span></div>
+          <div class="badge-chip locked" tabindex="0" data-tip="Nhà sưu tầm sao — Hai mươi lăm sao lận! (chưa đạt)"><span class="badge-icon">✨</span><span class="badge-lock">🔒</span></div>
+          <div class="badge-chip locked" tabindex="0" data-tip="Vua ngôi sao — Năm mươi sao, tuyệt vời! (chưa đạt)"><span class="badge-icon">👑</span><span class="badge-lock">🔒</span></div>
+          <div class="badge-chip locked" tabindex="0" data-tip="Ba ngày chăm chỉ — Ba ngày liền, chăm quá! (chưa đạt)"><span class="badge-icon">🔥</span><span class="badge-lock">🔒</span></div>
+          <div class="badge-chip locked" tabindex="0" data-tip="Tuần lễ siêng năng — Cả tuần đều học, xuất sắc! (chưa đạt)"><span class="badge-icon">🏆</span><span class="badge-lock">🔒</span></div>
+        </div>
+      </div>
+
+      <!-- 3 hoạt động lớn -->
+      <div class="row g-3 justify-content-center">
+        <div class="col-6 col-md-4"><div class="card zone-card zone-kid text-center h-100"><div class="card-body py-4">
+          <div class="zone-icon">📚</div><div class="fw-bold fs-5 text-dark">Học từ vựng</div>
+          <div class="text-muted small">Nghe & xem từ mới</div></div></div></div>
+        <div class="col-6 col-md-4"><div class="card zone-card zone-kid text-center h-100"><div class="card-body py-4">
+          <div class="zone-icon">🎤</div><div class="fw-bold fs-5 text-dark">Luyện phát âm</div>
+          <div class="text-muted small">Đọc theo & ghi âm</div></div></div></div>
+        <div class="col-6 col-md-4"><div class="card zone-card zone-kid text-center h-100"><div class="card-body py-4">
+          <div class="zone-icon">🎮</div><div class="fw-bold fs-5 text-dark">Trò chơi</div>
+          <div class="text-muted small">Vừa chơi vừa học</div></div></div></div>
+      </div>
+    </main>
+  </div>
+  <div class="wf-note">Trang chủ khu bé: chọn bé (nếu nhiều bé) → hiện tiến độ SINH ĐỘNG — linh vật lớn dần theo sao, tổng sao, chuỗi ngày 🔥, lưới huy hiệu (mở khoá dần). Huy hiệu/mốc tính từ GameResult + Attempt (progress/service.py). Cuối màn game/luyện hiện banner "Huy hiệu mới!" qua kidFx.</div>
+</section>
+
+<script src="assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+<script src="assets/wf-frame.js"></script>
+</body>
+</html>

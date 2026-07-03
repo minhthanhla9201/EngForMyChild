@@ -109,7 +109,7 @@ Tất cả lệnh chạy từ thư mục gốc dự án, dùng Python trong `.ve
 | Đổi mật khẩu admin | `.\.venv\Scripts\python.exe web\manage.py changepassword admin` |
 | Cập nhật cơ sở dữ liệu sau khi đổi cấu trúc | `.\.venv\Scripts\python.exe web\manage.py makemigrations` rồi `... migrate` |
 | Kiểm tra cấu hình có lỗi không | `.\.venv\Scripts\python.exe web\manage.py check` |
-| Chạy kiểm thử (test) | `.\.venv\Scripts\python.exe web\manage.py test core accounts catalog pronunciation games` |
+| Chạy kiểm thử (test) | `.\.venv\Scripts\python.exe web\manage.py test core accounts catalog pronunciation games progress` |
 | Nhập từ vựng từ file CSV | `.\.venv\Scripts\python.exe web\manage.py import_words web\sample_words.csv` |
 | Nhập từ vựng KHÔNG cần mạng (không sinh audio) | `.\.venv\Scripts\python.exe web\manage.py import_words web\sample_words.csv --no-audio` |
 | Sao lưu (xuất) toàn bộ từ vựng ra CSV | `.\.venv\Scripts\python.exe web\manage.py export_words web\words_backup.csv` |

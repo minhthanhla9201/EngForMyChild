@@ -18,6 +18,7 @@ from core.decorators import (clear_manage_unlock, manage_required,
                              mark_manage_unlocked)
 from games.models import GameResult
 from pronunciation.models import Attempt
+from progress import service as progress_service
 
 from .forms import (ChangePasscodeForm, ChildProfileForm, ManageUnlockForm,
                     SetPasscodeForm)
@@ -43,10 +44,55 @@ class ParentLoginView(LoginView):
 # KHU CỦA BÉ — trang chủ (chỉ cần đăng nhập). Layout base_kid.
 # =====================================================================
 
+# Khoá lưu id bé đang hoạt động ở khu của bé (trong session).
+ACTIVE_CHILD_KEY = 'active_child_id'
+
+
+def get_active_child(request):
+    """
+    Bé đang hoạt động ở khu của bé (theo session), hoặc None.
+
+    Luôn lọc theo owner để không trả bé của phụ huynh khác. Nếu id trong session
+    không hợp lệ (bé đã xoá / đổi tài khoản) thì bỏ qua.
+    """
+    cid = request.session.get(ACTIVE_CHILD_KEY)
+    if not cid:
+        return None
+    return ChildProfile.objects.filter(pk=cid, owner=request.user, active='Y').first()
+
+
 @login_required
 def home(request):
-    """Trang chủ khu của bé: 3 hoạt động lớn (Học / Luyện phát âm / Trò chơi)."""
-    return render(request, 'accounts/kid_home.html')
+    """
+    Trang chủ khu của bé: chọn bé → hiện tiến độ (sao, linh vật, huy hiệu) +
+    3 hoạt động lớn (Học / Luyện phát âm / Trò chơi).
+
+    Nếu chưa chọn bé (và có nhiều bé) → hiện màn chọn bé. Có đúng 1 bé thì tự chọn.
+    """
+    children = ChildProfile.objects.filter(owner=request.user, active='Y')
+    # "Đổi bé": xoá lựa chọn hiện tại để quay lại màn chọn bé.
+    if request.GET.get('switch'):
+        request.session.pop(ACTIVE_CHILD_KEY, None)
+        return redirect('accounts:home')
+
+    active = get_active_child(request)
+    # Tự chọn khi chỉ có 1 bé → bé vào thẳng, đỡ một bước bấm.
+    if active is None and children.count() == 1:
+        active = children.first()
+        request.session[ACTIVE_CHILD_KEY] = active.pk
+
+    context = {'children': children, 'active_child': active}
+    if active is not None:
+        context['progress'] = progress_service.summary(active)
+    return render(request, 'accounts/kid_home.html', context)
+
+
+@login_required
+def set_active_child(request, pk):
+    """Chọn bé đang hoạt động (lưu session) rồi về trang chủ khu bé."""
+    child = get_object_or_404(ChildProfile, pk=pk, owner=request.user, active='Y')
+    request.session[ACTIVE_CHILD_KEY] = child.pk
+    return redirect('accounts:home')
 
 
 # =====================================================================

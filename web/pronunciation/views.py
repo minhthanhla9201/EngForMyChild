@@ -18,6 +18,8 @@ from django.shortcuts import get_object_or_404, render
 
 from accounts.models import ChildProfile
 from catalog.models import Topic, Word
+from catalog import praise as praise_service
+from progress import service as progress_service
 from .models import Attempt
 
 logger = logging.getLogger('eng.pron')
@@ -73,5 +75,14 @@ def save_attempt(request, child_id, word_id):
 
     attempt = Attempt.objects.create(child=child, word=word, recording=audio)
     logger.info('Lưu bản ghi luyện: bé=%s từ=%s (attempt=%s)', child.name, word.text_en, attempt.pk)
+
+    # Trao huy hiệu vừa đủ điều kiện (vd "Tập nói", chuỗi ngày) → hiện cho bé.
+    new_badges = progress_service.check_and_award_badges(child)
     # GĐ 3 sẽ chấm điểm tại đây và trả stars; hiện trả thông điệp khích lệ.
-    return JsonResponse({'ok': True, 'message': 'Giỏi lắm! Đã ghi lại rồi nhé.'})
+    return JsonResponse({
+        'ok': True,
+        'message': 'Giỏi lắm! Đã ghi lại rồi nhé.',
+        'badges': [{'icon': b.icon, 'name_vi': b.name_vi, 'desc_vi': b.desc_vi,
+                    'voice_url': praise_service.badge_voice_url(b.desc_vi)}
+                   for b in new_badges],
+    })

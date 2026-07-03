@@ -289,17 +289,32 @@ class PraiseTests(TestCase):
         Path(out_path).write_bytes(b'ID3')
 
     def test_generate_all_creates_and_is_idempotent(self):
-        """Sinh mp3 cho mọi câu; chạy lại thì bỏ qua (không sinh trùng)."""
+        """Sinh mp3 cho mọi câu động viên + lời khen huy hiệu; chạy lại thì bỏ qua."""
         from catalog import praise
+        # Tổng = câu động viên (giọng nữ) + lời khen huy hiệu (giọng nam, lấy từ DB seed).
+        total = sum(len(v) for v in praise.PRAISE_LINES.values()) + len(praise._badge_lines())
         with mock.patch('catalog.praise.tts._edge_tts_save', side_effect=self._fake_edge):
             gen, skip, fail = praise.generate_all()
-            total = sum(len(v) for v in praise.PRAISE_LINES.values())
             self.assertEqual(gen, total)
             self.assertEqual(fail, 0)
             # Lần 2: đã có file → bỏ qua hết, không sinh mới.
             gen2, skip2, fail2 = praise.generate_all()
             self.assertEqual(gen2, 0)
             self.assertEqual(skip2, total)
+
+    def test_badge_voice_uses_different_voice(self):
+        """Lời khen huy hiệu sinh bằng GIỌNG NAM (khác giọng động viên) → file khác."""
+        from django.conf import settings
+        from catalog import praise
+        desc = praise._badge_lines()[0]
+        # Cùng câu, 2 giọng → 2 tên file khác nhau (hash gồm cả giọng).
+        f_female = praise.filename_for(desc, settings.TTS_VOICE_VI)
+        f_male = praise.filename_for(desc, settings.TTS_VOICE_BADGE)
+        self.assertNotEqual(f_female, f_male)
+        with mock.patch('catalog.praise.tts._edge_tts_save', side_effect=self._fake_edge):
+            praise.generate_all()
+        # badge_voice_url trả URL giọng nam đã sinh.
+        self.assertTrue(praise.badge_voice_url(desc).endswith('.mp3'))
 
     def test_generate_no_pyttsx3_fallback_on_failure(self):
         """edge-tts thất bại hẳn → tính là lỗi, KHÔNG tạo file (tránh giọng OS)."""

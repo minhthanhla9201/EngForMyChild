@@ -154,6 +154,8 @@
           });
           const d = await r.json();
           this.show(d.message || (d.ok ? 'Đã lưu!' : 'Chưa lưu được.'), !!d.ok);
+          // Ghi âm xong là một "thành công nhỏ" → khích lệ + hiện huy hiệu mới (nếu có).
+          if (d.ok && window.kidFx) { kidFx.correct(); kidFx.badges(d.badges); }
         } catch (e) { this.show('Có lỗi khi gửi bản ghi.', false); }
         finally { this.busy = false; }
       },

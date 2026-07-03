@@ -98,6 +98,139 @@ body.body-manage { background: #eef1f4; }
 }
 .stat-num { font-size: 1.75rem; font-weight: 700; color: var(--brand-dark); }
 
+/* ===== Tiến độ của bé (trang chủ khu bé) — sinh động, dễ thương ===== */
+/* Thẻ tiến độ nền gradient tươi */
+.progress-card {
+    border: none;
+    border-radius: 1.5rem;
+    background: linear-gradient(135deg, #fff6d5 0%, #ffe0ec 100%);
+    box-shadow: 0 .5rem 1.25rem rgba(255, 150, 100, .18);
+}
+/* Linh vật lớn dần: emoji TO cho bé nhìn rõ, nảy nhẹ khi vào trang */
+.pet-emoji {
+    font-size: 9rem;
+    line-height: 1;
+    display: inline-block;
+    animation: pet-bounce 2s ease-in-out infinite;
+}
+@keyframes pet-bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+.pet-name { font-weight: 800; color: #d96a00; font-size: 1.5rem; }
+
+/* Số sao TO, vàng, có bóng cho nổi bật (bé nhìn rõ thành quả) */
+.stars-big {
+    font-size: 4rem;
+    font-weight: 800;
+    color: #f59e0b;
+    text-shadow: 0 2px 0 #fff, 0 3px 4px rgba(0, 0, 0, .1);
+    line-height: 1.1;
+}
+/* Icon ⭐ phóng to riêng, KHÔNG bị giới hạn theo cỡ số bên cạnh */
+.stars-big .star-icon {
+    font-size: 5rem;
+    vertical-align: middle;
+}
+
+/* Thanh tiến tới mốc linh vật kế tiếp */
+.pet-progress {
+    height: 1rem;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, .6);
+    overflow: hidden;
+}
+.pet-progress-bar {
+    height: 100%;
+    border-radius: 1rem;
+    background: linear-gradient(90deg, #ffb703, #fb8500);
+    transition: width .6s ease;
+}
+
+/* Lưới huy hiệu: các ô tròn trải thành KHỐI nhiều cột (tự xuống hàng), căn giữa */
+.badge-grid { display: flex; flex-wrap: wrap; gap: .75rem; justify-content: center; }
+.badge-chip {
+    width: 4rem; height: 4rem;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid var(--brand-border);
+    position: relative;
+    cursor: default;
+    transition: transform .1s ease;
+}
+.badge-chip:hover, .badge-chip:focus { transform: scale(1.12); outline: none; }
+.badge-chip.earned {
+    background: #fff3cd;
+    border-color: #ffca3a;
+    box-shadow: 0 .2rem .5rem rgba(255, 200, 60, .4);
+}
+/* Chưa đạt → làm mờ CHỈ phần icon (không grayscale cả chip → tooltip vẫn rõ) + ổ khoá góc */
+.badge-icon { line-height: 1; }
+.badge-chip.locked { opacity: .55; }
+.badge-chip.locked .badge-icon { filter: grayscale(1); opacity: .7; }
+/* Ổ khoá là phần tử riêng (.badge-lock) — KHÔNG dùng ::after vì ::after dành cho mũi nhọn tooltip */
+.badge-lock {
+    position: absolute; bottom: -2px; right: -2px;
+    font-size: .9rem;
+}
+
+/* Tooltip ghi chú: hiện khi hover/focus vào chip (đẹp hơn title mặc định) */
+.badge-chip[data-tip]::before {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + .6rem);
+    left: 50%;
+    transform: translateX(-50%);
+    /* Cho phép XUỐNG DÒNG để bao trọn câu khen dài (không cắt chữ) */
+    white-space: normal;
+    width: max-content;
+    max-width: 16rem;
+    text-align: center;
+    line-height: 1.35;
+    background: #2b2b2b;
+    color: #fff;
+    font-size: .82rem;
+    font-weight: 500;
+    padding: .45rem .7rem;
+    border-radius: .6rem;
+    box-shadow: 0 .3rem .8rem rgba(0, 0, 0, .3);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .15s ease;
+    z-index: 20;
+    pointer-events: none;
+    filter: none;               /* không bị xám theo chip locked */
+}
+/* Mũi nhọn nhỏ dưới tooltip (tam giác trỏ về chip) */
+.badge-chip[data-tip]::after {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + .2rem);
+    left: 50%;
+    transform: translateX(-50%);
+    border: .4rem solid transparent;
+    border-top-color: #2b2b2b;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .15s ease;
+    z-index: 20;
+    pointer-events: none;
+    filter: none;
+}
+.badge-chip[data-tip]:hover::before, .badge-chip[data-tip]:focus::before,
+.badge-chip[data-tip]:hover::after,  .badge-chip[data-tip]:focus::after {
+    opacity: 1; visibility: visible;
+}
+
+/* Chip chuỗi ngày (streak) */
+.streak-chip {
+    display: inline-flex; align-items: center; gap: .25rem;
+    font-weight: 700; color: #e5484d;
+    background: #fff0f0; border-radius: 1rem; padding: .2rem .7rem;
+}
+
 /* ===== Hiệu ứng khích lệ cho bé (kidfx.js) — offline, thuần CSS ===== */
 /* Lớp phủ toàn màn, không chặn thao tác (pointer-events:none) */
 .kidfx-layer {
@@ -157,6 +290,25 @@ body.body-manage { background: #eef1f4; }
     0%   { opacity: 1; }
     100% { transform: translate(-50%, -80%) scale(.9); opacity: 0; }
 }
+
+/* Banner "Huy hiệu mới!" giữa màn khi bé vừa mở khoá */
+.kidfx-badge {
+    position: absolute;
+    left: 50%; top: 40%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    background: #fff;
+    border: 3px solid #ffca3a;
+    border-radius: 1.25rem;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 .6rem 1.5rem rgba(0, 0, 0, .25);
+    animation: kidfx-pop-in .4s cubic-bezier(.2, 1.4, .4, 1) both,
+               kidfx-pop-out .3s ease-in 1.8s forwards;
+}
+.kidfx-badge-title { font-weight: 800; color: #d96a00; }
+.kidfx-badge-icon { font-size: 4rem; line-height: 1.2; }
+.kidfx-badge-name { font-weight: 800; font-size: 1.25rem; color: #333; }
+.kidfx-badge-desc { color: #666; }
 
 /* Rung nhẹ khi chọn sai (gắn tạm class này vào phần tử muốn rung) */
 .kidfx-shake { animation: kidfx-shake .4s; }

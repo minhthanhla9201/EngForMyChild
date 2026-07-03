@@ -18,6 +18,8 @@ from django.shortcuts import get_object_or_404, render
 from accounts.models import ChildProfile
 from catalog.models import Topic
 from core.models import YesNo
+from catalog import praise as praise_service
+from progress import service as progress_service
 from .engine.registry import load_game_module
 from .models import GameResult, GameType
 
@@ -88,4 +90,12 @@ def submit(request, child_id, code, slug):
     )
     logger.info('Ván chơi: bé=%s game=%s chủ đề=%s → %s sao', child.name, game.code, topic.slug,
                 result.get('stars'))
+
+    # Trao huy hiệu vừa đủ điều kiện → trả về client để hiện "bé vừa đạt".
+    # voice_url: mp3 giọng nam (edge-tts) đọc lời khen huy hiệu (rỗng nếu chưa sinh).
+    new_badges = progress_service.check_and_award_badges(child)
+    result['badges'] = [{'icon': b.icon, 'name_vi': b.name_vi, 'desc_vi': b.desc_vi,
+                         'voice_url': praise_service.badge_voice_url(b.desc_vi)}
+                        for b in new_badges]
+    result['total_stars'] = progress_service.summary(child)['total_stars']
     return JsonResponse({'ok': True, **result})

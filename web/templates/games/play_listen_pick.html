@@ -69,7 +69,7 @@
   function listenPick() {
     return {
       questions: [], index: 0, answered: false, lastCorrect: false,
-      score: 0, finished: false, answers: [], starText: '',
+      score: 0, finished: false, answers: [], starText: '', newBadges: [],
       init() {
         const data = JSON.parse(document.getElementById('round-data').textContent);
         this.questions = data.questions || [];
@@ -106,9 +106,10 @@
           });
           const d = await r.json();
           this.starText = '⭐'.repeat(d.stars || 0) || '🌱';
+          this.newBadges = d.badges || [];   // huy hiệu vừa mở (hiện sau khi reo)
         } catch(e){ this.starText = '🌱'; }
         this.finished = true;
-        if (window.kidFx) kidFx.cheer();
+        if (window.kidFx) { kidFx.cheer(); kidFx.badges(this.newBadges); }
       },
     };
   }

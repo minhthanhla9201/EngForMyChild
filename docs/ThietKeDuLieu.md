@@ -31,7 +31,7 @@
 - **Cờ Y/N** = `CharField(max_length=1)` (đã quy ước) — bằng nhau trên mọi DB, không dùng `BooleanField` (tránh khác biệt 0/1 vs true/false giữa backend).
 - **Số:** dùng `IntegerField`/`PositiveSmallIntegerField`/`DecimalField` — tránh kiểu phụ thuộc DB. `AutoField`/`BigAutoField` để Django lo khoá chính (đặt `DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'`).
 - **Thời gian:** `DateTimeField` (Django chuẩn hoá UTC) — nhất quán hai DB. Bật `USE_TZ = True`.
-- **JSON:** `models.JSONField` (vd `Badge.condition`) — Django hỗ trợ trên cả SQLite (3.38+) và MySQL (5.7+). KHÔNG tự nhét JSON vào TextField rồi parse tay.
+- **JSON:** khi cần lưu cấu trúc, dùng `models.JSONField` — Django hỗ trợ trên cả SQLite (3.38+) và MySQL (5.7+). KHÔNG tự nhét JSON vào TextField rồi parse tay. (Điều kiện mở huy hiệu hiện dùng `kind`+`threshold`, không cần JSON.)
 - **File/ảnh/audio:** lưu **đường dẫn** qua `FileField`/`ImageField` (file nằm trong `media/`), KHÔNG lưu blob nhị phân vào DB → không phụ thuộc kiểu BLOB của DB, và nhẹ.
 
 **Migration & truy vấn:**
@@ -163,21 +163,26 @@ erDiagram
         int child_id FK
         int game_type_id FK
         int topic_id FK "null"
-        int stars
+        int stars "0-3"
+        int score "số câu đúng"
+        int total "tổng câu"
         int duration_sec
     }
     Badge {
         int id PK
-        string code UK
+        string code UK "max 50"
         string name_vi
         string icon
-        json condition "điều kiện mở"
+        string desc_vi "lời khen"
+        string kind "STARS/GAMES/WORDS/STREAK"
+        int threshold "ngưỡng đạt"
+        int order
+        string active "Y/N"
     }
     ChildBadge {
         int id PK
         int child_id FK
-        int badge_id FK
-        datetime earned_at
+        int badge_id FK "unique cùng child"
     }
 ```
 
@@ -315,15 +320,23 @@ score_round(payload) -> {score,total,stars} # chấm kết quả bé gửi lên
 >
 > Thêm từ mới → mọi game tự có thêm nội dung, không đụng code. Thêm game mới = 1 module trong `games/engine/` + 1 bản ghi `GameType` (seed qua migration).
 
-### Reward / Badge — huy hiệu (mở khoá dần)
+### Badge — huy hiệu (mở khoá dần)
 | field | kiểu | ghi chú |
 |---|---|---|
-| `code` | SlugField | vd `zoo_animals` |
-| `name_vi` | CharField | |
-| `icon` | CharField | |
-| `condition` | JSONField | điều kiện mở (vd `{"topic_done": "animals"}`) — JSONField chạy cả SQLite & MySQL |
+| `code` | SlugField(max_length=50, unique) | vd `first-star`, `streak-7` |
+| `name_vi` | CharField | tên huy hiệu |
+| `icon` | CharField | emoji 🏅 |
+| `desc_vi` | CharField | lời khen ngắn (client đọc bằng giọng) |
+| `kind` | CharField(choices) | loại điều kiện: `STARS` (tổng sao) / `GAMES` (lượt chơi) / `WORDS` (lần luyện) / `STREAK` (chuỗi ngày) |
+| `threshold` | PositiveIntegerField | ngưỡng đạt (vd 10 sao) |
+| `order`, `active` | | thứ tự, bật/tắt |
 
-Bảng nối `ChildBadge(child, badge, earned_at)` ghi huy hiệu bé đã đạt.
+> **Điều kiện mở khoá là DỮ LIỆU** (`kind` + `threshold`), không phải code — thêm huy hiệu = thêm bản ghi `Badge` (seed migration), KHÔNG sửa logic. Logic mở khoá dùng chung ở `progress/service.py: check_and_award_badges` (gọi sau mỗi ván chơi/lần luyện).
+
+Bảng nối `ChildBadge(child, badge)` (unique theo cặp) ghi huy hiệu bé đã đạt; thời điểm đạt lấy từ `created_at` (audit).
+
+### Tiến độ hiển thị cho bé (tính, không lưu)
+`progress/service.py: summary(child)` tính từ `GameResult` + `Attempt`: tổng sao, số lượt chơi, số lần luyện, **chuỗi ngày học liên tiếp** (streak), và **mức linh vật lớn dần** 🌱→🌿→🪴→🌳→🌸→🌟 theo tổng sao. Hiện ở trang chủ khu bé + banner "Huy hiệu mới!" cuối màn game/luyện (qua `kidFx.badges`). Lời khen huy hiệu (`desc_vi`) đọc bằng **giọng nam** edge-tts (`TTS_VOICE_BADGE`) — khác giọng nữ của lời động viên game — sinh sẵn qua `gen_praise`, client phát mp3 (`badge_voice_url`).
 
 ---
 

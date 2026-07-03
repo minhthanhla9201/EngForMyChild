@@ -10,6 +10,8 @@ app_name = 'accounts'
 urlpatterns = [
     # Trang chủ KHU CỦA BÉ (chỉ cần đăng nhập).
     path('', views.home, name='home'),
+    # Chọn bé đang hoạt động ở khu của bé (lưu session).
+    path('child/<int:pk>/select/', views.set_active_child, name='set_active_child'),
     # Đăng nhập có ghi log lý do lỗi; đăng xuất dùng view sẵn của Django.
     path('login/', views.ParentLoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),

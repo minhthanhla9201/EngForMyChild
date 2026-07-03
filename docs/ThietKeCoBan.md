@@ -273,7 +273,7 @@ Wireframe ([wireframe/](../wireframe/), mở [index.html](../wireframe/index.htm
 ### 🧒 Khu của bé (navbar xanh, `base_kid.html`)
 | Wireframe | Chức năng (mục) | URL → View | Template thật |
 |---|---|---|---|
-| *(mục lục không có thẻ riêng)* | Trang chủ bé — 3 hoạt động (5.1) | `/` → `home` | `accounts/kid_home.html` |
+| [kid-home.html](../wireframe/kid-home.html) | Trang chủ bé — **tiến độ** (linh vật, sao, huy hiệu) + 3 hoạt động (5.1) | `/` → `home` (+ `child/<pk>/select/` → `set_active_child`) | `accounts/kid_home.html` |
 | [learn-topics.html](../wireframe/learn-topics.html) | Học: chọn chủ đề (5.2) | `/learn/` → `topic_list` | `catalog/topic_list.html` |
 | [learn-words.html](../wireframe/learn-words.html) | Học: từ trong chủ đề + 🔊 Nghe (5.2) | `/learn/topic/<slug>/` → `word_list` (+ `/learn/word/<pk>/audio/` → `word_audio`) | `catalog/word_list.html` |
 | [speak-choose.html](../wireframe/speak-choose.html) | Phát âm: chọn bé & chủ đề (5.3) | `/speak/` → `choose` | `pronunciation/choose.html` |
