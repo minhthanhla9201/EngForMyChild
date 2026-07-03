@@ -95,6 +95,49 @@ body.body-kid .btn-outline-primary:focus {
     color: #fff;
 }
 
+/* ===== Nút chọn theme trên navbar khu bé (kidtheme.js) ===== */
+.theme-picker { position: relative; }
+.theme-toggle {
+    background: rgba(255, 255, 255, .2);
+    border: 1px solid rgba(255, 255, 255, .5);
+    color: #fff;
+    border-radius: 12px;
+    padding: 4px 10px;
+    font-size: 18px;
+    cursor: pointer;
+    line-height: 1;
+}
+.theme-toggle:hover { background: rgba(255, 255, 255, .32); }
+/* Bảng chọn: các ô màu tròn để bé chưa biết chữ tự bấm */
+.theme-menu {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 6px);
+    display: none;
+    gap: 10px;
+    padding: 10px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, .18);
+    z-index: 1090;
+}
+.theme-menu.open { display: flex; }
+.theme-swatch {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    outline: 2px solid transparent;
+    cursor: pointer;
+    padding: 0;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .2);
+}
+.theme-swatch:hover { transform: scale(1.1); }
+.theme-swatch.active { outline-color: #333; }
+/* Mỗi ô màu = ảnh thu nhỏ tông của theme tương ứng */
+.theme-swatch.sw-candy  { background: linear-gradient(135deg, #7b6cff, #ff7eb3); }
+.theme-swatch.sw-ocean  { background: linear-gradient(135deg, #2a8fe0, #24c4c4); }
+.theme-swatch.sw-garden { background: linear-gradient(135deg, #46b649, #fb8500); }
+
 .navbar-brand-bar {
     background: linear-gradient(90deg, var(--candy-blue), var(--brand) 55%, var(--candy-pink));
 }

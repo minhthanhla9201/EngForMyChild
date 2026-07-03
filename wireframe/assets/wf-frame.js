@@ -45,6 +45,14 @@ const WF_NAVS = {
           <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-controller"></i> Trò chơi</a></li>
         </ul>
         <ul class="navbar-nav align-items-lg-center">
+          <li class="nav-item theme-picker me-lg-2">
+            <button type="button" class="theme-toggle" title="Đổi màu">🎨</button>
+            <div class="theme-menu">
+              <button type="button" class="theme-swatch sw-candy active" title="Kẹo ngọt"></button>
+              <button type="button" class="theme-swatch sw-ocean" title="Biển & trời"></button>
+              <button type="button" class="theme-swatch sw-garden" title="Vườn cổ tích"></button>
+            </div>
+          </li>
           <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-shield-lock"></i> 👨‍👩‍👧 Cho phụ huynh</a></li>
         </ul>
       </div>

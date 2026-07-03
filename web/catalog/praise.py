@@ -35,22 +35,22 @@ PRAISE_DIR = 'praise'
 # Các câu động viên, gom theo tình huống. Thêm/bớt câu ở đây (dữ liệu, không sửa code).
 PRAISE_LINES = {
     'correct': [
-        'Giỏi quá!',
-        'Tuyệt vời!',
+        'Em giỏi quá!',
+        'Em tuyệt vời!',
         'Chính xác rồi!',
-        'Con làm hay lắm!',
-        'Xuất sắc!',
-        'Đúng rồi, giỏi ghê!',
+        'Em làm hay lắm!',
+        'Xuất sắc đó em!',
+        'Đúng rồi, em giỏi ghê!',
     ],
     'wrong': [
-        'Không sao đâu, thử lại nhé!',
-        'Gần đúng rồi, cố lên nào!',
+        'Không sao đâu, thử lại em nhé!',
+        'Gần đúng rồi, em cố lên nào!',
         'Nghe lại một lần nữa nhé!',
     ],
     'cheer': [
-        'Hoan hô, con giỏi lắm!',
-        'Tuyệt vời ông mặt trời!',
-        'Con làm được rồi, giỏi quá!',
+        'Hoan hô, em giỏi lắm!',
+        'Tuyệt vời ông mặt trời đó em!',
+        'Em làm được rồi đó, giỏi quá!',
     ],
 }
 
