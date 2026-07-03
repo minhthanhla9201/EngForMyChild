@@ -36,6 +36,12 @@ Nếu chưa có tài khoản quản trị thì tạo (làm 1 lần, tự đặt 
 .\.venv\Scripts\python.exe web\manage.py createsuperuser
 ```
 
+Tạo **giọng động viên tiếng Việt** cho khu của bé (làm 1 lần, cần internet — dùng edge-tts). Bỏ qua bước này vẫn chơi được (có confetti + âm thanh), chỉ là bé chưa nghe được lời khen; các file `media/` **không** nằm trong git nên máy mới cần chạy lại:
+```powershell
+.\.venv\Scripts\python.exe web\manage.py gen_praise
+```
+> Âm thanh hiệu ứng game (`static/sfx/*.wav`) đã có sẵn trong mã nguồn; nếu thiếu thì tạo lại bằng `gen_sfx` (chạy offline).
+
 **Mỗi lần muốn chạy web**, làm 1 lệnh:
 ```powershell
 .\.venv\Scripts\python.exe web\manage.py runserver
