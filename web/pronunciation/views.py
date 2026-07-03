@@ -20,6 +20,7 @@ from accounts.models import ChildProfile
 from catalog.models import Topic, Word
 from catalog import praise as praise_service
 from progress import service as progress_service
+from . import asr as asr_service
 from .models import Attempt
 
 logger = logging.getLogger('eng.pron')
@@ -76,12 +77,40 @@ def save_attempt(request, child_id, word_id):
     attempt = Attempt.objects.create(child=child, word=word, recording=audio)
     logger.info('Lưu bản ghi luyện: bé=%s từ=%s (attempt=%s)', child.name, word.text_en, attempt.pk)
 
+    # Chấm phát âm qua service ASR (so mức từ). ASR tắt/lỗi → result None: vẫn lưu
+    # bản ghi, chỉ không chấm (báo thân thiện) — không chặn bé, không 500.
+    result = asr_service.score(attempt.recording, word.text_en)
+    scored = result is not None
+    if scored:
+        attempt.asr_text = result['heard'][:255]
+        attempt.score = result['score']
+        attempt.stars = result['stars']
+        attempt.save(update_fields=['asr_text', 'score', 'stars', 'updated_at', 'updated_by'])
+        logger.info('Chấm phát âm: từ=%s nghe=%r điểm=%s sao=%s',
+                    word.text_en, result['heard'], result['score'], result['stars'])
+
     # Trao huy hiệu vừa đủ điều kiện (vd "Tập nói", chuỗi ngày) → hiện cho bé.
     new_badges = progress_service.check_and_award_badges(child)
-    # GĐ 3 sẽ chấm điểm tại đây và trả stars; hiện trả thông điệp khích lệ.
+
+    # Thông điệp khích lệ theo số sao (bé chưa biết chữ → giọng + sao là chính).
+    if not scored:
+        message = 'Đã ghi lại rồi nhé! (Chưa chấm được, thử lại sau nha.)'
+    elif result['stars'] >= 3:
+        message = 'Con đọc giỏi quá!'
+    elif result['stars'] == 2:
+        message = 'Gần đúng rồi, nghe lại rồi thử lại nhé!'
+    elif result['stars'] == 1:
+        message = 'Cố lên nào, nghe kỹ rồi đọc lại nhé!'
+    else:
+        message = 'Mình thử lại nhé, nghe mẫu trước nha!'
+
     return JsonResponse({
         'ok': True,
-        'message': 'Giỏi lắm! Đã ghi lại rồi nhé.',
+        'scored': scored,
+        'stars': result['stars'] if scored else None,
+        'heard': result['heard'] if scored else '',
+        'target': word.text_en,
+        'message': message,
         'badges': [{'icon': b.icon, 'name_vi': b.name_vi, 'desc_vi': b.desc_vi,
                     'voice_url': praise_service.badge_voice_url(b.desc_vi)}
                    for b in new_badges],

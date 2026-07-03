@@ -59,6 +59,25 @@
       <div class="alert" :class="messageOk ? 'alert-success' : 'alert-warning'" x-text="message"></div>
     </div>
 
+    {# Kết quả chấm: sao to + (khi chưa đúng) máy nghe thành gì + nút nghe mẫu/thử lại #}
+    <div class="mt-2" x-show="scored" x-transition>
+      <div class="stars-big" x-text="starText"></div>
+      {# Chỉ ra điểm sai ở mức TỪ: máy nghe thành X, đọc lại từ đúng #}
+      <div x-show="stars < 3 && heard" class="mt-1">
+        <span class="text-muted">Máy nghe thành:</span>
+        <span class="fw-bold" x-text="heard"></span>
+        <div class="text-muted small">Mình đọc lại <span class="fw-bold" x-text="current.text_en"></span> nhé!</div>
+      </div>
+      <div class="d-flex justify-content-center gap-2 mt-2" x-show="stars < 3">
+        <button class="btn btn-outline-primary btn-sm" @click="listen()" :disabled="busy">
+          <i class="bi bi-volume-up-fill"></i> Nghe mẫu
+        </button>
+        <button class="btn btn-kid btn-sm" @click="retry()" :disabled="busy">
+          <i class="bi bi-arrow-repeat"></i> Thử lại
+        </button>
+      </div>
+    </div>
+
     {# Nghe lại bản ghi của bé #}
     <audio x-ref="playback" controls class="w-100 mt-2" x-show="myRecordingUrl" :src="myRecordingUrl"></audio>
   </div>
@@ -101,6 +120,11 @@
       myRecordingUrl: '',
       mediaRecorder: null,
       chunks: [],
+      // Kết quả chấm phát âm (điền sau khi upload xong).
+      scored: false,
+      stars: null,
+      heard: '',
+      starText: '',
 
       init() {
         this.words = JSON.parse(document.getElementById('words-data').textContent);
@@ -153,16 +177,30 @@
             body: fd,
           });
           const d = await r.json();
-          this.show(d.message || (d.ok ? 'Đã lưu!' : 'Chưa lưu được.'), !!d.ok);
-          // Ghi âm xong là một "thành công nhỏ" → khích lệ + hiện huy hiệu mới (nếu có).
-          if (d.ok && window.kidFx) { kidFx.correct(); kidFx.badges(d.badges); }
+          // Đọc ĐÚNG (2-3 sao) → khích lệ vui; chưa đúng → nhẹ nhàng + tự phát mẫu.
+          const good = d.scored && d.stars >= 2;
+          this.show(d.message || (d.ok ? 'Đã lưu!' : 'Chưa lưu được.'), good || !d.scored);
+          // Hiện kết quả chấm (sao + máy nghe thành gì).
+          this.scored = !!d.scored;
+          this.stars = d.stars;
+          this.heard = d.heard || '';
+          this.starText = d.scored ? ('⭐'.repeat(d.stars) || '🌱') : '';
+          if (window.kidFx) {
+            if (d.scored && d.stars >= 2) { kidFx.correct(); }
+            else if (d.scored) { kidFx.wrong(); this.$nextTick(() => this.listen()); }  // sai → nghe lại mẫu
+            kidFx.badges(d.badges);
+          }
         } catch (e) { this.show('Có lỗi khi gửi bản ghi.', false); }
         finally { this.busy = false; }
       },
 
+      // Thử lại từ hiện tại: xoá kết quả cũ rồi thu âm lại luôn.
+      retry() { this.resetResult(); this.toggleRecord(); },
       next() { if (this.index < this.words.length - 1) { this.index++; this.reset(); } },
       prev() { if (this.index > 0) { this.index--; this.reset(); } },
-      reset() { this.message = ''; this.myRecordingUrl = ''; },
+      // Reset khi đổi từ (gồm cả kết quả chấm).
+      reset() { this.message = ''; this.myRecordingUrl = ''; this.resetResult(); },
+      resetResult() { this.scored = false; this.stars = null; this.heard = ''; this.starText = ''; },
       show(msg, ok) { this.message = msg; this.messageOk = ok; },
     };
   }
