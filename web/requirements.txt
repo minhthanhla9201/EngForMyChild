@@ -14,3 +14,5 @@ requests>=2.31       # gọi service ASR
 
 # Chỉ cần khi chạy MySQL (xem docs/ThietKeDuLieu.md mục 0.1):
 # mysqlclient>=2.2
+whitenoise>=6.6      # phục vụ file tĩnh khi DEBUG=False
+waitress>=3.0        # WSGI server cho Windows (Option 1)

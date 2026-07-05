@@ -10,10 +10,11 @@ services:
     volumes:
       - asr_models:/models       # cache model Whisper, không tải lại mỗi lần chạy
     ports:
-      - "9000:9000"              # web local gọi qua localhost:9000
+      - "9002:9000"              # web local gọi qua localhost:9000
     environment:
       ASR_MODEL: base            # cỡ model (tiny/base/small) — base cân bằng cho từ đơn
       ASR_LANG: en
+    restart: unless-stopped
 
   # --- WEB (Django) — đang CHẠY LOCAL nên comment lại. Bật khi muốn chạy web trong Docker. ---
   # web:
