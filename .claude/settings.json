@@ -39,7 +39,10 @@
       "PowerShell(.\\\\.venv\\\\Scripts\\\\python.exe src\\\\manage.py test groups.tests.GroupViewTests.test_update_schedule_replaces_days 2>&1)",
       "PowerShell(.\\\\.venv\\\\Scripts\\\\python.exe src\\\\manage.py test groups)",
       "Bash(grep -o \"altInput[^,;{}]\\\\{0,60\\\\}\" \"e:/Thanhhm/Others/Learning/LSM/src/static/vendor/flatpickr/flatpickr.min.js\")",
-      "Bash(./.venv/Scripts/python.exe -m pip install \"openpyxl>=3.1\")"
+      "Bash(./.venv/Scripts/python.exe -m pip install \"openpyxl>=3.1\")",
+      "Bash(.venv/Scripts/python.exe -c \"import waitress; print\\('waitress OK'\\)\")",
+      "Bash(.venv/Scripts/python.exe -c \"import whitenoise; print\\('whitenoise OK'\\)\")",
+      "Bash(.venv/Scripts/python.exe -m pip install \"whitenoise>=6.6\" \"waitress>=3.0\")"
     ]
   }
 }

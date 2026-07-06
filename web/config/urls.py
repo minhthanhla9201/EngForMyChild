@@ -1,9 +1,11 @@
 """URL gốc dự án EngForMyChild."""
 
+import re
+
 from django.conf import settings
-from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import include, path, re_path
+from django.views.static import serve
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -17,6 +19,12 @@ urlpatterns = [
     path('', include('accounts.urls')),
 ]
 
-# Phục vụ file media (audio/ảnh/ghi âm) khi chạy dev. Production để web server lo.
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Phục vụ file media (audio/ảnh/ghi âm). Media sinh runtime (TTS, ghi âm của bé) nên
+# KHÔNG dùng WhiteNoise (chỉ quét 1 lần lúc start). serve đọc đĩa mỗi request → thấy file mới.
+# Đăng ký trực tiếp bằng re_path (KHÔNG dùng helper static() vì nó tự no-op khi DEBUG=False),
+# để media hoạt động cả khi DEBUG=False — app chạy local, không có web server ngoài serve /media.
+# Static (CSS/JS) đã do WhiteNoiseMiddleware lo. Nếu sau này đặt Nginx trước thì bỏ route này.
+_media_prefix = settings.MEDIA_URL.lstrip('/')
+urlpatterns += [
+    re_path(r'^%s(?P<path>.*)$' % re.escape(_media_prefix), serve, {'document_root': settings.MEDIA_ROOT}),
+]
