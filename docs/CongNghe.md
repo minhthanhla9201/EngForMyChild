@@ -37,7 +37,7 @@
 - **[`faster-whisper`](https://github.com/SYSTRAN/faster-whisper)** — bản tối ưu của Whisper (OpenAI), **miễn phí, chạy local, không gửi dữ liệu ra ngoài**. Chấm "bé đọc có đúng từ đích không" ở **mức từ**.
 - Đặt trong **container `asr` riêng** (`asr/`: FastAPI + uvicorn + ffmpeg). Endpoint tối giản `POST /transcribe` (nhận file audio → trả text nghe được) + `GET /health`. **Service chỉ NHẬN DẠNG; việc SO KHỚP + quy sao nằm ở web** (`pronunciation/asr.py`) — dễ test/chỉnh, service nhẹ.
   - **Vì sao tách:** model Whisper nặng, khởi động chậm. Tách container giúp web nhẹ, bật/tắt ASR độc lập.
-- **Cách chạy:** web chạy LOCAL (`runserver`), chỉ ASR trong Docker → `docker compose up asr`. Web gọi qua `ASR_URL` (mặc định `http://localhost:9000`; nếu web cũng trong Docker thì `http://asr:9000`). Model cache ở volume `asr_models` (không tải lại).
+- **Cách chạy:** web chạy LOCAL (`runserver`), chỉ ASR trong Docker → `docker compose up asr`. Web gọi qua `ASR_URL` (mặc định `http://localhost:9002` — container nghe 9000, publish ra host 9002; nếu web cũng trong Docker thì `http://asr:9000`). Model cache ở volume `asr_models` (không tải lại).
 - **Model mặc định:** `base` (env `ASR_MODEL`; đổi `tiny`/`small` được), CPU int8, ngôn ngữ `en`.
 - **Chấm điểm:** `pronunciation/asr.py` chuẩn hoá + so khớp chuỗi (`difflib.SequenceMatcher`) giữa text ASR và từ đích → điểm 0–100 → **sao 0–3** (ngưỡng khích lệ 85/60/35, nới hơn game). Sai → hiện "máy nghe thành X" + tự phát mẫu + nút Thử lại. **ASR tắt/timeout → vẫn lưu bản ghi, báo "chưa chấm được" (không 500).** Giọng bé chỉ tới service local.
 
