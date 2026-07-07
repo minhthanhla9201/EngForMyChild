@@ -10,8 +10,8 @@ Website chạy **trên máy của bạn** (local) giúp bé 6–7 tuổi học t
 
 Bạn chỉ cần **một trong hai** cách dưới đây:
 
-- **Cách A — Không Docker** (đơn giản nhất để bắt đầu): cần **Python** (đã có sẵn trên máy bạn — bản 3.9).
-- **Cách B — Docker** (giống môi trường triển khai thật): cần **Docker Desktop** (máy bạn đã cài).
+- **Cách A — Chạy web bằng Python** (cách chính, dùng hằng ngày): cần **Python** (đã có sẵn trên máy bạn — bản 3.9).
+- **Cách B — Docker** (chỉ để bật dịch vụ **chấm phát âm** — ASR): cần **Docker Desktop** (máy bạn đã cài). Web vẫn chạy bằng Cách A.
 
 Mở **PowerShell** để gõ lệnh: bấm phím `Windows`, gõ `powershell`, Enter.
 
@@ -81,26 +81,16 @@ Khu quản lý trong app đã đủ cho việc thường ngày. Khi cần thao t
 
 ## 3. Cách B — Chạy bằng Docker
 
-Dùng khi muốn chạy "một phát" giống môi trường thật, hoặc về sau bật kèm dịch vụ chấm phát âm.
-
-**Bật:**
-```powershell
-docker compose up --build
-```
-Lần đầu sẽ tải/đóng gói nên hơi lâu. Khi xong, mở: **http://localhost:8000**
-
-**Tắt:** bấm `Ctrl + C`, rồi:
-```powershell
-docker compose down
-```
+Hiện tại **chỉ service chấm phát âm (ASR)** chạy trong Docker; web vẫn chạy local (Cách A). Service `web` trong `docker-compose.yml` đang để sẵn nhưng **comment lại** — bật khi muốn đóng gói cả web sau này.
 
 ### Bật chấm phát âm (ASR) — web chạy local, chỉ ASR trong Docker
-Phần luyện phát âm chấm điểm bằng **faster-whisper** chạy trong container `asr`. Web vẫn chạy local như thường; chỉ cần bật thêm service ASR:
+Phần luyện phát âm chấm điểm bằng **faster-whisper** chạy trong container `asr`. Cần **Docker Desktop** đang chạy. Web vẫn chạy local như thường; chỉ cần bật thêm service ASR:
 ```powershell
 docker compose up asr --build
 ```
 - Lần đầu sẽ **tải model** (`base`, ~74MB) → hơi lâu; sau đó cache lại (volume), nhanh.
-- Web local gọi ASR qua `http://localhost:9000` (đã đặt mặc định). Cứ chạy `runserver` như bình thường ở cửa sổ khác.
+- Container nghe cổng 9000, publish ra host **9002**. Web local gọi ASR qua `http://localhost:9002` (đã đặt sẵn `ASR_URL` trong `web/.env`). Cứ chạy `runserver` như bình thường ở cửa sổ khác.
+- **Tắt:** bấm `Ctrl + C`, rồi `docker compose down`.
 - **Không bật ASR cũng không sao:** bé vẫn thu âm & nghe lại được, chỉ là không có sao/nhận xét — màn báo "chưa chấm được, thử lại sau".
 - Bé đọc → máy chấm **sao (0–3)**, nếu chưa đúng thì hiện "máy nghe thành …" + tự phát mẫu để bé nghe và **thử lại**. Chấm để khích lệ, không gây áp lực; giọng bé chỉ xử lý trên máy, không gửi ra ngoài.
 
@@ -206,7 +196,7 @@ Vài giọng tiếng Anh hợp cho bé: `en-US-AnaNeural` (bé gái Mỹ), `en-U
 ### Luyện phát âm (ghi âm)
 Bấm **Luyện phát âm** ở trang chủ → chọn bé → chọn chủ đề. Ở mỗi từ: bé bấm **Nghe mẫu**, rồi bấm **Thu giọng** để đọc theo (bấm lần nữa để dừng). Bản ghi được lưu lại; phụ huynh xem ở khu quản lý **→ Tiến độ** (chi tiết bản ghi xem trong Django Admin).
 - **Lưu ý:** trình duyệt sẽ hỏi quyền dùng **micro** — hãy bấm Cho phép. Ghi âm chạy được trên `localhost` (Chrome/Edge/Firefox).
-- Phần **chấm điểm tự động** (máy nghe bé đọc đúng chưa) sẽ có ở Giai đoạn 3 (dùng Faster-Whisper, cần Docker).
+- **Chấm điểm tự động** (máy nghe bé đọc đúng chưa) đã có: bật service ASR (xem [mục 3](#bật-chấm-phát-âm-asr--web-chạy-local-chỉ-asr-trong-docker)) rồi bé đọc → máy chấm **sao (0–3)** + gợi ý thử lại. Không bật ASR thì bé vẫn thu âm/nghe lại bình thường, chỉ không có điểm.
 
 ### Trò chơi
 Bấm **Trò chơi** ở trang chủ → chọn bé → chọn game → chọn chủ đề. Hiện có:
@@ -234,7 +224,7 @@ Các thiết lập đổi theo máy nằm trong **`web\.env`** (đã tạo sẵn
 - `DEBUG=True` — chế độ phát triển (hiện lỗi chi tiết). Khi chạy thật để `False`.
 - `DATABASE_URL=sqlite:///db.sqlite3` — đang dùng **SQLite** (một file, không cần cài gì). Có thể đổi sang MySQL sau (xem mục 7).
 - `TTS_VOICE=en-US-AnaNeural` — giọng đọc mẫu (edge-tts). Cách đổi giọng: xem mục **Đổi giọng đọc** ở phần 4.
-- `ASR_URL` — địa chỉ dịch vụ chấm phát âm, dùng ở Giai đoạn 3 (chưa bật).
+- `ASR_URL` — địa chỉ dịch vụ chấm phát âm (mặc định `http://localhost:9002` khi web chạy local). Cần bật service `asr` bằng Docker (xem [mục 3](#bật-chấm-phát-âm-asr--web-chạy-local-chỉ-asr-trong-docker)).
 
 > File `.env.example` là bản mẫu để tham khảo; **`.env`** mới là bản đang dùng thật.
 
@@ -256,7 +246,7 @@ Các thiết lập đổi theo máy nằm trong **`web\.env`** (đã tạo sẵn
 
 Hiện dùng SQLite cho gọn. Khi muốn dùng MySQL, **không phải sửa code** — chỉ:
 1. Bật service `db` (MySQL) trong `docker-compose.yml` (đã để sẵn, đang comment).
-2. Mở `mysqlclient` trong `web\requirements.txt` và phần cài đặt trong `web\Dockerfile`.
+2. Bỏ comment dòng `mysqlclient>=2.2` trong `web\requirements.txt` rồi cài lại thư viện.
 3. Đổi dòng `DATABASE_URL` trong `web\.env` sang `mysql://...`.
 4. Chạy lại `migrate`.
 
@@ -272,7 +262,7 @@ Chi tiết kỹ thuật: `docs/ThietKeDuLieu.md` mục **0.1**.
 | `docs/ThietKeDuLieu.md` | Mô hình dữ liệu + sơ đồ ERD + tương thích SQLite/MySQL |
 | `docs/CongNghe.md` | Công nghệ sử dụng (đều miễn phí, mã nguồn mở) |
 
-**Tình trạng hiện tại:** đã xong **GĐ 0** (khung + đăng nhập + hồ sơ bé), **GĐ 1** (từ vựng + nhập CSV + nghe mẫu), **GĐ 2** (luyện phát âm + ghi âm), **GĐ 4** (trò chơi: Nghe & chọn, Lật thẻ tìm cặp + chấm sao). Còn lại: **GĐ 3** (chấm điểm phát âm bằng Faster-Whisper — cần Docker) và **GĐ 5** (ngữ pháp + huy hiệu + trang tiến độ phụ huynh).
+**Tình trạng hiện tại:** đã xong **GĐ 0** (khung + đăng nhập + hồ sơ bé), **GĐ 1** (từ vựng + nhập CSV + nghe mẫu), **GĐ 2** (luyện phát âm + ghi âm), **GĐ 3** (chấm điểm phát âm bằng Faster-Whisper — service ASR trong Docker), **GĐ 4** (trò chơi: Nghe & chọn, Lật thẻ tìm cặp + chấm sao), và một phần **GĐ 5** (huy hiệu + trang tiến độ phụ huynh). Còn lại: phần **ngữ pháp** của GĐ 5.
 
 ---
 

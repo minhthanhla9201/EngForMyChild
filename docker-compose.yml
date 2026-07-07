@@ -1,7 +1,7 @@
 # Docker Compose — EngForMyChild
 # Cách chạy hiện tại: WEB chạy LOCAL (.\.venv\Scripts\python.exe web\manage.py runserver),
 # chỉ SERVICE ASR chạy trong Docker → `docker compose up asr`.
-# Web local gọi ASR qua http://localhost:9000 (container publish cổng 9000).
+# Web local gọi ASR qua http://localhost:9002 (container nghe cổng 9000, publish ra host 9002).
 
 services:
   # --- GĐ 3: service chấm phát âm (faster-whisper) ---
@@ -10,10 +10,11 @@ services:
     volumes:
       - asr_models:/models       # cache model Whisper, không tải lại mỗi lần chạy
     ports:
-      - "9000:9000"              # web local gọi qua localhost:9000
+      - "9002:9000"              # host 9002 → container 9000; web local đặt ASR_URL=http://localhost:9002
     environment:
       ASR_MODEL: base            # cỡ model (tiny/base/small) — base cân bằng cho từ đơn
       ASR_LANG: en
+    restart: unless-stopped
 
   # --- WEB (Django) — đang CHẠY LOCAL nên comment lại. Bật khi muốn chạy web trong Docker. ---
   # web:
