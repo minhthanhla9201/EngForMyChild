@@ -31,7 +31,11 @@ def choose(request):
     """Chọn bé + chủ đề để bắt đầu luyện phát âm."""
     children = ChildProfile.objects.filter(owner=request.user, active='Y')
     topics = Topic.objects.filter(active='Y')
-    return render(request, 'pronunciation/choose.html', {'children': children, 'topics': topics})
+    return render(request, 'pronunciation/choose.html', {
+        'children': children,
+        'topics': topics,
+        'hint_voice_url': praise_service.page_hint_url('speak_choose'),
+    })
 
 
 @login_required

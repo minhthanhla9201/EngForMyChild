@@ -32,7 +32,11 @@ logger = logging.getLogger('eng.catalog')
 def topic_list(request):
     """Danh sách chủ đề đang dùng."""
     topics = Topic.objects.filter(active='Y')
-    return render(request, 'catalog/topic_list.html', {'topics': topics})
+    return render(request, 'catalog/topic_list.html', {
+        'topics': topics,
+        # URL mp3 giọng hướng dẫn (rỗng nếu chưa sinh → template bỏ qua, không lỗi).
+        'hint_voice_url': praise_service.page_hint_url('topic_select'),
+    })
 
 
 @login_required
@@ -40,7 +44,12 @@ def word_list(request, slug):
     """Danh sách từ trong một chủ đề."""
     topic = get_object_or_404(Topic, slug=slug, active='Y')
     words = topic.words.filter(active='Y')
-    return render(request, 'catalog/word_list.html', {'topic': topic, 'words': words})
+    return render(request, 'catalog/word_list.html', {
+        'topic': topic,
+        'words': words,
+        # URL mp3 giọng hướng dẫn xem từ (rỗng nếu chưa sinh → bỏ qua).
+        'hint_voice_url': praise_service.page_hint_url('word_select'),
+    })
 
 
 @login_required

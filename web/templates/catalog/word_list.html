@@ -49,10 +49,19 @@
     <div x-show="error" x-transition class="alert alert-warning" x-text="error"></div>
   </div>
 </div>
+
+{# Nhúng URL giọng hướng dẫn (rỗng nếu chưa sinh gen_praise) — an toàn qua json_script. #}
+{{ hint_voice_url|json_script:"hint-url" }}
 {% endblock %}
 
 {% block extra_js %}
 <script>
+  // Đọc câu hướng dẫn xem từ cho bé 1 lần khi vào trang.
+  (function () {
+    var u = JSON.parse(document.getElementById('hint-url').textContent);
+    window.addEventListener('load', function () { if (window.kidFx) kidFx.playHint(u); });
+  })();
+
   // Alpine component: gọi API lấy URL audio (sinh + cache phía server) rồi phát.
   function wordAudio() {
     return {

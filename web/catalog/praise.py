@@ -52,6 +52,28 @@ PRAISE_LINES = {
         'Tuyệt vời ông mặt trời đó em!',
         'Em làm được rồi đó, giỏi quá!',
     ],
+    # Câu hướng dẫn hiển thị khi bé vào trang chọn chủ đề.
+    'topic_select': [
+        'Em click chọn chủ đề để luyện tập nhé!',
+        'Bấm vào chủ đề em thích để bắt đầu nhé!',
+        'Em chọn chủ đề nào muốn học nào!',
+    ],
+    # Câu hướng dẫn hiển thị khi bé vào trang danh sách từ trong chủ đề.
+    'word_select': [
+        'Bấm vào nút nghe để nghe phát âm từng từ nhé!',
+        'Em bấm Nghe để luyện phát âm từng từ nhé!',
+        'Nghe và đọc theo từng từ em nhé!',
+    ],
+    # Câu hướng dẫn hiển thị khi bé vào màn hình chọn luyện phát âm.
+    'speak_choose': [
+        'Chọn bé và chọn chủ đề để luyện phát âm nhé!',
+        'Em hãy chọn chủ đề muốn luyện nói nào!',
+    ],
+    # Câu hướng dẫn hiển thị khi bé vào màn hình chọn game.
+    'games_choose': [
+        'Chọn trò chơi và chủ đề em muốn chơi nhé!',
+        'Em hãy chọn một trò chơi thật vui nào!',
+    ],
 }
 
 
@@ -130,17 +152,33 @@ def _hint_lines():
     return out
 
 
+def _page_hint_lines():
+    """Tất cả câu hướng dẫn trang (topic_select, word_select, speak_choose, games_choose) — dùng bởi generate_all."""
+    seen, out = set(), []
+    for key in ('topic_select', 'word_select', 'speak_choose', 'games_choose'):
+        for text in PRAISE_LINES.get(key, []):
+            if text and text not in seen:
+                seen.add(text)
+                out.append(text)
+    return out
+
+
 def generate_all(force=False):
     """
-    Sinh mp3 cho MỌI câu động viên (giọng nữ) + lời khen huy hiệu (giọng nam).
+    Sinh mp3 cho MỌI câu động viên (giọng nữ) + lời khen huy hiệu (giọng nam)
+    + câu hướng dẫn trang (topic_select, word_select).
     Trả (đã_sinh, bỏ_qua, lỗi). Dùng bởi lệnh `gen_praise`. CHỈ edge-tts (retry).
     """
     voice = _default_voice()
     badge_voice = getattr(settings, 'TTS_VOICE_BADGE', 'vi-VN-NamMinhNeural')
 
     generated = skipped = failed = 0
-    # Lời động viên game + câu hướng dẫn game — giọng nữ.
-    female_lines = [t for lines in PRAISE_LINES.values() for t in lines] + _hint_lines()
+    # Lời động viên game + câu hướng dẫn game + câu hướng dẫn trang — giọng nữ.
+    female_lines = (
+        [t for lines in PRAISE_LINES.values() for t in lines]
+        + _hint_lines()
+        + _page_hint_lines()
+    )
     for text in female_lines:
         r = generate_line(text, voice, force)
         generated += r == 'gen'; skipped += r == 'skip'; failed += r == 'fail'
@@ -179,3 +217,19 @@ def badge_voice_url(desc_vi):
 def hint_voice_url(hint_vi):
     """URL mp3 giọng NỮ đọc câu hướng dẫn game `hint_vi` (đã sinh), hoặc '' nếu chưa."""
     return _url_if_exists(hint_vi, _default_voice())
+
+
+def page_hint_url(key):
+    """
+    URL mp3 giọng NỮ đọc một câu hướng dẫn trang (`key` là 'topic_select' hoặc
+    'word_select'). Bốc câu đầu tiên đã sinh trong nhóm — đủ để phát khi vào trang.
+    Trả '' nếu chưa sinh (gen_praise chưa chạy) → client bỏ qua, không báo lỗi.
+    """
+    import random
+    lines = PRAISE_LINES.get(key, [])
+    if not lines:
+        return ''
+    # Lấy tất cả URL đã có, bốc ngẫu nhiên 1 câu.
+    voice = _default_voice()
+    urls = [u for u in (_url_if_exists(t, voice) for t in lines) if u]
+    return random.choice(urls) if urls else ''
