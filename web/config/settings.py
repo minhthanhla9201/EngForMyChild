@@ -164,8 +164,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # --- Cấu hình riêng dự án (đọc từ .env) ---
-# URL service ASR (faster-whisper) — dùng từ GĐ 3. Giọng TTS mặc định cho edge-tts.
-ASR_URL = os.getenv('ASR_URL', 'http://asr:9000')
+# URL service ASR (faster-whisper) — chấm phát âm (GĐ 3).
+# Web chạy LOCAL → gọi container asr qua cổng publish localhost:9000.
+# (Nếu chạy web trong Docker thì đặt ASR_URL=http://asr:9000 trong web/.env.)
+ASR_URL = os.getenv('ASR_URL', 'http://localhost:9000')
+ASR_TIMEOUT = float(os.getenv('ASR_TIMEOUT', '20'))  # giây; ASR chậm lần đầu (tải model)
 TTS_VOICE = os.getenv('TTS_VOICE', 'en-US-AnaNeural')  # giọng trẻ em, rõ ràng
 # Giọng tiếng Việt (Neural, tự nhiên) cho lời động viên khi bé chơi game.
 TTS_VOICE_VI = os.getenv('TTS_VOICE_VI', 'vi-VN-HoaiMyNeural')

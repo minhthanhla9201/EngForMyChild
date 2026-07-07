@@ -5,6 +5,7 @@ và ràng buộc POST-only cho API lưu.
 
 import shutil
 import tempfile
+from unittest import mock
 
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -13,6 +14,7 @@ from django.urls import reverse
 
 from accounts.models import ChildProfile
 from catalog.models import Topic, Word
+from . import asr as asr_service
 from .models import Attempt
 
 # Ghi file test vào thư mục tạm rồi xoá — không để rác trong media/ thật.
@@ -87,17 +89,38 @@ class PronunciationViewTests(TestCase):
         resp = self.client.get(reverse('pronunciation:practice', args=[self.other_child.pk, 'animals']))
         self.assertEqual(resp.status_code, 404)
 
-    def test_save_attempt_creates_record(self):
-        """POST bản ghi → tạo Attempt gắn đúng bé + từ."""
+    @mock.patch('pronunciation.views.asr_service.score',
+                return_value={'heard': 'cat', 'target': 'cat', 'score': 100, 'stars': 3})
+    def test_save_attempt_scores_recording(self, _mock):
+        """POST bản ghi → chấm điểm (ASR mock) → điền stars/asr_text, trả kết quả."""
         self.client.login(username='parent', password='pass12345')
         audio = SimpleUploadedFile('rec.webm', b'fake-audio-bytes', content_type='audio/webm')
         url = reverse('pronunciation:save_attempt', args=[self.child.pk, self.word.pk])
         resp = self.client.post(url, {'audio': audio})
         self.assertEqual(resp.status_code, 200)
-        self.assertTrue(resp.json()['ok'])
+        data = resp.json()
+        self.assertTrue(data['ok'])
+        self.assertTrue(data['scored'])
+        self.assertEqual(data['stars'], 3)
         attempt = Attempt.objects.get(child=self.child, word=self.word)
         self.assertTrue(attempt.recording.name)
-        self.assertFalse(attempt.is_scored)  # GĐ 2 chưa chấm điểm
+        self.assertTrue(attempt.is_scored)          # đã chấm
+        self.assertEqual(attempt.stars, 3)
+        self.assertEqual(attempt.asr_text, 'cat')
+
+    @mock.patch('pronunciation.views.asr_service.score', return_value=None)
+    def test_save_attempt_when_asr_off(self, _mock):
+        """ASR tắt/lỗi (score None) → vẫn lưu bản ghi, KHÔNG chấm, không 500."""
+        self.client.login(username='parent', password='pass12345')
+        audio = SimpleUploadedFile('rec.webm', b'x', content_type='audio/webm')
+        url = reverse('pronunciation:save_attempt', args=[self.child.pk, self.word.pk])
+        resp = self.client.post(url, {'audio': audio})
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertTrue(data['ok'])
+        self.assertFalse(data['scored'])            # không chấm được
+        attempt = Attempt.objects.get(child=self.child, word=self.word)
+        self.assertFalse(attempt.is_scored)         # để trống, chờ lần sau
 
     def test_save_attempt_requires_post(self):
         """GET vào API lưu → 405 (chỉ nhận POST)."""
@@ -121,3 +144,35 @@ class PronunciationViewTests(TestCase):
         url = reverse('pronunciation:save_attempt', args=[self.other_child.pk, self.word.pk])
         resp = self.client.post(url, {'audio': audio})
         self.assertEqual(resp.status_code, 404)
+
+
+class AsrScoringTests(TestCase):
+    """Chấm phát âm — logic thuần (so khớp + quy sao), không gọi service thật."""
+
+    def test_match_score_exact_and_partial(self):
+        """Khớp hoàn toàn = 100 (bỏ hoa/dấu câu); lệch thì thấp hơn."""
+        self.assertEqual(asr_service.match_score('cat', 'cat'), 100)
+        self.assertEqual(asr_service.match_score('Cat.', 'cat'), 100)   # chuẩn hoá
+        self.assertTrue(asr_service.match_score('cut', 'cat') < 100)
+        self.assertEqual(asr_service.match_score('', 'cat'), 0)
+
+    def test_stars_thresholds(self):
+        """Quy điểm khớp → sao theo ngưỡng khích lệ của phát âm (85/60/35)."""
+        self.assertEqual(asr_service.stars_from_score(100), 3)
+        self.assertEqual(asr_service.stars_from_score(85), 3)
+        self.assertEqual(asr_service.stars_from_score(70), 2)
+        self.assertEqual(asr_service.stars_from_score(40), 1)
+        self.assertEqual(asr_service.stars_from_score(10), 0)
+
+    def test_transcribe_returns_none_when_asr_down(self):
+        """ASR không gọi được → transcribe trả None (không raise)."""
+        with mock.patch('pronunciation.asr.requests.post', side_effect=Exception('down')):
+            self.assertIsNone(asr_service.transcribe(
+                SimpleUploadedFile('r.webm', b'x', content_type='audio/webm')))
+
+    def test_score_combines_transcribe_and_match(self):
+        """score() ghép transcribe + match → dict có heard/score/stars."""
+        with mock.patch('pronunciation.asr.transcribe', return_value='cat'):
+            r = asr_service.score(SimpleUploadedFile('r.webm', b'x'), 'cat')
+        self.assertEqual(r['heard'], 'cat')
+        self.assertEqual(r['stars'], 3)

@@ -94,6 +94,16 @@ Lần đầu sẽ tải/đóng gói nên hơi lâu. Khi xong, mở: **http://loc
 docker compose down
 ```
 
+### Bật chấm phát âm (ASR) — web chạy local, chỉ ASR trong Docker
+Phần luyện phát âm chấm điểm bằng **faster-whisper** chạy trong container `asr`. Web vẫn chạy local như thường; chỉ cần bật thêm service ASR:
+```powershell
+docker compose up asr --build
+```
+- Lần đầu sẽ **tải model** (`base`, ~74MB) → hơi lâu; sau đó cache lại (volume), nhanh.
+- Web local gọi ASR qua `http://localhost:9000` (đã đặt mặc định). Cứ chạy `runserver` như bình thường ở cửa sổ khác.
+- **Không bật ASR cũng không sao:** bé vẫn thu âm & nghe lại được, chỉ là không có sao/nhận xét — màn báo "chưa chấm được, thử lại sau".
+- Bé đọc → máy chấm **sao (0–3)**, nếu chưa đúng thì hiện "máy nghe thành …" + tự phát mẫu để bé nghe và **thử lại**. Chấm để khích lệ, không gây áp lực; giọng bé chỉ xử lý trên máy, không gửi ra ngoài.
+
 > Dữ liệu (cơ sở dữ liệu, file âm thanh) được giữ lại qua các lần chạy nhờ "volume" đã cấu hình sẵn — tắt/bật không mất.
 
 ---
