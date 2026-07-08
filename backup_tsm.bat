@@ -100,9 +100,10 @@ REM gh sẽ tự tạo tag nếu chưa tồn tại
 REM ==================================================
 echo [INFO] Dang upload len GitHub Release...
 
+set LOGFILE=backup\upload.log
 gh release create %TAG% "%ZIP_FILE%" ^
     --title "%TAG%" ^
-    --notes "Automatic SQLite backup"
+    --notes "Automatic SQLite backup" > "%LOGFILE%" 2>&1
 
 if errorlevel 1 (
     echo [ERROR] Tao GitHub Release that bai
