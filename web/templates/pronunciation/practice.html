@@ -50,8 +50,20 @@
       {# Thu âm: bấm để bắt đầu / dừng #}
       <button class="btn" :class="recording ? 'btn-danger' : 'btn-success'"
               @click="toggleRecord()" :disabled="busy && !recording">
-        <span x-show="!recording"><i class="bi bi-mic-fill"></i> Thu giọng</span>
+        <span x-show="!recording"><i class="bi bi-mic-fill"></i> Thu giọng (Bấm)</span>
         <span x-show="recording"><i class="bi bi-stop-fill"></i> Dừng</span>
+      </button>
+
+      {# Nhấn giữ thu âm #}
+      <button class="btn btn-warning"
+              @mousedown="startRecord()"
+              @mouseup="stopRecord()"
+              @mouseleave="stopRecord()"
+              @touchstart.prevent="startRecord()"
+              @touchend.prevent="stopRecord()"
+              :disabled="busy && !recording">
+        <span x-show="!recording"><i class="bi bi-mic-fill"></i> Nhấn & Giữ để nói</span>
+        <span x-show="recording" class="text-danger fw-bold"><i class="bi bi-record-fill"></i> Đang thu...</span>
       </button>
     </div>
 
@@ -143,9 +155,9 @@
         finally { this.busy = false; }
       },
 
-      // Bắt đầu / dừng thu âm bằng MediaRecorder.
-      async toggleRecord() {
-        if (this.recording) { this.mediaRecorder.stop(); return; }
+      // Bắt đầu thu âm
+      async startRecord() {
+        if (this.recording || this.busy) return;
         try {
           const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
           this.chunks = [];
@@ -162,6 +174,23 @@
           this.message = '';
         } catch (e) {
           this.show('Không bật được micro. Hãy cho phép trình duyệt dùng micro nhé.', false);
+        }
+      },
+
+      // Dừng thu âm
+      stopRecord() {
+        if (!this.recording || !this.mediaRecorder) return;
+        if (this.mediaRecorder.state !== 'inactive') {
+          this.mediaRecorder.stop();
+        }
+      },
+
+      // Bấm để Bắt đầu / Dừng xen kẽ (nút Click cũ)
+      toggleRecord() {
+        if (this.recording) {
+          this.stopRecord();
+        } else {
+          this.startRecord();
         }
       },
 

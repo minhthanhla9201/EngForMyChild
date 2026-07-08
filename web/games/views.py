@@ -32,8 +32,12 @@ def choose(request):
     children = ChildProfile.objects.filter(owner=request.user, active='Y')
     topics = Topic.objects.filter(active='Y')
     games = GameType.objects.filter(active='Y')
-    return render(request, 'games/choose.html',
-                  {'children': children, 'topics': topics, 'games': games})
+    return render(request, 'games/choose.html', {
+        'children': children,
+        'topics': topics,
+        'games': games,
+        'hint_voice_url': praise_service.page_hint_url('games_choose'),
+    })
 
 
 @login_required

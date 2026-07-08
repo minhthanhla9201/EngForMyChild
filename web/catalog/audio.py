@@ -61,3 +61,26 @@ def generate_tts_clip(word):
         is_default=YesNo.YES,
     )
     return clip
+
+
+def get_vi_instruction(word):
+    """
+    Sinh & cache audio câu hướng dẫn tiếng Việt: 'X thì tiếng Anh đọc là Y'.
+    Trả URL hoặc None nếu lỗi (vd mất mạng).
+    """
+    instruction = f"{word.text_vi} .. thì tiếng Anh em đọc là ..."
+    voice = getattr(settings, 'TTS_VOICE_VI', 'vi-VN-HoaiMyNeural')
+
+    filename = f'inst_{word.pk}.mp3'
+    out_path = settings.MEDIA_ROOT / 'instructions' / filename
+
+    if not out_path.exists():
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            tts._edge_tts_save(instruction, out_path, voice)
+        except Exception:
+            logger.warning('Không sinh được hướng dẫn cho từ %r', word.text_en)
+            return None
+
+    from django.core.files.storage import default_storage
+    return default_storage.url(f'instructions/{filename}')
