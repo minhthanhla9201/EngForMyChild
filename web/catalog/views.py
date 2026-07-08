@@ -62,8 +62,18 @@ def word_audio(request, pk):
     clip = audio_service.get_clip(word)
     if not clip:
         # Không sinh được (vd offline và pyttsx3 lỗi) → báo nhẹ nhàng, không 500.
-        return JsonResponse({'ok': False, 'message': 'Chưa nghe được, thử lại sau nhé.'}, status=503)
-    return JsonResponse({'ok': True, 'url': clip.file.url})
+        return JsonResponse({'ok': False, 'message': 'Chưa tạo được audio, thử lại sau nhé.'}, status=503)
+
+    # Sinh câu hướng dẫn tiếng Việt "X thì tiếng Anh đọc là Y" (cache).
+    vi_url = audio_service.get_vi_instruction(word)
+
+    return JsonResponse({
+        'ok': True,
+        'url': clip.file.url,  # tương thích ngược — templates cũ vẫn dùng data.url
+        'en_url': clip.file.url,
+        'vi_instruction': f"{word.text_vi} .. thì tiếng Anh em đọc là ...",
+        'vi_url': vi_url or '',
+    })
 
 
 @login_required

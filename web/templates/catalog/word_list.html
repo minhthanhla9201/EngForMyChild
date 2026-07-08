@@ -63,6 +63,7 @@
   })();
 
   // Alpine component: gọi API lấy URL audio (sinh + cache phía server) rồi phát.
+  // Nếu có hướng dẫn tiếng Việt ("X thì tiếng Anh đọc là Y") thì phát trước.
   function wordAudio() {
     return {
       loadingId: null,
@@ -74,10 +75,17 @@
           const resp = await fetch(`/learn/word/${pk}/audio/`);
           const data = await resp.json();
           if (data.ok) {
-            this.$refs.player.src = data.url;
-            this.$refs.player.play();
+            const player = this.$refs.player;
+            // Phát hướng dẫn tiếng Việt trước (nếu có), xong mới phát tiếng Anh.
+            if (data.vi_url) {
+              player.src = data.vi_url;
+              await player.play();
+              await new Promise(resolve => { player.onended = resolve; });
+            }
+            player.src = data.en_url;
+            player.play();
           } else {
-            this.error = data.message || 'Chưa nghe được, thử lại nhé.';
+            this.error = data.message || 'Chưa tạo được audio, thử lại nhé.';
           }
         } catch (e) {
           this.error = 'Có lỗi khi tải âm thanh.';
