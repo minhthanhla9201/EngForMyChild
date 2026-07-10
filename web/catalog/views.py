@@ -66,6 +66,8 @@ def word_audio(request, pk):
 
     # Sinh câu hướng dẫn tiếng Việt "X thì tiếng Anh đọc là Y" (cache).
     vi_url = audio_service.get_vi_instruction(word)
+    # Audio ngắn đọc TÊN tiếng Việt của từ ("con mèo") — dùng cho game hình.
+    vi_name_url = audio_service.get_vi_name(word)
 
     return JsonResponse({
         'ok': True,
@@ -73,6 +75,7 @@ def word_audio(request, pk):
         'en_url': clip.file.url,
         'vi_instruction': f"{word.text_vi} .. tiếng Anh em đọc là ...",
         'vi_url': vi_url or '',
+        'vi_name_url': vi_name_url or '',
     })
 
 

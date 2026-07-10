@@ -23,14 +23,14 @@
         <div class="col-4 col-md-3">
           <button class="btn w-100 p-2 d-flex align-items-center justify-content-center"
                   :class="card.done ? 'btn-success' : (isUp(i) ? 'btn-warning' : 'btn-outline-primary')"
-                  style="min-height:96px"
+                  style="min-height:150px"
                   @click="flip(i)" :disabled="card.done || busy">
             {# Úp: dấu hỏi. Lật/đã ghép: hình hoặc nút loa tuỳ mặt thẻ. #}
             <template x-if="!card.done && !isUp(i)">
-              <span class="fs-2">❓</span>
+              <span class="fs-1">❓</span>
             </template>
             <template x-if="(card.done || isUp(i)) && card.face === 'image'">
-              <img :src="card.image" class="img-fluid rounded" style="height:80px;object-fit:contain" alt="">
+              <img :src="card.image" class="img-fluid rounded" style="height:130px;object-fit:contain" alt="">
             </template>
             <template x-if="(card.done || isUp(i)) && card.face === 'audio'">
               <span class="fs-1"><i class="bi bi-volume-up-fill"></i></span>
@@ -52,6 +52,8 @@
   </div>
 
   <audio x-ref="player"></audio>
+  {# player riêng cho giọng đọc TÊN tiếng Việt của thẻ hình #}
+  <audio x-ref="viplayer"></audio>
 </div>
 {{ hint_voice_url|json_script:"hint-url" }}
 {% endblock %}
@@ -75,14 +77,19 @@
         if (!this.pairsTotal) { this.finished = true; }
       },
       isUp(i){ return this.up.includes(i); },
-      // Phát audio của thẻ loa khi lật.
+      // Lật thẻ LOA → phát audio tiếng Anh; lật thẻ HÌNH → đọc TÊN tiếng Việt
+      // (bé chưa biết chữ, nghe tên hình vừa lật).
       async playCard(card) {
-        if (card.face !== 'audio') return;
-        try {
-          const r = await fetch(`/learn/word/${card.word_id}/audio/`);
-          const d = await r.json();
-          if (d.ok) { this.$refs.player.src = d.url; await this.$refs.player.play(); }
-        } catch(e){}
+        if (card.face === 'audio') {
+          try {
+            const r = await fetch(`/learn/word/${card.word_id}/audio/`);
+            const d = await r.json();
+            if (d.ok) { this.$refs.player.src = d.url; await this.$refs.player.play(); }
+          } catch(e){}
+        } else if (card.face === 'image' && card.vi_name_url) {
+          try { this.$refs.viplayer.src = card.vi_name_url; this.$refs.viplayer.currentTime = 0;
+                this.$refs.viplayer.play().catch(function(){}); } catch(e){}
+        }
       },
       flip(i) {
         if (this.busy || this.cards[i].done || this.isUp(i)) return;

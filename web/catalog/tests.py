@@ -385,3 +385,55 @@ class TopicIconTests(TestCase):
         t = Topic.objects.create(name_en='Y', name_vi='Y', slug='y',
                                  icon_static='', icon='🫥')
         self.assertEqual(t.icon_src, '')
+
+
+class ViNameAudioTests(TestCase):
+    """
+    Audio đọc TÊN tiếng Việt của từ (get_vi_name) cho game hình: bé chưa biết chữ
+    chạm vào hình sẽ nghe tên. edge-tts được MOCK (không gọi mạng).
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.topic = Topic.objects.create(name_en='Animals', name_vi='Động vật', slug='animals')
+        cls.word = Word.objects.create(topic=cls.topic, text_en='cat', text_vi='con mèo')
+
+    def setUp(self):
+        # Cache audio vào thư mục tạm để không đụng media thật.
+        self._tmp = tempfile.mkdtemp()
+        self._override = self.settings(MEDIA_ROOT=self._tmp)
+        self._override.enable()
+
+    def tearDown(self):
+        self._override.disable()
+
+    def _fake_edge(self, text, out_path, voice):
+        """Giả lập edge-tts: ghi file mp3 rỗng + nhớ text đã đọc (để khẳng định đọc text_vi)."""
+        from pathlib import Path
+        self._spoken = text
+        Path(out_path).write_bytes(b'ID3')
+
+    def test_get_vi_name_reads_text_vi_and_caches(self):
+        """get_vi_name đọc CHỈ text_vi ('con mèo'), tạo file, và idempotent (lần 2 không gọi lại)."""
+        from catalog import audio
+        with mock.patch('catalog.audio.tts._edge_tts_save', side_effect=self._fake_edge) as m:
+            url = audio.get_vi_name(self.word)
+            self.assertTrue(url.endswith(f'names/name_{self.word.pk}.mp3'))
+            self.assertEqual(self._spoken, 'con mèo')  # đọc đúng tên tiếng Việt, không câu dài
+            # Lần 2: file đã có → KHÔNG gọi edge-tts lại (cache).
+            audio.get_vi_name(self.word)
+            self.assertEqual(m.call_count, 1)
+
+    def test_get_vi_name_none_when_no_text_vi(self):
+        """Từ không có text_vi → trả None (không sinh file rỗng)."""
+        from catalog import audio
+        w = Word.objects.create(topic=self.topic, text_en='x', text_vi='')
+        self.assertIsNone(audio.get_vi_name(w))
+
+    def test_word_payload_includes_vi_name_url(self):
+        """word_payload gửi vi_name_url để game hình phát tên khi bé chạm hình."""
+        from games.engine.base import word_payload
+        with mock.patch('catalog.audio.tts._edge_tts_save', side_effect=self._fake_edge):
+            payload = word_payload(self.word)
+        self.assertIn('vi_name_url', payload)
+        self.assertTrue(payload['vi_name_url'].endswith('.mp3'))

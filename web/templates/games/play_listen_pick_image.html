@@ -26,11 +26,11 @@
     <div class="row g-3">
       <template x-for="choice in current.choices" :key="choice.id">
         <div class="col-6">
-          <button class="btn btn-outline-primary w-100 p-2" style="min-height:140px"
+          <button class="btn btn-outline-primary w-100 p-2" style="min-height:200px"
                   @click="pick(choice.id)" :disabled="answered">
             <template x-if="choice.image">
               <img :src="choice.image" :alt="choice.text_en"
-                   class="img-fluid rounded" style="height:120px;object-fit:contain">
+                   class="img-fluid rounded" style="height:180px;object-fit:contain">
             </template>
             {# Không ảnh (hiếm) → hiện chữ để không bí. #}
             <template x-if="!choice.image">
@@ -58,6 +58,8 @@
   </div>
 
   <audio x-ref="player"></audio>
+  {# player riêng cho giọng đọc TÊN tiếng Việt (không cắt tiếng player tiếng Anh) #}
+  <audio x-ref="viplayer"></audio>
 </div>
 {{ hint_voice_url|json_script:"hint-url" }}
 {% endblock %}
@@ -82,6 +84,13 @@
         // trước; bé bấm "Nghe" hoặc sang câu sau sẽ tự phát (playAudio ở pick()).
       },
       get current(){ return this.questions[this.index] || {choices: []}; },
+      // Đọc TÊN tiếng Việt của một lựa chọn ("con mèo") để bé biết vừa chọn hình gì.
+      sayName(choice) {
+        const u = choice && choice.vi_name_url;
+        if (!u) return;
+        try { this.$refs.viplayer.src = u; this.$refs.viplayer.currentTime = 0;
+              this.$refs.viplayer.play().catch(function(){}); } catch(e){}
+      },
       // Phát audio mẫu của từ đáp án (API catalog).
       async playAudio() {
         try {
@@ -93,6 +102,9 @@
       pick(pickedId) {
         if (this.answered) return;
         this.answered = true;
+        // Đọc tên tiếng Việt của HÌNH bé vừa chọn (bé chưa biết chữ).
+        const picked = this.current.choices.find(c => c.id === pickedId);
+        this.sayName(picked);
         this.lastCorrect = (pickedId === this.current.answer_id);
         if (this.lastCorrect) this.score++;
         // Hiệu ứng khích lệ đa giác quan (dùng chung kidFx): đúng vui, sai nhẹ nhàng.

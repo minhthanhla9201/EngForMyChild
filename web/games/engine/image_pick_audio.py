@@ -9,6 +9,7 @@ Chỉ dùng từ có ảnh (needs_image='Y').
 
 import random
 
+from catalog.audio import get_vi_name
 from .base import stars_from_ratio, word_payload
 
 NUM_CHOICES = 4
@@ -39,6 +40,8 @@ def build_round(words, count=5):
             'image_word_id': target.pk,
             # URL hình đáp án để client hiện ngay (không phải dò lại từ choices).
             'image': target.image.url if target.image else '',
+            # Audio đọc TÊN tiếng Việt của hình đề bài (nút "Hình này là gì?").
+            'image_vi_name_url': get_vi_name(target) or '',
             'choices': [word_payload(w) for w in choices],
         })
     return {'questions': questions}

@@ -27,10 +27,18 @@ def stars_from_ratio(score, total):
 
 
 def word_payload(word):
-    """Dữ liệu một từ gửi ra client (an toàn, gọn). Hình lấy URL nếu có."""
+    """
+    Dữ liệu một từ gửi ra client (an toàn, gọn). Hình lấy URL nếu có.
+
+    vi_name_url: audio đọc TÊN tiếng Việt của từ ("con mèo") — bé chưa biết chữ,
+    chạm vào hình sẽ nghe tên hình. Gửi sẵn URL để client phát ngay, không round-trip.
+    Import trong hàm để tránh vòng import (games → catalog). '' nếu chưa sinh được.
+    """
+    from catalog.audio import get_vi_name
     return {
         'id': word.pk,
         'text_en': word.text_en,
         'text_vi': word.text_vi,
         'image': word.image.url if word.image else '',
+        'vi_name_url': get_vi_name(word) or '',
     }
