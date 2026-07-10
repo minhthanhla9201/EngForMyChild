@@ -71,7 +71,7 @@ def word_audio(request, pk):
         'ok': True,
         'url': clip.file.url,  # tương thích ngược — templates cũ vẫn dùng data.url
         'en_url': clip.file.url,
-        'vi_instruction': f"{word.text_vi} .. thì tiếng Anh em đọc là ...",
+        'vi_instruction': f"{word.text_vi} .. tiếng Anh em đọc là ...",
         'vi_url': vi_url or '',
     })
 

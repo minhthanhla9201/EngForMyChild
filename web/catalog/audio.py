@@ -65,10 +65,10 @@ def generate_tts_clip(word):
 
 def get_vi_instruction(word):
     """
-    Sinh & cache audio câu hướng dẫn tiếng Việt: 'X thì tiếng Anh đọc là Y'.
+    Sinh & cache audio câu hướng dẫn tiếng Việt: 'X tiếng Anh đọc là Y'.
     Trả URL hoặc None nếu lỗi (vd mất mạng).
     """
-    instruction = f"{word.text_vi} .. thì tiếng Anh em đọc là ..."
+    instruction = f"{word.text_vi} .. tiếng Anh em đọc là ..."
     voice = getattr(settings, 'TTS_VOICE_VI', 'vi-VN-HoaiMyNeural')
 
     filename = f'inst_{word.pk}.mp3'

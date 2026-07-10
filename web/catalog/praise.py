@@ -43,9 +43,9 @@ PRAISE_LINES = {
         'Đúng rồi, em giỏi ghê!',
     ],
     'wrong': [
-        'Không sao đâu, thử lại em nhé!',
+        'Sai rồi, thử lại em nhé!',
         'Gần đúng rồi, em cố lên nào!',
-        'Nghe lại một lần nữa nhé!',
+        'Chưa đúng, nghe lại một lần nữa nhé!',
     ],
     'cheer': [
         'Hoan hô, em giỏi lắm!',
