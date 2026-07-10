@@ -30,6 +30,8 @@ const WF_SCREENS = [
   { id: 'wordform',       file: 'wordform.html',       title: 'Form thêm/sửa từ' },
   { id: 'import',         file: 'import.html',         title: 'Nhập CSV' },
   { id: 'progress',       file: 'progress.html',       title: 'Tiến độ của bé' },
+  { id: 'manage-pets',    file: 'manage-pets.html',    title: 'Quản lý linh vật' },
+  { id: 'manage-badges',  file: 'manage-badges.html',  title: 'Quản lý huy hiệu' },
 ];
 
 // HTML 3 loại navbar mẫu (giống base_kid / base_manage / login chưa đăng nhập của app thật).

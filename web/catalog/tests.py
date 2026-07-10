@@ -290,19 +290,29 @@ class PraiseTests(TestCase):
 
     def test_generate_all_creates_and_is_idempotent(self):
         """Sinh mp3 cho mọi câu động viên + lời khen huy hiệu; chạy lại thì bỏ qua."""
+        from django.conf import settings
         from catalog import praise
-        # Tổng = câu động viên (nữ) + câu hướng dẫn game (nữ) + lời khen huy hiệu (nam).
-        # _badge_lines/_hint_lines lấy từ DB seed (Badge/GameType).
-        total = (sum(len(v) for v in praise.PRAISE_LINES.values())
-                 + len(praise._hint_lines()) + len(praise._badge_lines()))
+        # Tổng = số FILE mp3 DUY NHẤT sẽ sinh. generate_all lặp qua nhiều nguồn có thể
+        # TRÙNG câu (vd _page_hint_lines lấy lại từ PRAISE_LINES) — cùng (câu+giọng) →
+        # cùng 1 file, chỉ sinh 1 lần. Đếm theo tên file để khớp hành vi thật (dedupe).
+        voice = praise._default_voice()
+        badge_voice = getattr(settings, 'TTS_VOICE_BADGE', 'vi-VN-NamMinhNeural')
+        female = ([t for lines in praise.PRAISE_LINES.values() for t in lines]
+                  + praise._hint_lines() + praise._page_hint_lines())
+        # Số FILE duy nhất (dedupe theo câu+giọng): generate_all lặp qua nhiều nguồn
+        # có thể TRÙNG câu (vd _page_hint_lines lấy lại từ PRAISE_LINES) → cùng 1 file.
+        unique_files = {praise.filename_for(t, voice) for t in female}
+        unique_files |= {praise.filename_for(t, badge_voice) for t in praise._badge_lines()}
         with mock.patch('catalog.praise.tts._edge_tts_save', side_effect=self._fake_edge):
             gen, skip, fail = praise.generate_all()
-            self.assertEqual(gen, total)
+            # Lần 1: mỗi FILE duy nhất được sinh đúng 1 lần (câu trùng → skip trong cùng lượt).
+            self.assertEqual(gen, len(unique_files))
             self.assertEqual(fail, 0)
-            # Lần 2: đã có file → bỏ qua hết, không sinh mới.
+            # Idempotent — lần 2 KHÔNG sinh mới, không lỗi; mọi lượt lặp đều 'skip'.
             gen2, skip2, fail2 = praise.generate_all()
             self.assertEqual(gen2, 0)
-            self.assertEqual(skip2, total)
+            self.assertEqual(fail2, 0)
+            self.assertEqual(skip2, gen + skip)  # tổng lượt lặp lần 1 = số skip lần 2
 
     def test_badge_voice_uses_different_voice(self):
         """Lời khen huy hiệu sinh bằng GIỌNG NAM (khác giọng động viên) → file khác."""

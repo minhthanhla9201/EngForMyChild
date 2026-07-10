@@ -1,4 +1,5 @@
 {% extends 'base_kid.html' %}
+{% load icons %}
 {% block title %}Bé học tiếng Anh{% endblock %}
 
 {% block content %}
@@ -44,7 +45,8 @@
     <div class="row align-items-center g-3">
       {# Linh vật lớn dần theo sao #}
       <div class="col-6 text-center">
-        <div class="pet-emoji">{{ progress.pet_emoji }}</div>
+        {# Icon linh vật render bằng <img> SVG offline (fallback emoji text) — không phụ thuộc font #}
+        <div class="pet-emoji">{% icon_img emoji=progress.pet_emoji src=progress.pet_icon_src size=120 alt=progress.pet_name %}</div>
         <div class="pet-name">{{ progress.pet_name }}</div>
         {% if progress.pet_remain_stars %}
         <div class="pet-progress mt-2">
@@ -70,15 +72,15 @@
     {# Huy hiệu (mở khoá dần) — hàng riêng full-width để trải thành KHỐI nhiều cột #}
     <hr class="my-3">
     <div class="text-center fw-bold text-dark mb-2">
-      🏅 Huy hiệu {{ progress.badges_earned|length }}/{{ progress.badges_total }}
+      {% icon_img emoji='🏅' size=24 alt='Huy hiệu' %} Huy hiệu {{ progress.badges_earned|length }}/{{ progress.badges_total }}
     </div>
     <div class="badge-grid">
       {% for item in progress.badges_all %}
       {# tabindex=0 để hover VÀ focus (bàn phím/chạm) đều hiện tooltip #}
       <div class="badge-chip {% if item.earned %}earned{% else %}locked{% endif %}" tabindex="0"
            data-tip="{{ item.badge.name_vi }}{% if item.badge.desc_vi %} — {{ item.badge.desc_vi }}{% endif %}{% if not item.earned %} (chưa đạt){% endif %}">
-        <span class="badge-icon">{{ item.badge.icon }}</span>
-        {% if not item.earned %}<span class="badge-lock">🔒</span>{% endif %}
+        <span class="badge-icon">{% icon_img emoji=item.badge.icon src=item.badge.icon_src size=36 alt=item.badge.name_vi %}</span>
+        {% if not item.earned %}<span class="badge-lock">{% icon_img emoji='🔒' size=20 alt='Chưa đạt' %}</span>{% endif %}
       </div>
       {% endfor %}
     </div>
