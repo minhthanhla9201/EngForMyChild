@@ -1,11 +1,12 @@
 {% extends 'base_kid.html' %}
+{% load icons %}
 {% block title %}{{ topic.name_vi }}{% endblock %}
 
 {% block content %}
 {# x-data: trạng thái client cho việc phát audio (Alpine.js) #}
 <div x-data="wordAudio()">
   <div class="d-flex align-items-center justify-content-between mb-3">
-    <h1 class="h4 m-0">{{ topic.icon }} {{ topic.name_vi }} <span class="text-muted fs-6">({{ topic.name_en }})</span></h1>
+    <h1 class="h4 m-0">{% icon_img emoji=topic.icon src=topic.icon_src size=28 alt=topic.name_vi %} {{ topic.name_vi }} <span class="text-muted fs-6">({{ topic.name_en }})</span></h1>
     <a href="{% url 'catalog:topic_list' %}" class="btn btn-outline-secondary btn-sm">
       <i class="bi bi-arrow-left"></i> Chủ đề
     </a>

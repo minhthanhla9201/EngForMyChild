@@ -1,4 +1,5 @@
 {% extends 'base_manage.html' %}
+{% load icons %}
 {% block title %}Quản lý chủ đề{% endblock %}
 
 {% block content %}
@@ -26,7 +27,7 @@
     <tbody>
       {% for topic in topics %}
       <tr>
-        <td class="fs-4">{{ topic.icon }}</td>
+        <td>{% icon_img emoji=topic.icon src=topic.icon_src size=36 alt=topic.name_vi %}</td>
         <td>
           <div class="fw-bold">{{ topic.name_vi }}</div>
           <div class="text-muted small">{{ topic.name_en }}</div>

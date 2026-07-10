@@ -8,6 +8,7 @@ luôn khai báo max_length, cờ Y/N là CharField (xem docs/ThietKeDuLieu.md 0.
 
 from django.db import models
 
+from core.icons import resolve_icon_src
 from core.models import AuditedModel, YesNo
 
 
@@ -17,7 +18,14 @@ class Topic(AuditedModel):
     name_en = models.CharField('Tên (tiếng Anh)', max_length=100)
     name_vi = models.CharField('Tên (tiếng Việt)', max_length=100)
     slug = models.SlugField('Định danh', max_length=100, unique=True)
-    icon = models.CharField('Biểu tượng', max_length=50, blank=True, default='📚')
+    # icon_static: đường dẫn SVG CỐ ĐỊNH trong static (vd 'icons/topic/animals.svg')
+    # — commit theo repo, deploy máy khác luôn có, KHÔNG phụ thuộc font. MẶC ĐỊNH.
+    icon_static = models.CharField('SVG tĩnh', max_length=120, blank=True,
+                                   help_text="Đường dẫn trong static, vd icons/topic/animals.svg")
+    # icon (emoji): fallback cuối + suy ra SVG offline (media).
+    icon = models.CharField('Biểu tượng (emoji)', max_length=50, blank=True, default='📚')
+    # icon_image: ảnh chủ đề do người quản lý upload (ƯU TIÊN cao nhất nếu có).
+    icon_image = models.ImageField('Ảnh chủ đề', upload_to='images/topic/', blank=True)
     order = models.PositiveIntegerField('Thứ tự', default=0)
     active = models.CharField('Đang dùng', max_length=1, choices=YesNo.choices, default=YesNo.YES)
 
@@ -33,6 +41,11 @@ class Topic(AuditedModel):
     def is_active(self):
         # So sánh '== Y' — tránh chuỗi 'N' vẫn truthy.
         return self.active == YesNo.YES
+
+    @property
+    def icon_src(self):
+        """URL icon để render <img>: ảnh upload > SVG tĩnh (repo) > SVG offline emoji > ''."""
+        return resolve_icon_src(self.icon_image, self.icon_static, self.icon)
 
 
 class Word(AuditedModel):

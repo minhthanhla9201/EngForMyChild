@@ -11,29 +11,8 @@ Tiến độ hiển thị cho bé (tổng sao, mức cây, streak) TÍNH từ Ga
 
 from django.db import models
 
-from core.icons import emoji_svg_path
+from core.icons import resolve_icon_src
 from core.models import AuditedModel, YesNo
-
-
-def _resolve_icon_src(image, icon_static, emoji):
-    """
-    URL icon để render <img>, theo thứ tự ưu tiên (dùng chung PetStage/Badge):
-    1) ảnh upload (media) — phụ huynh tự đặt riêng;
-    2) SVG tĩnh trong static (repo) — MẶC ĐỊNH, commit theo mã nguồn nên deploy
-       máy khác luôn có, không cần mạng, không phụ thuộc font;
-    3) SVG offline của emoji trong media (nếu đã fetch);
-    4) '' → template hiển thị ký tự emoji (fallback cuối).
-    """
-    if image:
-        return image.url
-    if icon_static:
-        from django.templatetags.static import static
-        return static(icon_static)
-    rel = emoji_svg_path(emoji)
-    if rel:
-        from django.conf import settings
-        return f'{settings.MEDIA_URL}{rel}'
-    return ''
 
 
 class PetStage(AuditedModel):
@@ -75,7 +54,7 @@ class PetStage(AuditedModel):
     @property
     def icon_src(self):
         """URL icon để render <img>: ảnh upload > SVG tĩnh (repo) > SVG offline emoji > ''."""
-        return _resolve_icon_src(self.image, self.icon_static, self.emoji)
+        return resolve_icon_src(self.image, self.icon_static, self.emoji)
 
 
 class Badge(AuditedModel):
@@ -120,7 +99,7 @@ class Badge(AuditedModel):
     @property
     def icon_src(self):
         """URL icon để render <img>: ảnh upload > SVG tĩnh (repo) > SVG offline emoji > ''."""
-        return _resolve_icon_src(self.icon_image, self.icon_static, self.icon)
+        return resolve_icon_src(self.icon_image, self.icon_static, self.icon)
 
 
 class ChildBadge(AuditedModel):

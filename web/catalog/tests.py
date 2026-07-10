@@ -357,3 +357,31 @@ class PraiseTests(TestCase):
         data = resp.json()
         self.assertTrue(data['ok'])
         self.assertIn('correct', data['lines'])
+
+
+# GIF 1x1 hợp lệ để test upload ImageField (Pillow đọc được).
+GIF_1PX = (b'GIF89a\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\xff\xff\xff!'
+           b'\xf9\x04\x01\x00\x00\x00\x00,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x01D\x00;')
+
+
+class TopicIconTests(TestCase):
+    """Icon chủ đề KHÔNG phụ thuộc font: ưu tiên ảnh upload > SVG tĩnh > SVG emoji > ''."""
+
+    def test_seeded_topics_use_static_svg(self):
+        """Topic seed có icon_static → icon_src trỏ SVG tĩnh trong static (repo)."""
+        t = Topic.objects.create(name_en='Animals', name_vi='Động vật', slug='animals',
+                                 icon_static='icons/topic/animals.svg', icon='🐱')
+        self.assertIn('icons/topic/animals.svg', t.icon_src)  # static() URL
+
+    def test_uploaded_image_beats_static(self):
+        """Có ảnh upload → ưu tiên hơn cả SVG tĩnh."""
+        t = Topic.objects.create(
+            name_en='X', name_vi='X', slug='x', icon_static='icons/topic/animals.svg',
+            icon_image=SimpleUploadedFile('t.gif', GIF_1PX, content_type='image/gif'))
+        self.assertIn('images/topic/', t.icon_src)  # media upload, không phải static
+
+    def test_icon_src_empty_when_nothing_resolves(self):
+        """Không ảnh + không static + emoji không có SVG offline → '' (fallback text)."""
+        t = Topic.objects.create(name_en='Y', name_vi='Y', slug='y',
+                                 icon_static='', icon='🫥')
+        self.assertEqual(t.icon_src, '')

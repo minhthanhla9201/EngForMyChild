@@ -13,7 +13,7 @@ class WordInline(admin.TabularInline):
 
 @admin.register(Topic)
 class TopicAdmin(admin.ModelAdmin):
-    list_display = ('name_en', 'name_vi', 'order', 'active')
+    list_display = ('name_en', 'name_vi', 'icon_static', 'icon', 'order', 'active')
     list_filter = ('active',)
     search_fields = ('name_en', 'name_vi')
     prepopulated_fields = {'slug': ('name_en',)}
