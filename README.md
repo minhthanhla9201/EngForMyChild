@@ -115,6 +115,8 @@ Tất cả lệnh chạy từ thư mục gốc dự án, dùng Python trong `.ve
 | Sao lưu (xuất) toàn bộ từ vựng ra CSV | `.\.venv\Scripts\python.exe web\manage.py export_words web\words_backup.csv` |
 | Tạo âm thanh hiệu ứng game (WAV, offline) | `.\.venv\Scripts\python.exe web\manage.py gen_sfx` |
 | Tạo giọng động viên tiếng Việt (mp3 Neural, cần mạng 1 lần) | `.\.venv\Scripts\python.exe web\manage.py gen_praise` |
+| Tải hình minh hoạ emoji (SVG) cho từ vựng | `.\.venv\Scripts\python.exe web\manage.py fetch_images` |
+| Tạo lại toàn bộ media từ DB (khi mất file) | `.\.venv\Scripts\python.exe web\manage.py recreate_media` |
 
 ### Nhập từ vựng (thu thập dữ liệu dần)
 Tạo file CSV (mở bằng Excel/Google Sheet rồi lưu dạng CSV) với các cột:
@@ -170,6 +172,23 @@ Bộ dữ liệu hiện đã đổi sẵn ~33 từ tiêu biểu (con vật, trá
 **Dùng ảnh riêng (ảnh chụp/tranh vẽ) cho một từ:** vào khu quản lý → **Từ vựng → Sửa** → chọn file ở ô *Hình minh hoạ*. Ảnh upload tay **ưu tiên cao nhất**, ghi đè hình emoji.
 
 > Cột `image` trong file CSV backup lưu **đường dẫn** tới hình (vd `images/1F431.svg`), không phải ảnh nhúng. Khi khôi phục/đổi máy, nhớ mang theo cả thư mục `web\media\images\`.
+
+### Khôi phục media khi mất file (DB còn)
+
+Nếu thư mục `web\media\` bị mất nhưng database vẫn còn, chạy lần lượt:
+
+```powershell
+.\.venv\Scripts\python.exe web\manage.py recreate_media    # audio + hướng dẫn
+.\.venv\Scripts\python.exe web\manage.py fetch_images --force  # hình emoji
+.\.venv\Scripts\python.exe web\manage.py gen_praise --force     # giọng động viên
+```
+
+- `media/audio/`, `media/instructions/` → tạo lại được (TTS, cần mạng hoặc giọng Windows dự phòng)
+- `media/images/` → tạo lại được (tải từ CDN, cần mạng)
+- `media/praise/` → tạo lại được (edge-tts, cần mạng)
+- `media/recordings/` → ❌ **Mất vĩnh viễn** (giọng bé — cần backup riêng)
+
+Xem thêm: `docs/TrienKhai.md` mục 1.12.
 
 ### Học từ vựng & nghe phát âm
 Sau khi đăng nhập, bấm **Học từ vựng** ở trang chủ → chọn chủ đề → bấm 🔊 **Nghe** ở mỗi từ. Lần đầu nghe một từ, hệ thống sinh audio rồi lưu lại; các lần sau phát ngay.

@@ -370,6 +370,39 @@ exit /b 0
    ```
 3. Bấm đúp `start_tsm.bat` chạy lại server.
 
+### 1.12. ♻️ Khôi phục thư mục media (khi mất file nhưng DB còn)
+
+Nếu thư mục `web/media/` bị mất (xoá nhầm, lỗi ổ cứng, format máy…) nhưng **file database**
+`web/db.sqlite3` vẫn còn, bạn có thể tạo lại hầu hết file media.
+
+**Các lệnh chạy lần lượt:**
+
+```powershell
+# 1. Audio phát âm từ vựng (media/audio/) + hướng dẫn tiếng Việt (media/instructions/)
+.\.venv\Scripts\python.exe web\manage.py recreate_media
+
+# 2. Hình minh hoạ emoji (media/images/) — cần internet
+.\.venv\Scripts\python.exe web\manage.py fetch_images --force
+
+# 3. Câu động viên tiếng Việt (media/praise/) — cần internet
+.\.venv\Scripts\python.exe web\manage.py gen_praise --force
+```
+
+**Chi tiết từng thư mục:**
+
+| Thư mục | Kết quả | Ghi chú |
+|---|---|---|
+| `media/audio/` | ✅ Tạo lại được | Dùng edge-tts (giọng Neural). Nếu mất mạng, tự dùng giọng Windows (pyttsx3). |
+| `media/instructions/` | ✅ Tạo lại được | edge-tts giọng Việt. Nếu mất mạng sẽ bỏ qua câu hướng dẫn. |
+| `media/images/` | ✅ Tạo lại được | Tải SVG từ CDN (jsdelivr / unpkg). Cần internet. |
+| `media/praise/` | ✅ Tạo lại được | edge-tts giọng Việt. Cần internet. |
+| `media/recordings/` | ❌ **Mất vĩnh viễn** | Giọng đọc của bé — DB chỉ lưu **đường dẫn file**, không lưu nội dung âm thanh. Cần backup riêng thư mục này. |
+
+> **Mẹo:** lần đầu chạy có thể lâu (hàng trăm file audio). Dùng `--dry-run` để xem trước
+> danh sách: `.\.venv\Scripts\python.exe web\manage.py recreate_media --dry-run`
+>
+> **Sau khi tạo xong, hãy backup ngay thư mục `web/media/`** để lần sau khỏi chạy lại.
+
 ---
 
 ## Option 2 — Docker (đóng gói, dễ di chuyển)
