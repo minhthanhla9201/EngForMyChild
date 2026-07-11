@@ -37,7 +37,7 @@
 
     <label class="form-label fw-bold">Chọn chủ đề để luyện:</label>
     <div class="row g-3">
-      {% for topic in topics %}
+      {% for topic, prog in topic_list %}
       <div class="col-6 col-md-3">
         <a class="text-decoration-none" :href="`/speak/${childId}/{{ topic.slug }}/`">
           <div class="card child-card text-center h-100">

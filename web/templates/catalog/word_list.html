@@ -17,7 +17,21 @@
     {% for word in words %}
     <div class="col-6 col-md-3">
       <div class="card child-card text-center h-100">
-        <div class="card-body">
+        <div class="card-body position-relative">
+          {# Badge độ thành thạo — góc trên bên phải #}
+          <div class="position-absolute top-0 end-0 p-2">
+            {% if word.mastery.icon == 'star' %}
+              <span class="badge bg-success" title="Thành thạo — điểm TB {{ word.mastery.avg_score }}/100">
+                ⭐ {{ word.mastery.avg_score }}
+              </span>
+            {% elif word.mastery.icon == 'book' %}
+              <span class="badge bg-info text-dark" title="Đang học — {{ word.mastery.attempts }} lần luyện">
+                📖 {{ word.mastery.avg_score }}
+              </span>
+            {% else %}
+              <span class="badge bg-secondary" title="Chưa học">🆕</span>
+            {% endif %}
+          </div>
           {% if word.image %}
             <img src="{{ word.image.url }}" alt="{{ word.text_en }}" class="img-fluid mb-2" style="max-height:90px">
           {% else %}

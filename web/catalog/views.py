@@ -18,6 +18,9 @@ from django.utils.text import slugify
 
 from core.decorators import manage_required
 
+from accounts.utils import get_active_child
+from progress import service as progress_service
+
 from . import audio as audio_service
 from . import imports as import_service
 from . import ipa as ipa_service
@@ -27,27 +30,65 @@ from .models import Topic, Word
 
 logger = logging.getLogger('eng.catalog')
 
+# Mastery mặc định cho word khi không có child context (template dùng word.mastery.*).
+_DEFAULT_MASTERY = {
+    'level': 'new',
+    'level_label': 'Chưa học',
+    'icon': 'new',
+    'avg_score': 0,
+    'attempts': 0,
+    'scores': [],
+}
+
 
 @login_required
 def topic_list(request):
-    """Danh sách chủ đề đang dùng."""
+    """Danh sách chủ đề đang dùng — sắp xếp theo tiến độ của bé (chưa học lên đầu)."""
     topics = Topic.objects.filter(active='Y')
+
+    child = get_active_child(request)
+    topic_progress_data = {}
+    if child:
+        topic_progress_data = progress_service.topic_mastery_data(child, topics)
+        # Sắp xếp: % tiến độ tăng dần → chủ đề ít học nhất lên đầu.
+        topics = sorted(topics, key=lambda t: topic_progress_data.get(t.id, {}).get('pct', 0))
+
+    # Ghép topic + progress thành list để template dễ duyệt (tránh dict lookup filter).
+    topic_list = [(t, topic_progress_data.get(t.id)) for t in topics]
+
     return render(request, 'catalog/topic_list.html', {
-        'topics': topics,
-        # URL mp3 giọng hướng dẫn (rỗng nếu chưa sinh → template bỏ qua, không lỗi).
+        'topic_list': topic_list,
         'hint_voice_url': praise_service.page_hint_url('topic_select'),
     })
 
 
 @login_required
 def word_list(request, slug):
-    """Danh sách từ trong một chủ đề."""
+    """Danh sách từ trong một chủ đề — sắp xếp: chưa học → đang học → thành thạo."""
     topic = get_object_or_404(Topic, slug=slug, active='Y')
-    words = topic.words.filter(active='Y')
+    words = list(topic.words.filter(active='Y'))  # list để sort Python
+
+    child = get_active_child(request)
+    word_mastery = {}
+    if child:
+        word_mastery = progress_service.word_mastery_data(child, words)
+        # Gán mastery vào từng word object để template dùng dễ dàng.
+        for w in words:
+            w.mastery = word_mastery.get(w.id, _DEFAULT_MASTERY)
+        # Sort: level (new→learning→mastered), cùng level thì alphabet.
+        level_order = {'new': 0, 'learning': 1, 'mastered': 2}
+        words.sort(key=lambda w: (
+            level_order.get(w.mastery['level'], 99),
+            w.text_en.lower(),
+        ))
+    else:
+        # Gán mặc định cho mọi word (template dùng word.mastery.icon, v.v.)
+        for w in words:
+            w.mastery = _DEFAULT_MASTERY
+
     return render(request, 'catalog/word_list.html', {
         'topic': topic,
         'words': words,
-        # URL mp3 giọng hướng dẫn xem từ (rỗng nếu chưa sinh → bỏ qua).
         'hint_voice_url': praise_service.page_hint_url('word_select'),
     })
 
