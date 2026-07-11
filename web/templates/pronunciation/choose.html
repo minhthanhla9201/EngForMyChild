@@ -15,7 +15,7 @@
     <p class="mb-2">Chưa có hồ sơ bé nào.</p>
     <div><a href="{% url 'accounts:child_add' %}" class="btn btn-kid">Thêm bé</a></div>
   </div>
-{% elif not topics %}
+{% elif not topic_list %}
   <div class="card child-card text-center p-4">
     <p class="mb-0">Chưa có chủ đề từ vựng. Hãy nhập từ vựng trước (xem README).</p>
   </div>
