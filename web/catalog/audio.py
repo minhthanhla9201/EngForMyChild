@@ -65,10 +65,10 @@ def generate_tts_clip(word):
 
 def get_vi_instruction(word):
     """
-    Sinh & cache audio câu hướng dẫn tiếng Việt: 'X thì tiếng Anh đọc là Y'.
+    Sinh & cache audio câu hướng dẫn tiếng Việt: 'X tiếng Anh đọc là Y'.
     Trả URL hoặc None nếu lỗi (vd mất mạng).
     """
-    instruction = f"{word.text_vi} .. thì tiếng Anh em đọc là ..."
+    instruction = f"{word.text_vi} .. tiếng Anh em đọc là ..."
     voice = getattr(settings, 'TTS_VOICE_VI', 'vi-VN-HoaiMyNeural')
 
     filename = f'inst_{word.pk}.mp3'
@@ -84,3 +84,33 @@ def get_vi_instruction(word):
 
     from django.core.files.storage import default_storage
     return default_storage.url(f'instructions/{filename}')
+
+
+def get_vi_name(word):
+    """
+    Sinh & cache audio đọc CHỈ TÊN TIẾNG VIỆT của từ (vd 'con mèo') — dùng cho game
+    có hình: bé chưa biết chữ, chạm vào hình sẽ nghe tên hình bằng giọng.
+
+    Khác get_vi_instruction (đọc câu dài): đây chỉ đọc text_vi ngắn gọn. Cache
+    media/names/name_<pk>.mp3, giọng nữ TTS_VOICE_VI. Trả URL hoặc None nếu lỗi/offline.
+    Idempotent: đã có file thì trả luôn (không gọi TTS lại).
+    """
+    if not word.text_vi:
+        return None
+    voice = getattr(settings, 'TTS_VOICE_VI', 'vi-VN-HoaiMyNeural')
+
+    filename = f'name_{word.pk}.mp3'
+    # Path() để hoạt động cả khi MEDIA_ROOT là str (vd test override_settings).
+    from pathlib import Path
+    out_path = Path(settings.MEDIA_ROOT) / 'names' / filename
+
+    if not out_path.exists():
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            tts._edge_tts_save(word.text_vi, out_path, voice)
+        except Exception:
+            logger.warning('Không sinh được tên tiếng Việt cho từ %r', word.text_en)
+            return None
+
+    from django.core.files.storage import default_storage
+    return default_storage.url(f'names/{filename}')

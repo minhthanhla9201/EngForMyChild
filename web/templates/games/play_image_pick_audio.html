@@ -20,7 +20,13 @@
       <p class="mb-2">{{ game.hint_vi }}</p>
       <div>
         <img :src="current.image" class="img-fluid rounded"
-             style="height:160px;object-fit:contain" alt="">
+             style="height:220px;object-fit:contain" alt="">
+      </div>
+      {# Bé chưa biết chữ → nút đọc TÊN tiếng Việt của hình đề bài #}
+      <div class="mt-2">
+        <button class="btn btn-outline-secondary btn-sm" @click="sayPromptName()">
+          <i class="bi bi-volume-up"></i> Hình này là gì?
+        </button>
       </div>
     </div>
 
@@ -60,6 +66,8 @@
   </div>
 
   <audio x-ref="player"></audio>
+  {# player riêng cho giọng đọc TÊN tiếng Việt của hình đề bài #}
+  <audio x-ref="viplayer"></audio>
 </div>
 {{ hint_voice_url|json_script:"hint-url" }}
 {% endblock %}
@@ -83,6 +91,13 @@
         if (!this.questions.length) { this.finished = true; }
       },
       get current(){ return this.questions[this.index] || {choices: []}; },
+      // Đọc TÊN tiếng Việt của hình đề bài ("con mèo") — bé chưa biết chữ.
+      sayPromptName() {
+        const u = this.current && this.current.image_vi_name_url;
+        if (!u) return;
+        try { this.$refs.viplayer.src = u; this.$refs.viplayer.currentTime = 0;
+              this.$refs.viplayer.play().catch(function(){}); } catch(e){}
+      },
       // Vị trí (1-based) của loa đang chọn để bé dễ nhận biết.
       get chosenPos(){
         const i = this.current.choices.findIndex(c => c.id === this.chosenId);

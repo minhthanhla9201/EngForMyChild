@@ -84,6 +84,36 @@ urlpatterns += [
 python -c "from django.core.management.utils import get_random_secret_key as k; print(k())"
 ```
 
+### 0.5. Sinh dữ liệu media (icon SVG + giọng tiếng Việt) — CHẠY SAU `migrate`
+
+Ngoài `migrate`/`collectstatic`, app cần **sinh sẵn một số media** để hoạt động đầy đủ khi học **offline**. Chạy **một lần** sau khi `migrate` (các lệnh này **cần internet** vì gọi CDN emoji + edge-tts; chạy lại **idempotent** — đã có file thì bỏ qua). Lệnh dưới ghi vào `web/media/`.
+
+| Lệnh | Sinh ra | Nếu KHÔNG chạy |
+|------|---------|----------------|
+| `fetch_images` | SVG hình minh hoạ **từ vựng** (Twemoji) → `media/images/` | Từ vựng/game thiếu hình |
+| `fetch_ui_icons` | SVG emoji **giao diện** (linh vật, huy hiệu, icon tĩnh) → `media/images/` | Một số icon rơi về ký tự emoji (phụ thuộc font máy) |
+| `gen_praise` | Giọng **động viên / hướng dẫn** tiếng Việt (edge-tts) → `media/praise/` | Game/luyện thiếu giọng khen, chỉ còn hiệu ứng hình |
+| `gen_vi_names --images-only` | Giọng đọc **tên tiếng Việt của từ có ảnh** ("con mèo") → `media/names/` | **Game hình không đọc tên khi bé chạm/chọn hình** (bé chưa biết chữ sẽ khó) |
+
+```powershell
+# Windows (Option 1) — chạy sau bước migrate
+.\.venv\Scripts\python.exe web\manage.py fetch_images
+.\.venv\Scripts\python.exe web\manage.py fetch_ui_icons
+.\.venv\Scripts\python.exe web\manage.py gen_praise
+.\.venv\Scripts\python.exe web\manage.py gen_vi_names --images-only
+```
+```bash
+# Linux / trong container (Option 2, 3) — thay tiền tố python cho phù hợp
+python web/manage.py fetch_images
+python web/manage.py fetch_ui_icons
+python web/manage.py gen_praise
+python web/manage.py gen_vi_names --images-only
+```
+
+> - **Icon linh vật / huy hiệu / chủ đề** dùng SVG **tĩnh** trong `web/static/icons/` (đã commit theo repo) làm mặc định → hiển thị đúng ngay cả khi CHƯA chạy `fetch_ui_icons`; lệnh này chỉ bổ sung SVG cho các emoji tĩnh khác trong giao diện.
+> - Nếu deploy **offline hoàn toàn** (máy đích không có internet): chạy 4 lệnh trên ở một máy CÓ mạng trước, rồi **chép cả thư mục `web/media/`** sang máy đích (media không nằm trong git).
+> - Chạy lại sau khi **thêm từ vựng mới** để sinh hình + giọng cho từ mới.
+
 ---
 
 ## Option 1 — Local, SQLite3, cho 1 máy
@@ -139,6 +169,7 @@ Vẫn trong **PowerShell** tại thư mục dự án (`D:\EngForMyChild`):
 .\.venv\Scripts\python.exe web\manage.py createsuperuser
 .\.venv\Scripts\python.exe web\manage.py check --deploy   # xem cảnh báo bảo mật
 ```
+> Sau đó chạy **[mục 0.5](#05-sinh-dữ-liệu-media-icon-svg--giọng-tiếng-việt--chạy-sau-migrate)** để sinh hình minh hoạ + giọng tiếng Việt (gồm giọng đọc tên hình cho game — quan trọng với bé chưa biết chữ).
 
 ### 1.6. Chạy service ASR (chấm phát âm) bằng Docker
 ASR là service riêng (faster-whisper). Cần cài **Docker Desktop** trước ([docker.com](https://www.docker.com/products/docker-desktop/)).
@@ -447,8 +478,14 @@ CSRF_TRUSTED_ORIGINS=http://ip-server:9001
 docker compose up -d --build              # build image + chạy nền (web, db, asr)
 docker compose exec web python manage.py migrate
 docker compose exec web python manage.py createsuperuser
+# Sinh media (icon SVG + giọng tiếng Việt, gồm giọng đọc tên hình cho game) — xem mục 0.5
+docker compose exec web python manage.py fetch_images
+docker compose exec web python manage.py fetch_ui_icons
+docker compose exec web python manage.py gen_praise
+docker compose exec web python manage.py gen_vi_names --images-only
 ```
 Truy cập `http://<ip-server>:9001`. Xem log: `docker compose logs -f web`.
+> Media sinh vào volume `media_data` (giữ qua các lần rebuild). Chạy lại 4 lệnh sinh media sau khi thêm từ vựng mới.
 
 ### 2.6. 🔒 Backup & ♻️ Restore
 ```bash
@@ -523,6 +560,11 @@ LOG_LEVEL=INFO
 .venv/bin/python web/manage.py collectstatic --noinput
 .venv/bin/python web/manage.py createsuperuser
 .venv/bin/python web/manage.py check --deploy
+# Sinh media (icon SVG + giọng tiếng Việt, gồm giọng đọc tên hình cho game) — xem mục 0.5
+.venv/bin/python web/manage.py fetch_images
+.venv/bin/python web/manage.py fetch_ui_icons
+.venv/bin/python web/manage.py gen_praise
+.venv/bin/python web/manage.py gen_vi_names --images-only
 ```
 
 ### 3.7. Chạy gunicorn như systemd service
@@ -606,6 +648,10 @@ cd /opt/eng && sudo git pull
 sudo .venv/bin/pip install -r web/requirements.txt
 .venv/bin/python web/manage.py migrate
 .venv/bin/python web/manage.py collectstatic --noinput
+# Nếu bản mới thêm từ vựng/đổi icon → sinh lại media (mục 0.5); idempotent, bỏ qua file đã có
+.venv/bin/python web/manage.py fetch_images
+.venv/bin/python web/manage.py fetch_ui_icons
+.venv/bin/python web/manage.py gen_vi_names --images-only
 sudo systemctl restart eng
 sudo docker compose up -d --build asr    # nếu service ASR có thay đổi
 ```
@@ -618,6 +664,8 @@ sudo docker compose up -d --build asr    # nếu service ASR có thay đổi
 |-------------|--------------------------|
 | Trang hiện nhưng **mất CSS/JS** | Chưa `collectstatic`, hoặc dùng `CompressedManifestStaticFilesStorage` mà chưa gom static. Chạy lại `collectstatic --noinput`. |
 | **Không có tiếng / ảnh không hiện** (audio, hình từ vựng 404) | Thiếu route media khi `DEBUG=False`. Kiểm tra [mục 0.3](#03-phục-vụ-file-media-audioảnhghi-âm) + thư mục `web/media/` có file không. |
+| **Game hình không đọc tên tiếng Việt** khi bé chạm/chọn hình | Chưa sinh giọng đọc tên. Chạy `gen_vi_names --images-only` ([mục 0.5](#05-sinh-dữ-liệu-media-icon-svg--giọng-tiếng-việt--chạy-sau-migrate)); kiểm `web/media/names/` có `name_*.mp3`. Game vẫn chơi được, chỉ thiếu giọng. |
+| **Icon linh vật/huy hiệu/chủ đề rơi về emoji** (khác nhau theo máy) | Bình thường SVG tĩnh trong `web/static/icons/` đã lo; nếu vẫn lỗi → chưa `collectstatic`. Với emoji tĩnh khác trong giao diện: chạy `fetch_ui_icons`. |
 | **Chấm phát âm không chạy** | Service ASR chưa bật hoặc sai `ASR_URL`. Kiểm tra `docker compose ps` (service `asr`), và `ASR_URL` trỏ đúng (`localhost:9002` khi web local — cổng publish của container, `asr:9000` khi web trong Docker). |
 | Lỗi **400 Bad Request** | Thiếu host trong `ALLOWED_HOSTS`. Thêm IP/tên miền đang truy cập. |
 | Lỗi **403 CSRF** khi bấm Lưu | Thiếu `CSRF_TRUSTED_ORIGINS` (phải đúng cả `http/https` và cổng). |

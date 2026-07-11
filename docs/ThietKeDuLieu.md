@@ -107,7 +107,9 @@ erDiagram
         string name_en
         string name_vi
         string slug UK "max 100"
-        string icon "emoji, utf8mb4"
+        string icon_static "SVG tĩnh trong static (mặc định)"
+        string icon "emoji (fallback), utf8mb4"
+        string icon_image "ảnh upload (ưu tiên nhất)"
         int order
         string active "Y/N"
     }
@@ -173,7 +175,9 @@ erDiagram
         int id PK
         string code UK "max 50"
         string name_vi
-        string icon
+        string icon_static "SVG tĩnh trong static (mặc định)"
+        string icon "emoji (fallback), utf8mb4"
+        string icon_image "ảnh upload (ưu tiên nhất)"
         string desc_vi "lời khen"
         string kind "STARS/GAMES/WORDS/STREAK"
         int threshold "ngưỡng đạt"
@@ -184,6 +188,16 @@ erDiagram
         int id PK
         int child_id FK
         int badge_id FK "unique cùng child"
+    }
+    PetStage {
+        int id PK
+        int threshold UK "ngưỡng sao"
+        string name_vi "tên mốc"
+        string icon_static "SVG tĩnh trong static (mặc định)"
+        string emoji "emoji (fallback), utf8mb4"
+        string image "ảnh upload (ưu tiên nhất)"
+        int order
+        string active "Y/N"
     }
 ```
 
@@ -199,7 +213,9 @@ erDiagram
 | `name_en` | CharField | vd "Animals" |
 | `name_vi` | CharField | vd "Động vật" |
 | `slug` | SlugField(max_length=100, unique) | định danh URL — cột unique nên ≤191 (utf8mb4) |
-| `icon` | CharField(max_length=50) | tên icon / emoji 🐾 (cần utf8mb4 trên MySQL) |
+| `icon_static` | CharField(max_length=120) | đường dẫn SVG **tĩnh** trong static (vd `icons/topic/animals.svg`) — MẶC ĐỊNH, commit theo repo |
+| `icon` | CharField(max_length=50) | emoji 🐾 (fallback cuối + suy ra SVG offline media; cần utf8mb4 trên MySQL) |
+| `icon_image` | ImageField(`images/topic/`) | ảnh chủ đề upload — **ưu tiên cao nhất** nếu có |
 | `order` | IntegerField | thứ tự hiển thị |
 | `active` | CharField('Y'/'N') | bật/tắt |
 
@@ -329,18 +345,34 @@ score_round(payload) -> {score,total,stars} # chấm kết quả bé gửi lên
 |---|---|---|
 | `code` | SlugField(max_length=50, unique) | vd `first-star`, `streak-7` |
 | `name_vi` | CharField | tên huy hiệu |
-| `icon` | CharField | emoji 🏅 |
+| `icon_static` | CharField(max_length=120) | đường dẫn SVG **tĩnh** trong static (vd `icons/badge/stars-10.svg`) — MẶC ĐỊNH, commit theo repo |
+| `icon` | CharField | emoji 🏅 (fallback cuối + suy ra SVG offline media) |
+| `icon_image` | ImageField(`images/badge/`) | ảnh upload — **ưu tiên cao nhất** nếu có |
 | `desc_vi` | CharField | lời khen ngắn (client đọc bằng giọng) |
 | `kind` | CharField(choices) | loại điều kiện: `STARS` (tổng sao) / `GAMES` (lượt chơi) / `WORDS` (lần luyện) / `STREAK` (chuỗi ngày) |
 | `threshold` | PositiveIntegerField | ngưỡng đạt (vd 10 sao) |
 | `order`, `active` | | thứ tự, bật/tắt |
 
-> **Điều kiện mở khoá là DỮ LIỆU** (`kind` + `threshold`), không phải code — thêm huy hiệu = thêm bản ghi `Badge` (seed migration), KHÔNG sửa logic. Logic mở khoá dùng chung ở `progress/service.py: check_and_award_badges` (gọi sau mỗi ván chơi/lần luyện).
+> **Điều kiện mở khoá là DỮ LIỆU** (`kind` + `threshold`), không phải code — thêm huy hiệu = thêm bản ghi `Badge` (seed migration hoặc trang quản lý), KHÔNG sửa logic. Logic mở khoá dùng chung ở `progress/service.py: check_and_award_badges` (gọi sau mỗi ván chơi/lần luyện).
 
 Bảng nối `ChildBadge(child, badge)` (unique theo cặp) ghi huy hiệu bé đã đạt; thời điểm đạt lấy từ `created_at` (audit).
 
+### PetStage — mốc linh vật lớn dần
+| field | kiểu | ghi chú |
+|---|---|---|
+| `threshold` | PositiveIntegerField(unique) | ngưỡng tổng sao để đạt mốc (0, 10, 25, …) |
+| `name_vi` | CharField | tên mốc (Hạt mầm, Chồi non, …) |
+| `icon_static` | CharField(max_length=120) | đường dẫn SVG **tĩnh** trong static (vd `icons/pet/tree.svg`) — MẶC ĐỊNH, commit theo repo |
+| `emoji` | CharField | emoji 🌱 (fallback cuối + suy ra SVG offline media) |
+| `image` | ImageField(`images/pet/`) | ảnh upload — **ưu tiên cao nhất** nếu có |
+| `order`, `active` | | thứ tự, bật/tắt |
+
+> Trước đây các mốc hardcode trong `service.py` (`PET_STAGES`); đã **chuyển sang bảng DB** để phụ huynh tự đổi mốc/icon qua trang quản lý (`/manage/pets/`). Seed 6 mốc mặc định ở `0004_seed_pet_stages`; gán SVG tĩnh ở `0006_assign_icon_static`. `service.py: pet_stage()` đọc từ DB; bảng rỗng → mốc mặc định "Hạt mầm" để không vỡ trang.
+
+> **Icon KHÔNG phụ thuộc font hệ thống** — áp dụng cho `Topic`, `Badge`, `PetStage` (và emoji tĩnh trong template), render bằng `<img>`. Thứ tự ưu tiên (`.icon_src`, hàm `core.icons.resolve_icon_src` dùng chung): **(1)** ảnh upload (`media`, người quản lý tự đặt) → **(2)** SVG tĩnh `icon_static` trong `web/static/icons/` (MẶC ĐỊNH — **commit theo repo** nên deploy máy khác luôn có, không cần tải mạng) → **(3)** SVG offline của emoji trong `media/images/` (nếu đã `fetch_ui_icons`) → **(4)** `''` (template hiện ký tự emoji). Vì sao dùng static cho mặc định: `media/` bị `.gitignore` (dữ liệu người dùng) nên không theo repo; SVG cố định phải nằm ở `static/` mới đi cùng mã nguồn. Bộ SVG: `web/static/icons/{topic,pet,badge}/`. Tiện ích: `core/icons.py`, template tag `{% icon_img %}` (`core/templatetags/icons.py`).
+
 ### Tiến độ hiển thị cho bé (tính, không lưu)
-`progress/service.py: summary(child)` tính từ `GameResult` + `Attempt`: tổng sao, số lượt chơi, số lần luyện, **chuỗi ngày học liên tiếp** (streak), và **mức linh vật lớn dần** 🌱→🌿→🪴→🌳→🌸→🌟 theo tổng sao. Hiện ở trang chủ khu bé + banner "Huy hiệu mới!" cuối màn game/luyện (qua `kidFx.badges`). Lời khen huy hiệu (`desc_vi`) đọc bằng **giọng nam** edge-tts (`TTS_VOICE_BADGE`) — khác giọng nữ của lời động viên game — sinh sẵn qua `gen_praise`, client phát mp3 (`badge_voice_url`).
+`progress/service.py: summary(child)` tính từ `GameResult` + `Attempt`: tổng sao, số lượt chơi, số lần luyện, **chuỗi ngày học liên tiếp** (streak), và **mức linh vật lớn dần** 🌱→🌿→🪴→🌳→🌸→🌟 theo tổng sao (từ bảng `PetStage`). Hiện ở trang chủ khu bé + banner "Huy hiệu mới!" cuối màn game/luyện (qua `kidFx.badges`). Lời khen huy hiệu (`desc_vi`) đọc bằng **giọng nam** edge-tts (`TTS_VOICE_BADGE`) — khác giọng nữ của lời động viên game — sinh sẵn qua `gen_praise`, client phát mp3 (`badge_voice_url`).
 
 ---
 

@@ -304,6 +304,8 @@ Wireframe ([wireframe/](../wireframe/), mở [index.html](../wireframe/index.htm
 | [wordform.html](../wireframe/wordform.html) | Form thêm/sửa từ (5.2) | `/manage/words/add|<pk>/edit/` → `word_form` | `catalog/manage/word_form.html` |
 | [import.html](../wireframe/import.html) | Nhập CSV + **Xuất CSV** (backup) (5.2) | `/manage/import/` → `word_import`; nút Xuất → `/manage/export/` → `word_export` | `catalog/manage/word_import.html` |
 | [progress.html](../wireframe/progress.html) | Tiến độ của bé (5.1) | `/manage/progress/` → `progress` | `accounts/progress.html` |
+| [manage-pets.html](../wireframe/manage-pets.html) | Quản lý linh vật (mốc lớn dần + icon) | `/manage/pets/` → `petstage_manage`; add/`<pk>/edit/` → `petstage_form` | `progress/manage/petstage_list.html`, `progress/manage/petstage_form.html` |
+| [manage-badges.html](../wireframe/manage-badges.html) | Quản lý huy hiệu (điều kiện + icon) | `/manage/badges/` → `badge_manage`; add/`<pk>/edit/` → `badge_form` | `progress/manage/badge_list.html`, `progress/manage/badge_form.html` |
 
 ### Ghi chú map
 - **22 file wireframe** (chưa kể `index.html`) phủ toàn bộ chức năng đã làm (GĐ 0/1/2/4), gồm **5 game**: Nghe & chọn, Lật thẻ tìm cặp, và 3 game nhận dạng cho bé chưa biết chữ (Nghe & chọn hình, Nhìn hình & chọn tiếng, Ghép hình với tiếng). Chưa có wireframe cho **GĐ 3** (chấm điểm phát âm) và **GĐ 5** (ngữ pháp/huy hiệu) vì chưa làm.

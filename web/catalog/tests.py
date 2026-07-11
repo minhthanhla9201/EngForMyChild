@@ -290,19 +290,29 @@ class PraiseTests(TestCase):
 
     def test_generate_all_creates_and_is_idempotent(self):
         """Sinh mp3 cho mọi câu động viên + lời khen huy hiệu; chạy lại thì bỏ qua."""
+        from django.conf import settings
         from catalog import praise
-        # Tổng = câu động viên (nữ) + câu hướng dẫn game (nữ) + lời khen huy hiệu (nam).
-        # _badge_lines/_hint_lines lấy từ DB seed (Badge/GameType).
-        total = (sum(len(v) for v in praise.PRAISE_LINES.values())
-                 + len(praise._hint_lines()) + len(praise._badge_lines()))
+        # Tổng = số FILE mp3 DUY NHẤT sẽ sinh. generate_all lặp qua nhiều nguồn có thể
+        # TRÙNG câu (vd _page_hint_lines lấy lại từ PRAISE_LINES) — cùng (câu+giọng) →
+        # cùng 1 file, chỉ sinh 1 lần. Đếm theo tên file để khớp hành vi thật (dedupe).
+        voice = praise._default_voice()
+        badge_voice = getattr(settings, 'TTS_VOICE_BADGE', 'vi-VN-NamMinhNeural')
+        female = ([t for lines in praise.PRAISE_LINES.values() for t in lines]
+                  + praise._hint_lines() + praise._page_hint_lines())
+        # Số FILE duy nhất (dedupe theo câu+giọng): generate_all lặp qua nhiều nguồn
+        # có thể TRÙNG câu (vd _page_hint_lines lấy lại từ PRAISE_LINES) → cùng 1 file.
+        unique_files = {praise.filename_for(t, voice) for t in female}
+        unique_files |= {praise.filename_for(t, badge_voice) for t in praise._badge_lines()}
         with mock.patch('catalog.praise.tts._edge_tts_save', side_effect=self._fake_edge):
             gen, skip, fail = praise.generate_all()
-            self.assertEqual(gen, total)
+            # Lần 1: mỗi FILE duy nhất được sinh đúng 1 lần (câu trùng → skip trong cùng lượt).
+            self.assertEqual(gen, len(unique_files))
             self.assertEqual(fail, 0)
-            # Lần 2: đã có file → bỏ qua hết, không sinh mới.
+            # Idempotent — lần 2 KHÔNG sinh mới, không lỗi; mọi lượt lặp đều 'skip'.
             gen2, skip2, fail2 = praise.generate_all()
             self.assertEqual(gen2, 0)
-            self.assertEqual(skip2, total)
+            self.assertEqual(fail2, 0)
+            self.assertEqual(skip2, gen + skip)  # tổng lượt lặp lần 1 = số skip lần 2
 
     def test_badge_voice_uses_different_voice(self):
         """Lời khen huy hiệu sinh bằng GIỌNG NAM (khác giọng động viên) → file khác."""
@@ -347,3 +357,83 @@ class PraiseTests(TestCase):
         data = resp.json()
         self.assertTrue(data['ok'])
         self.assertIn('correct', data['lines'])
+
+
+# GIF 1x1 hợp lệ để test upload ImageField (Pillow đọc được).
+GIF_1PX = (b'GIF89a\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\xff\xff\xff!'
+           b'\xf9\x04\x01\x00\x00\x00\x00,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x01D\x00;')
+
+
+class TopicIconTests(TestCase):
+    """Icon chủ đề KHÔNG phụ thuộc font: ưu tiên ảnh upload > SVG tĩnh > SVG emoji > ''."""
+
+    def test_seeded_topics_use_static_svg(self):
+        """Topic seed có icon_static → icon_src trỏ SVG tĩnh trong static (repo)."""
+        t = Topic.objects.create(name_en='Animals', name_vi='Động vật', slug='animals',
+                                 icon_static='icons/topic/animals.svg', icon='🐱')
+        self.assertIn('icons/topic/animals.svg', t.icon_src)  # static() URL
+
+    def test_uploaded_image_beats_static(self):
+        """Có ảnh upload → ưu tiên hơn cả SVG tĩnh."""
+        t = Topic.objects.create(
+            name_en='X', name_vi='X', slug='x', icon_static='icons/topic/animals.svg',
+            icon_image=SimpleUploadedFile('t.gif', GIF_1PX, content_type='image/gif'))
+        self.assertIn('images/topic/', t.icon_src)  # media upload, không phải static
+
+    def test_icon_src_empty_when_nothing_resolves(self):
+        """Không ảnh + không static + emoji không có SVG offline → '' (fallback text)."""
+        t = Topic.objects.create(name_en='Y', name_vi='Y', slug='y',
+                                 icon_static='', icon='🫥')
+        self.assertEqual(t.icon_src, '')
+
+
+class ViNameAudioTests(TestCase):
+    """
+    Audio đọc TÊN tiếng Việt của từ (get_vi_name) cho game hình: bé chưa biết chữ
+    chạm vào hình sẽ nghe tên. edge-tts được MOCK (không gọi mạng).
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.topic = Topic.objects.create(name_en='Animals', name_vi='Động vật', slug='animals')
+        cls.word = Word.objects.create(topic=cls.topic, text_en='cat', text_vi='con mèo')
+
+    def setUp(self):
+        # Cache audio vào thư mục tạm để không đụng media thật.
+        self._tmp = tempfile.mkdtemp()
+        self._override = self.settings(MEDIA_ROOT=self._tmp)
+        self._override.enable()
+
+    def tearDown(self):
+        self._override.disable()
+
+    def _fake_edge(self, text, out_path, voice):
+        """Giả lập edge-tts: ghi file mp3 rỗng + nhớ text đã đọc (để khẳng định đọc text_vi)."""
+        from pathlib import Path
+        self._spoken = text
+        Path(out_path).write_bytes(b'ID3')
+
+    def test_get_vi_name_reads_text_vi_and_caches(self):
+        """get_vi_name đọc CHỈ text_vi ('con mèo'), tạo file, và idempotent (lần 2 không gọi lại)."""
+        from catalog import audio
+        with mock.patch('catalog.audio.tts._edge_tts_save', side_effect=self._fake_edge) as m:
+            url = audio.get_vi_name(self.word)
+            self.assertTrue(url.endswith(f'names/name_{self.word.pk}.mp3'))
+            self.assertEqual(self._spoken, 'con mèo')  # đọc đúng tên tiếng Việt, không câu dài
+            # Lần 2: file đã có → KHÔNG gọi edge-tts lại (cache).
+            audio.get_vi_name(self.word)
+            self.assertEqual(m.call_count, 1)
+
+    def test_get_vi_name_none_when_no_text_vi(self):
+        """Từ không có text_vi → trả None (không sinh file rỗng)."""
+        from catalog import audio
+        w = Word.objects.create(topic=self.topic, text_en='x', text_vi='')
+        self.assertIsNone(audio.get_vi_name(w))
+
+    def test_word_payload_includes_vi_name_url(self):
+        """word_payload gửi vi_name_url để game hình phát tên khi bé chạm hình."""
+        from games.engine.base import word_payload
+        with mock.patch('catalog.audio.tts._edge_tts_save', side_effect=self._fake_edge):
+            payload = word_payload(self.word)
+        self.assertIn('vi_name_url', payload)
+        self.assertTrue(payload['vi_name_url'].endswith('.mp3'))

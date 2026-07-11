@@ -17,18 +17,16 @@ from django.utils import timezone
 
 from games.models import GameResult
 from pronunciation.models import Attempt
-from .models import Badge, ChildBadge
+from .models import Badge, ChildBadge, PetStage
 
-# Mốc "linh vật lớn dần" theo tổng sao. Bé chưa biết chữ → nhìn emoji là hiểu lớn lên.
-# (ngưỡng_sao, emoji, tên_vi). Xếp tăng dần; chọn mốc CAO NHẤT mà tổng sao đạt.
-PET_STAGES = [
-    (0,   '🌱', 'Hạt mầm'),
-    (10,  '🌿', 'Chồi non'),
-    (25,  '🪴', 'Cây nhỏ'),
-    (50,  '🌳', 'Cây lớn'),
-    (100, '🌸', 'Cây ra hoa'),
-    (200, '🌟', 'Cây ngôi sao'),
-]
+# Mốc mặc định khi bảng PetStage RỖNG (chưa seed) — để trang không vỡ.
+# Bình thường các mốc lấy từ DB (PetStage) để phụ huynh tự chỉnh qua trang quản lý.
+_DEFAULT_STAGE = (0, '🌱', 'Hạt mầm')
+
+
+def _pet_stages():
+    """Danh sách mốc linh vật đang dùng, tăng dần theo ngưỡng sao (đọc từ DB)."""
+    return list(PetStage.objects.filter(active='Y').order_by('threshold'))
 
 
 def _counts(child):
@@ -65,20 +63,32 @@ def _streak_days(child):
     return streak
 
 
-def pet_stage(total_stars):
-    """Trả (level_index, emoji, name_vi) của linh vật theo tổng sao."""
-    idx, emoji, name = 0, PET_STAGES[0][1], PET_STAGES[0][2]
-    for i, (need, e, n) in enumerate(PET_STAGES):
-        if total_stars >= need:
-            idx, emoji, name = i, e, n
-    return idx, emoji, name
+def pet_stage(total_stars, stages=None):
+    """
+    Trả (level_index, emoji, name_vi, stage) của linh vật theo tổng sao.
+
+    Chọn mốc CAO NHẤT mà tổng sao đạt. `stage` là đối tượng PetStage (hoặc None
+    khi bảng rỗng) để lấy icon_src. `stages` truyền vào để tránh truy vấn lặp.
+    """
+    if stages is None:
+        stages = _pet_stages()
+    if not stages:
+        # Bảng chưa seed → mốc mặc định, không có object (icon fallback emoji text).
+        return 0, _DEFAULT_STAGE[1], _DEFAULT_STAGE[2], None
+    idx, chosen = 0, stages[0]
+    for i, st in enumerate(stages):
+        if total_stars >= st.threshold:
+            idx, chosen = i, st
+    return idx, chosen.emoji, chosen.name_vi, chosen
 
 
-def _next_pet_target(total_stars):
+def _next_pet_target(total_stars, stages=None):
     """Số sao còn thiếu để lên mốc linh vật kế tiếp (None nếu đã tối đa)."""
-    for need, _e, _n in PET_STAGES:
-        if total_stars < need:
-            return need - total_stars, need
+    if stages is None:
+        stages = _pet_stages()
+    for st in stages:
+        if total_stars < st.threshold:
+            return st.threshold - total_stars, st.threshold
     return None, None
 
 
@@ -118,15 +128,18 @@ def summary(child):
     """
     stars, games, words = _counts(child)
     streak = _streak_days(child)
-    level, emoji, name = pet_stage(stars)
-    remain, next_need = _next_pet_target(stars)
+    stages = _pet_stages()
+    level, emoji, name, stage = pet_stage(stars, stages)
+    remain, next_need = _next_pet_target(stars, stages)
     # % tiến tới mốc kế: từ ngưỡng mốc HIỆN TẠI đến ngưỡng mốc KẾ (để thanh đầy dần).
     if next_need:
-        cur_need = PET_STAGES[level][0]
+        cur_need = stages[level].threshold if stages else 0
         span = next_need - cur_need
         pet_percent = int((stars - cur_need) / span * 100) if span > 0 else 0
     else:
         pet_percent = 100  # đã tối đa
+    # icon_src: URL <img> của linh vật (ảnh upload/SVG offline); rỗng → fallback emoji text.
+    pet_icon_src = stage.icon_src if stage else ''
 
     earned = list(ChildBadge.objects.filter(child=child).select_related('badge')
                   .order_by('badge__order', 'badge__threshold'))
@@ -139,7 +152,8 @@ def summary(child):
         'words_practiced': words,
         'streak_days': streak,
         'pet_level': level,
-        'pet_emoji': emoji,
+        'pet_emoji': emoji,            # fallback text nếu không có SVG/ảnh
+        'pet_icon_src': pet_icon_src,  # URL icon để render <img> (ưu tiên)
         'pet_name': name,
         'pet_remain_stars': remain,      # còn thiếu bao nhiêu sao để lên mốc kế
         'pet_next_need': next_need,

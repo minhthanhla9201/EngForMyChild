@@ -1,0 +1,60 @@
+{% extends 'base_manage.html' %}
+{% load icons %}
+{% block title %}Quản lý huy hiệu{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <h1 class="h4 m-0">🏅 Quản lý huy hiệu</h1>
+  <div class="d-flex gap-2">
+    <a href="{% url 'progress_manage:badge_add' %}" class="btn btn-kid btn-sm">
+      <i class="bi bi-plus-lg"></i> Thêm huy hiệu
+    </a>
+    <a href="{% url 'accounts:dashboard' %}" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-house"></i> Bảng điều khiển
+    </a>
+  </div>
+</div>
+
+<p class="text-muted small">Bé mở khoá huy hiệu khi đạt điều kiện. Icon dùng ảnh tải lên;
+  nếu để trống sẽ dùng hình SVG của emoji (không phụ thuộc font máy).</p>
+
+{% if badges %}
+<div class="table-responsive">
+  <table class="table align-middle">
+    <thead>
+      <tr>
+        <th>Icon</th><th>Tên</th><th>Điều kiện</th>
+        <th class="text-center">Thứ tự</th><th class="text-center">Đang dùng</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for badge in badges %}
+      <tr>
+        <td>{% icon_img emoji=badge.icon src=badge.icon_src size=40 alt=badge.name_vi %}</td>
+        <td>
+          <div class="fw-bold">{{ badge.name_vi }}</div>
+          <div class="text-muted small">{{ badge.desc_vi }}</div>
+        </td>
+        <td>{{ badge.get_kind_display }} ≥ {{ badge.threshold }}</td>
+        <td class="text-center">{{ badge.order }}</td>
+        <td class="text-center">
+          {% if badge.is_active %}<span class="badge text-bg-success">Có</span>
+          {% else %}<span class="badge text-bg-secondary">Tạm ẩn</span>{% endif %}
+        </td>
+        <td class="text-end">
+          <a href="{% url 'progress_manage:badge_edit' badge.pk %}"
+             class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i> Sửa</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card child-card text-center p-5">
+  <div class="display-6 mb-2">📭</div>
+  <p class="mb-3">Chưa có huy hiệu nào.</p>
+  <div><a href="{% url 'progress_manage:badge_add' %}" class="btn btn-kid">Thêm huy hiệu đầu tiên</a></div>
+</div>
+{% endif %}
+{% endblock %}
