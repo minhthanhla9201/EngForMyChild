@@ -45,6 +45,7 @@ def choose(request):
 
     return render(request, 'games/choose.html', {
         'children': children,
+        'active_child': child,
         'topic_list': topic_list,
         'games': games,
         'hint_voice_url': praise_service.page_hint_url('games_choose'),

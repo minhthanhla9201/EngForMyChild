@@ -21,7 +21,7 @@
   </div>
 {% else %}
   {# Chọn bé rồi chọn chủ đề; link luyện ghép child_id + slug (Alpine giữ bé đang chọn) #}
-  <div x-data="{ childId: {{ children.0.pk }} }">
+  <div x-data="{ childId: {{ active_child.pk|default:children.0.pk }} }">
     <div class="card child-card p-3 mb-3">
       <label class="form-label fw-bold">Bé nào luyện?</label>
       <div class="d-flex flex-wrap gap-2">
