@@ -52,6 +52,20 @@
               <div class="child-avatar mb-2">{% icon_img emoji=topic.icon src=topic.icon_src size=56 alt=topic.name_vi %}</div>
               <div class="fw-bold text-dark">{{ topic.name_vi }}</div>
               <div class="text-muted small">{{ topic.name_en }}</div>
+              {% if prog %}
+              <div class="mt-2">
+                <div class="d-flex justify-content-between small text-muted mb-1">
+                  <span>{{ prog.practiced_words }}/{{ prog.total_words }} từ</span>
+                  <span>{{ prog.pct }}%</span>
+                </div>
+                <div class="progress" style="height:6px;">
+                  <div class="progress-bar {% if prog.pct >= 80 %}bg-success{% elif prog.pct >= 20 %}bg-info{% else %}bg-secondary{% endif %}"
+                       role="progressbar" style="width:{{ prog.pct }}%"
+                       aria-valuenow="{{ prog.pct }}" aria-valuemin="0" aria-valuemax="100">
+                  </div>
+                </div>
+              </div>
+              {% endif %}
             </div>
           </div>
         </a>

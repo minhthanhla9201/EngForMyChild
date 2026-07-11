@@ -61,13 +61,24 @@ def practice(request, child_id, slug):
     # Danh sách từ cho client (Alpine). Truyền list thuần — template dùng json_script
     # để serialize (KHÔNG json.dumps ở đây, tránh mã hoá 2 lần → client nhận chuỗi).
     # Dùng ẢNH THẬT của từ (w.image) như bên games; template fallback icon khi từ chưa có ảnh.
+    mastery = progress_service.word_mastery_data(child, words) if words else {}
     words_data = [{
         'id': w.pk,
         'text_en': w.text_en,
         'text_vi': w.text_vi,
         'phonetic': w.phonetic,
         'image': w.image.url if w.image else '',
+        # Độ thành thạo — dùng cho display + sắp xếp.
+        'mastery_level': mastery.get(w.id, {}).get('level', 'new'),
+        'mastery_label': mastery.get(w.id, {}).get('level_label', 'Chưa học'),
+        'mastery_icon': mastery.get(w.id, {}).get('icon', 'new'),
+        'mastery_score': mastery.get(w.id, {}).get('avg_score', 0),
+        'mastery_attempts': mastery.get(w.id, {}).get('attempts', 0),
     } for w in words]
+
+    # Sắp xếp: chưa học lên đầu — giúp bé tập trung từ mới.
+    level_order = {'new': 0, 'learning': 1, 'mastered': 2}
+    words_data.sort(key=lambda wd: level_order.get(wd['mastery_level'], 99))
 
     return render(request, 'pronunciation/practice.html', {
         'child': child, 'topic': topic, 'words_data': words_data, 'empty': not words.exists(),
