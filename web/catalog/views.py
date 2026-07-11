@@ -8,6 +8,7 @@ GĐ 1: danh sách chủ đề → danh sách từ trong chủ đề (có nút �
 
 import logging
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
@@ -25,6 +26,7 @@ from . import audio as audio_service
 from . import imports as import_service
 from . import ipa as ipa_service
 from . import praise as praise_service
+from .emoji_map import EMOJI_MAP
 from .forms import TopicForm, WordForm, WordImportForm
 from .models import Topic, Word
 
@@ -76,7 +78,7 @@ def word_list(request, slug):
         for w in words:
             w.mastery = word_mastery.get(w.id, _DEFAULT_MASTERY)
         # Sort: level (new→learning→mastered), cùng level thì alphabet.
-        level_order = {'new': 0, 'learning': 1, 'mastered': 2}
+        level_order = {'new': 0, 'learning': 1, 'familiar': 2, 'mastered': 3}
         words.sort(key=lambda w: (
             level_order.get(w.mastery['level'], 99),
             w.text_en.lower(),
@@ -195,6 +197,49 @@ def word_form(request, pk=None):
         messages.success(request, f'Đã lưu từ "{obj.text_en}".')
         return redirect('catalog_manage:word_manage')
     return render(request, 'catalog/manage/word_form.html', {'form': form, 'is_add': word is None})
+
+
+@manage_required
+def word_fetch_image(request, pk):
+    """
+    Tải lại hình minh hoạ (emoji SVG) cho một từ từ CDN.
+
+    Dùng khi hình bị lỗi / mất file. Giữ nguyên các từ khác.
+    """
+    import urllib.error
+    import urllib.request
+
+    word = get_object_or_404(Word, pk=pk)
+    emoji = EMOJI_MAP.get(word.text_en.lower())
+
+    if not emoji:
+        messages.warning(request, f'Từ "{word.text_en}" chưa có emoji trong bảng ánh xạ.')
+        return redirect('catalog_manage:word_edit', pk=pk)
+
+    # Cấu hình giống fetch_images — mặc định dùng Twemoji.
+    from core.icons import emoji_to_filename
+    fname = emoji_to_filename(emoji)
+    rel_path = f'images/{fname}.svg'
+    abs_path = settings.MEDIA_ROOT / 'images' / f'{fname}.svg'
+    abs_path.parent.mkdir(parents=True, exist_ok=True)
+
+    cdn = 'https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/svg/{name}.svg'
+    url = cdn.format(name=fname.lower())
+
+    try:
+        req = urllib.request.Request(url, headers={'User-Agent': 'eng-fetch-image'})
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            abs_path.write_bytes(resp.read())
+    except (urllib.error.URLError, urllib.error.HTTPError, OSError) as e:
+        messages.error(request, f'Không tải được hình cho "{word.text_en}": {e}')
+        logger.warning('Fetch image lỗi cho từ %s (id=%s): %s', word.text_en, pk, e)
+        return redirect('catalog_manage:word_edit', pk=pk)
+
+    # Gán đường dẫn mới cho word.
+    word.image = rel_path
+    word.save(update_fields=['image'])
+    messages.success(request, f'Đã tải hình cho "{word.text_en}" thành công.')
+    return redirect('catalog_manage:word_edit', pk=pk)
 
 
 @manage_required

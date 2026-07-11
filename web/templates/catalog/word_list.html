@@ -24,6 +24,10 @@
               <span class="badge bg-success" title="Thành thạo — điểm TB {{ word.mastery.avg_score }}/100">
                 ⭐ {{ word.mastery.avg_score }}
               </span>
+            {% elif word.mastery.icon == 'thumbs' %}
+              <span class="badge bg-warning text-dark" title="Gần đạt — {{ word.mastery.attempts }} lần luyện">
+                👍 {{ word.mastery.avg_score }}
+              </span>
             {% elif word.mastery.icon == 'book' %}
               <span class="badge bg-info text-dark" title="Đang học — {{ word.mastery.attempts }} lần luyện">
                 📖 {{ word.mastery.avg_score }}

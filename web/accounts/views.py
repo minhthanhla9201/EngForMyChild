@@ -11,6 +11,7 @@ import logging
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
+from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
 
 from catalog.models import Topic, Word
@@ -156,27 +157,41 @@ def progress(request):
 
     Lọc theo owner — chỉ thấy dữ liệu các bé thuộc phụ huynh đang đăng nhập.
     Có thể chọn 1 bé qua ?child=<pk>; mặc định gộp tất cả bé của phụ huynh.
+    Có phân trang qua ?page=<n>.
     """
     children = ChildProfile.objects.filter(owner=request.user, active='Y')
     selected = None
     child_pk = request.GET.get('child')
     if child_pk:
-        # get_object_or_404 + lọc owner: không xem được tiến độ bé của người khác.
         selected = get_object_or_404(ChildProfile, pk=child_pk, owner=request.user)
-        results = GameResult.objects.filter(child=selected)
-        attempts = Attempt.objects.filter(child=selected)
+        results = GameResult.objects.filter(child=selected).order_by('-created_at')
+        attempts = Attempt.objects.filter(child=selected).order_by('-created_at')
     else:
-        results = GameResult.objects.filter(child__in=children)
-        attempts = Attempt.objects.filter(child__in=children)
+        results = GameResult.objects.filter(child__in=children).order_by('-created_at')
+        attempts = Attempt.objects.filter(child__in=children).order_by('-created_at')
+
+    # Tổng quan — aggregate riêng để không ảnh hưởng queryset gốc.
+    from django.db.models import Sum
+    total_stars = results.aggregate(s=Sum('stars'))['s'] or 0
+    total_games = results.count()
+    total_attempts = attempts.count()
+
+    # Phân trang: mỗi bảng 20 dòng.
+    page_r = request.GET.get('page_r', 1)
+    page_a = request.GET.get('page_a', 1)
+    results_page = Paginator(
+        results.select_related('child', 'game_type', 'topic'), 20).get_page(page_r)
+    attempts_page = Paginator(
+        attempts.select_related('child', 'word'), 20).get_page(page_a)
 
     context = {
         'children': children,
         'selected': selected,
-        'results': results.select_related('child', 'game_type', 'topic')[:50],
-        'attempts': attempts.select_related('child', 'word')[:50],
-        'total_stars': sum(r.stars for r in results),
-        'total_games': results.count(),
-        'total_attempts': attempts.count(),
+        'results_page': results_page,
+        'attempts_page': attempts_page,
+        'total_stars': total_stars,
+        'total_games': total_games,
+        'total_attempts': total_attempts,
     }
     return render(request, 'accounts/progress.html', context)
 
