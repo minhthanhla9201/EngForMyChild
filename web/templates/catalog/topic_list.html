@@ -1,4 +1,5 @@
 {% extends 'base_kid.html' %}
+{% load icons %}
 {% block title %}Chủ đề học{% endblock %}
 
 {% block content %}
@@ -16,7 +17,7 @@
     <a href="{% url 'catalog:word_list' topic.slug %}" class="text-decoration-none">
       <div class="card child-card text-center h-100">
         <div class="card-body">
-          <div class="child-avatar mb-2">{{ topic.icon }}</div>
+          <div class="child-avatar mb-2">{% icon_img emoji=topic.icon src=topic.icon_src size=56 alt=topic.name_vi %}</div>
           <div class="fw-bold text-dark">{{ topic.name_vi }}</div>
           <div class="text-muted small">{{ topic.name_en }}</div>
         </div>

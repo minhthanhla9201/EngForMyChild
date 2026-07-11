@@ -1,0 +1,57 @@
+{% extends 'base_manage.html' %}
+{% load icons %}
+{% block title %}Quản lý linh vật{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <h1 class="h4 m-0">🌱 Quản lý linh vật</h1>
+  <div class="d-flex gap-2">
+    <a href="{% url 'progress_manage:petstage_add' %}" class="btn btn-kid btn-sm">
+      <i class="bi bi-plus-lg"></i> Thêm mốc
+    </a>
+    <a href="{% url 'accounts:dashboard' %}" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-house"></i> Bảng điều khiển
+    </a>
+  </div>
+</div>
+
+<p class="text-muted small">Linh vật lớn dần theo tổng sao của bé. Icon dùng ảnh tải lên;
+  nếu để trống sẽ dùng hình SVG của emoji (không phụ thuộc font máy).</p>
+
+{% if stages %}
+<div class="table-responsive">
+  <table class="table align-middle">
+    <thead>
+      <tr>
+        <th>Icon</th><th>Tên mốc</th><th class="text-center">Ngưỡng sao</th>
+        <th class="text-center">Thứ tự</th><th class="text-center">Đang dùng</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for stage in stages %}
+      <tr>
+        <td>{% icon_img emoji=stage.emoji src=stage.icon_src size=40 alt=stage.name_vi %}</td>
+        <td class="fw-bold">{{ stage.name_vi }}</td>
+        <td class="text-center">{{ stage.threshold }} ⭐</td>
+        <td class="text-center">{{ stage.order }}</td>
+        <td class="text-center">
+          {% if stage.is_active %}<span class="badge text-bg-success">Có</span>
+          {% else %}<span class="badge text-bg-secondary">Tạm ẩn</span>{% endif %}
+        </td>
+        <td class="text-end">
+          <a href="{% url 'progress_manage:petstage_edit' stage.pk %}"
+             class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i> Sửa</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card child-card text-center p-5">
+  <div class="display-6 mb-2">📭</div>
+  <p class="mb-3">Chưa có mốc linh vật nào.</p>
+  <div><a href="{% url 'progress_manage:petstage_add' %}" class="btn btn-kid">Thêm mốc đầu tiên</a></div>
+</div>
+{% endif %}
+{% endblock %}

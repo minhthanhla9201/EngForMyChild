@@ -32,6 +32,7 @@ from django.core.management.base import BaseCommand
 
 from catalog.emoji_map import EMOJI_MAP
 from catalog.models import Word
+from core.icons import emoji_to_filename  # nguồn sự thật chung (dùng lại, không lặp)
 
 logger = logging.getLogger('eng.catalog')
 
@@ -48,17 +49,6 @@ STYLES = {
         'upper': True,  # CDN dùng tên file chữ HOA (khác Twemoji dùng thường)
     },
 }
-
-
-def emoji_to_filename(emoji):
-    """
-    Đổi emoji → tên codepoint: nối bằng '-', HOA, bỏ VS16 (FE0F).
-
-    VD '🐱' → '1F431'; '☂️' (U+2602 U+FE0F) → '2602'. (Cả Twemoji lẫn OpenMoji
-    đều bỏ FE0F trong tên file cho các emoji thường dùng ở bộ này.)
-    """
-    cps = [f'{ord(ch):X}' for ch in emoji if ord(ch) != 0xFE0F]
-    return '-'.join(cps)
 
 
 class Command(BaseCommand):

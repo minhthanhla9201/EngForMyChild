@@ -9,6 +9,7 @@ chữ. Chỉ dùng từ có ảnh (needs_image='Y'). Chấm dùng chung stars_fr
 
 import random
 
+from catalog.audio import get_vi_name
 from .base import stars_from_ratio
 
 DEFAULT_PAIRS = 6
@@ -32,8 +33,11 @@ def build_round(words, count=DEFAULT_PAIRS):
     pairs = []
     for w in chosen:
         image_url = w.image.url if w.image else ''
+        # vi_name_url: đọc tên tiếng Việt của hình khi bé lật thẻ HÌNH (chưa biết chữ).
+        vi_name_url = get_vi_name(w) or ''
         pairs.append({'pair_id': w.pk, 'image': image_url, 'word_id': w.pk})
-        cards.append({'pair_id': w.pk, 'face': 'image', 'image': image_url, 'word_id': w.pk})
+        cards.append({'pair_id': w.pk, 'face': 'image', 'image': image_url,
+                      'word_id': w.pk, 'vi_name_url': vi_name_url})
         cards.append({'pair_id': w.pk, 'face': 'audio', 'image': '', 'word_id': w.pk})
     random.shuffle(cards)
     return {'pairs': pairs, 'cards': cards}

@@ -11,7 +11,50 @@ Tiến độ hiển thị cho bé (tổng sao, mức cây, streak) TÍNH từ Ga
 
 from django.db import models
 
+from core.icons import resolve_icon_src
 from core.models import AuditedModel, YesNo
+
+
+class PetStage(AuditedModel):
+    """
+    Một mốc "linh vật lớn dần" theo tổng sao (hạt mầm → cây ra hoa...).
+
+    TÁCH KHỎI code (trước đây hardcode PET_STAGES trong service.py) để phụ huynh
+    tự đổi mốc/icon qua trang quản lý — dữ liệu tách rời code (skill §10.2).
+    Icon KHÔNG phụ thuộc font: ưu tiên ảnh upload, nếu không thì dùng SVG offline
+    của emoji (xem icon_src). Bé chưa biết chữ → nhìn icon là hiểu lớn lên.
+    """
+
+    threshold = models.PositiveIntegerField('Ngưỡng sao', unique=True)
+    name_vi = models.CharField('Tên mốc', max_length=100)
+    # icon_static: đường dẫn SVG CỐ ĐỊNH trong static (vd 'icons/pet/tree.svg') —
+    # commit theo repo, deploy máy khác luôn có, KHÔNG phụ thuộc mạng/font. Ưu tiên
+    # sau ảnh upload. Là nguồn icon MẶC ĐỊNH của app.
+    icon_static = models.CharField('SVG tĩnh', max_length=120, blank=True,
+                                   help_text="Đường dẫn trong static, vd icons/pet/tree.svg")
+    # emoji: fallback cuối + để suy ra SVG offline (media) khi không có static/ảnh.
+    emoji = models.CharField('Emoji', max_length=20, blank=True, default='🌱')
+    # image: ảnh linh vật do phụ huynh upload (ƯU TIÊN cao nhất nếu có).
+    image = models.ImageField('Ảnh linh vật', upload_to='images/pet/', blank=True)
+    order = models.PositiveIntegerField('Thứ tự', default=0)
+    active = models.CharField('Đang dùng', max_length=1, choices=YesNo.choices, default=YesNo.YES)
+
+    class Meta:
+        verbose_name = 'Linh vật (mốc lớn dần)'
+        verbose_name_plural = 'Linh vật (mốc lớn dần)'
+        ordering = ['threshold']
+
+    def __str__(self):
+        return f'{self.threshold}⭐ {self.name_vi}'
+
+    @property
+    def is_active(self):
+        return self.active == YesNo.YES
+
+    @property
+    def icon_src(self):
+        """URL icon để render <img>: ảnh upload > SVG tĩnh (repo) > SVG offline emoji > ''."""
+        return resolve_icon_src(self.image, self.icon_static, self.emoji)
 
 
 class Badge(AuditedModel):
@@ -26,7 +69,14 @@ class Badge(AuditedModel):
 
     code = models.SlugField('Mã huy hiệu', max_length=50, unique=True)
     name_vi = models.CharField('Tên huy hiệu', max_length=100)
-    icon = models.CharField('Biểu tượng', max_length=50, blank=True, default='🏅')
+    # icon_static: đường dẫn SVG CỐ ĐỊNH trong static (vd 'icons/badge/stars-10.svg')
+    # — commit theo repo, deploy máy khác luôn có. Nguồn icon MẶC ĐỊNH của app.
+    icon_static = models.CharField('SVG tĩnh', max_length=120, blank=True,
+                                   help_text="Đường dẫn trong static, vd icons/badge/stars-10.svg")
+    # icon (emoji): fallback cuối + để suy ra SVG offline (media).
+    icon = models.CharField('Biểu tượng (emoji)', max_length=50, blank=True, default='🏅')
+    # icon_image: ảnh huy hiệu do phụ huynh upload (ƯU TIÊN cao nhất nếu có).
+    icon_image = models.ImageField('Ảnh huy hiệu', upload_to='images/badge/', blank=True)
     # Câu khích lệ ngắn hiện khi mở được (bé chưa biết chữ → cũng đọc bằng giọng ở client).
     desc_vi = models.CharField('Lời khen', max_length=150, blank=True)
     kind = models.CharField('Loại điều kiện', max_length=10, choices=Kind.choices)
@@ -45,6 +95,11 @@ class Badge(AuditedModel):
     @property
     def is_active(self):
         return self.active == YesNo.YES
+
+    @property
+    def icon_src(self):
+        """URL icon để render <img>: ảnh upload > SVG tĩnh (repo) > SVG offline emoji > ''."""
+        return resolve_icon_src(self.icon_image, self.icon_static, self.icon)
 
 
 class ChildBadge(AuditedModel):

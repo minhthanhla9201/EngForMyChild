@@ -308,6 +308,10 @@ body.body-manage { background: #eef1f4; }
     border-color: #ffca3a;
     box-shadow: 0 3px 8px rgba(255, 200, 60, .4);
 }
+/* Icon render bằng <img> SVG offline (tag icon_img) — không phụ thuộc font hệ thống.
+   Kích thước do tag đặt inline (width/height px); rule này chỉ chuẩn hoá cách hiển thị. */
+.emoji-svg { display: inline-block; vertical-align: middle; }
+
 /* Chưa đạt → làm mờ CHỈ phần icon (không grayscale cả chip → tooltip vẫn rõ) + ổ khoá góc */
 .badge-icon { line-height: 1; }
 .badge-chip.locked { opacity: .55; }

@@ -1,4 +1,5 @@
 {% extends 'base_kid.html' %}
+{% load icons %}
 {% block title %}Trò chơi{% endblock %}
 
 {% block content %}
@@ -48,7 +49,7 @@
         <a class="text-decoration-none" :href="`/games/${childId}/${gameCode}/{{ topic.slug }}/`">
           <div class="card child-card text-center h-100">
             <div class="card-body">
-              <div class="child-avatar mb-2">{{ topic.icon }}</div>
+              <div class="child-avatar mb-2">{% icon_img emoji=topic.icon src=topic.icon_src size=56 alt=topic.name_vi %}</div>
               <div class="fw-bold text-dark">{{ topic.name_vi }}</div>
               <div class="text-muted small">{{ topic.name_en }}</div>
             </div>

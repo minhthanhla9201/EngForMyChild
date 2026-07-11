@@ -1,0 +1,30 @@
+{% extends 'base_manage.html' %}
+{% load icons %}
+{% block title %}{% if is_add %}Thêm mốc linh vật{% else %}Sửa mốc linh vật{% endif %}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-7">
+    <div class="card child-card p-2">
+      <div class="card-body">
+        <h1 class="h4 mb-3">{% if is_add %}➕ Thêm mốc linh vật{% else %}✏️ Sửa mốc linh vật{% endif %}</h1>
+        {% if stage %}
+        <div class="mb-3 d-flex align-items-center gap-2">
+          <span class="text-muted small">Icon hiện tại:</span>
+          {% icon_img emoji=stage.emoji src=stage.icon_src size=48 alt=stage.name_vi %}
+        </div>
+        {% endif %}
+        {# enctype: form có upload ảnh linh vật #}
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          {% include 'catalog/manage/_form_fields.html' %}
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-kid">Lưu</button>
+            <a href="{% url 'progress_manage:petstage_manage' %}" class="btn btn-outline-secondary">Huỷ</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

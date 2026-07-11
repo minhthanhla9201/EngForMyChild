@@ -1,13 +1,20 @@
-"""Admin cho huy hiệu (xem/sửa định nghĩa + huy hiệu bé đã mở)."""
+"""Admin cho linh vật + huy hiệu (xem/sửa định nghĩa + huy hiệu bé đã mở)."""
 
 from django.contrib import admin
 
-from .models import Badge, ChildBadge
+from .models import Badge, ChildBadge, PetStage
+
+
+@admin.register(PetStage)
+class PetStageAdmin(admin.ModelAdmin):
+    list_display = ('threshold', 'name_vi', 'icon_static', 'emoji', 'image', 'order', 'active')
+    list_filter = ('active',)
+    ordering = ('threshold',)
 
 
 @admin.register(Badge)
 class BadgeAdmin(admin.ModelAdmin):
-    list_display = ('icon', 'name_vi', 'kind', 'threshold', 'order', 'active')
+    list_display = ('name_vi', 'icon_static', 'icon', 'kind', 'threshold', 'order', 'active')
     list_filter = ('kind', 'active')
     ordering = ('order', 'threshold')
 

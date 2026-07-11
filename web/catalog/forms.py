@@ -14,13 +14,17 @@ class TopicForm(forms.ModelForm):
 
     class Meta:
         model = Topic
-        fields = ['name_en', 'name_vi', 'slug', 'icon', 'order', 'active']
+        fields = ['name_en', 'name_vi', 'slug', 'icon_static', 'icon', 'icon_image', 'order', 'active']
         widgets = {
             'name_en': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'VD: Animals'}),
             'name_vi': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'VD: Động vật'}),
             'slug': forms.TextInput(attrs={'class': 'form-control',
                                            'placeholder': 'Để trống để tự sinh từ tên tiếng Anh'}),
-            'icon': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Emoji, VD 🐶'}),
+            'icon_static': forms.TextInput(attrs={'class': 'form-control',
+                                                  'placeholder': 'VD: icons/topic/animals.svg (SVG mặc định)'}),
+            'icon': forms.TextInput(attrs={'class': 'form-control',
+                                           'placeholder': 'Emoji, VD 🐶 (fallback cuối)'}),
+            'icon_image': forms.ClearableFileInput(attrs={'class': 'form-control', 'accept': 'image/*'}),
             'order': forms.NumberInput(attrs={'class': 'form-control'}),
             'active': forms.Select(attrs={'class': 'form-select'}),
         }
