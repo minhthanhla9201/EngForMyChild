@@ -44,6 +44,7 @@ def choose(request):
 
     return render(request, 'pronunciation/choose.html', {
         'children': children,
+        'active_child': child,
         'topic_list': topic_list,
         'hint_voice_url': praise_service.page_hint_url('speak_choose'),
     })

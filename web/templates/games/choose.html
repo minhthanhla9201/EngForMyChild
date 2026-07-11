@@ -21,7 +21,7 @@
   </div>
 {% else %}
   {# Chọn bé → chọn game → chọn chủ đề. Alpine giữ bé + game đang chọn. #}
-  <div x-data="{ childId: {{ children.0.pk }}, gameCode: '{{ games.0.code }}' }">
+  <div x-data="{ childId: {{ active_child.pk|default:children.0.pk }}, gameCode: '{{ games.0.code }}' }">
     <div class="card child-card p-3 mb-3">
       <label class="form-label fw-bold">Bé nào chơi?</label>
       <div class="d-flex flex-wrap gap-2 mb-3">
