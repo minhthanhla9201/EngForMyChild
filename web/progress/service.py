@@ -164,3 +164,122 @@ def summary(child):
         'badges_total': len(all_badges),
         'badges_all': [{'badge': b, 'earned': b.id in earned_ids} for b in all_badges],
     }
+
+
+# ==============================================================================
+# ĐỘ THÀNH THẠO CHO TỪNG TỪ (per-word mastery)
+# ==============================================================================
+
+# Ngưỡng: trung bình 3 lần gần nhất >= 60% → thành thạo.
+WORD_MASTERY_THRESHOLD = 60
+
+
+def word_mastery_data(child, words):
+    """
+    Tính độ thành thạo cho từng từ dựa trên lịch sử luyện phát âm (Attempt).
+
+    `words` là iterable các Word objects. Trả về dict:
+        {word_id: {
+            'level': 'new' | 'learning' | 'mastered',
+            'level_label': 'Chưa học' | 'Đang học' | 'Thành thạo',
+            'icon': 'new' | 'book' | 'star',
+            'avg_score': int (0-100),
+            'attempts': int,
+            'scores': list[int] (tối đa 3 lần gần nhất),
+        }}
+
+    Thuật toán:
+      - 3 lần gần nhất (có score), trung bình >= WORD_MASTERY_THRESHOLD
+        VÀ có ít nhất 2 lần attempt → 'mastered'
+      - Đã có attempt → 'learning'
+      - Chưa có attempt nào → 'new'
+    """
+    from pronunciation.models import Attempt
+
+    # Query tất cả attempt có score (đã được chấm ASR).
+    attempts = (Attempt.objects
+                .filter(child=child, word__in=words, score__isnull=False)
+                .order_by('word_id', '-created_at'))
+
+    # Gom theo word_id, lấy tối đa 3 score gần nhất.
+    tmp = {}
+    for a in attempts:
+        if a.word_id not in tmp:
+            tmp[a.word_id] = {'attempts': 0, 'scores': []}
+        entry = tmp[a.word_id]
+        if entry['attempts'] < 3:
+            entry['scores'].append(a.score)
+        entry['attempts'] += 1
+
+    # Xây dict kết quả, gán level cho từng word.
+    mastery = {}
+    for wid, entry in tmp.items():
+        scores = entry['scores']
+        avg = sum(scores) / len(scores) if scores else 0
+        if entry['attempts'] >= 2 and avg >= WORD_MASTERY_THRESHOLD:
+            level = 'mastered'
+            label = 'Thành thạo'
+            icon = 'star'
+        else:
+            level = 'learning'
+            label = 'Đang học'
+            icon = 'book'
+        mastery[wid] = {
+            'level': level,
+            'level_label': label,
+            'icon': icon,
+            'avg_score': int(avg),
+            'attempts': entry['attempts'],
+            'scores': scores,
+        }
+
+    # Word chưa có attempt nào → 'new'.
+    for w in words:
+        if w.id not in mastery:
+            mastery[w.id] = {
+                'level': 'new',
+                'level_label': 'Chưa học',
+                'icon': 'new',
+                'avg_score': 0,
+                'attempts': 0,
+                'scores': [],
+            }
+
+    return mastery
+
+
+def topic_mastery_data(child, topics):
+    """
+    Tính tiến độ cho từng chủ đề dựa trên độ thành thạo của các từ trong chủ đề.
+
+    `topics` là iterable các Topic objects. Trả về dict:
+        {topic_id: {
+            'total_words': int,
+            'practiced_words': int,   # learning + mastered
+            'pct': int,               # 0-100
+        }}
+    """
+    from catalog.models import Word
+
+    # Lấy tất cả từ active trong các chủ đề.
+    words = Word.objects.filter(topic__in=topics, active='Y').select_related('topic')
+    wm = word_mastery_data(child, words)
+
+    # Gom theo topic.
+    tmp = {}
+    for w in words:
+        if w.topic_id not in tmp:
+            tmp[w.topic_id] = {'total': 0, 'practiced': 0}
+        tmp[w.topic_id]['total'] += 1
+        if wm.get(w.id, {}).get('level') in ('learning', 'mastered'):
+            tmp[w.topic_id]['practiced'] += 1
+
+    result = {}
+    for tid, entry in tmp.items():
+        pct = int(entry['practiced'] / entry['total'] * 100) if entry['total'] > 0 else 0
+        result[tid] = {
+            'total_words': entry['total'],
+            'practiced_words': entry['practiced'],
+            'pct': pct,
+        }
+    return result

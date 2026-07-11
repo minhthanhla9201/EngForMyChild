@@ -16,6 +16,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 
 from accounts.models import ChildProfile
+from accounts.utils import get_active_child
 from catalog.models import Topic
 from core.models import YesNo
 from catalog import praise as praise_service
@@ -28,13 +29,23 @@ logger = logging.getLogger('eng.games')
 
 @login_required
 def choose(request):
-    """Chọn bé + chủ đề + loại game."""
+    """Chọn bé + chủ đề + loại game — chủ đề sắp xếp theo tiến độ của bé."""
     children = ChildProfile.objects.filter(owner=request.user, active='Y')
     topics = Topic.objects.filter(active='Y')
     games = GameType.objects.filter(active='Y')
+
+    child = get_active_child(request)
+    topic_list = [(t, None) for t in topics]
+    if child:
+        td = progress_service.topic_mastery_data(child, topics)
+        topic_list = sorted(
+            [(t, td.get(t.id)) for t in topics],
+            key=lambda x: (x[1] or {}).get('pct', 0),
+        )
+
     return render(request, 'games/choose.html', {
         'children': children,
-        'topics': topics,
+        'topic_list': topic_list,
         'games': games,
         'hint_voice_url': praise_service.page_hint_url('games_choose'),
     })
