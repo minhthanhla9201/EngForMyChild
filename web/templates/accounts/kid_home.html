@@ -62,9 +62,13 @@
       {# Tổng sao + chuỗi ngày #}
       <div class="col-6 text-center">
         <div class="stars-big"><span class="star-icon">⭐</span> {{ progress.total_stars }}</div>
-        <div class="text-muted fw-bold">Tổng số sao</div>
+        <div class="small text-muted">Tổng số sao</div>
+        <div class="d-flex justify-content-center gap-3 mt-1 small">
+          <span><span class="fw-bold text-warning">🎮</span> {{ progress.game_stars }} sao</span>
+          <span><span class="fw-bold text-info">🎤</span> {{ progress.speech_stars }} sao</span>
+        </div>
         {% if progress.streak_days %}
-        <div class="mt-2"><span class="streak-chip">🔥 {{ progress.streak_days }} ngày</span></div>
+        <div class="mt-1"><span class="streak-chip">🔥 {{ progress.streak_days }} ngày</span></div>
         {% endif %}
       </div>
     </div>

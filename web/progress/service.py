@@ -3,8 +3,10 @@ Tính tiến độ của một bé và mở khoá huy hiệu — logic dùng chu
 màn kết thúc game/luyện). Tách riêng khỏi view để dễ test.
 
 Chỉ số tiến độ TÍNH từ dữ liệu đã có (GameResult, Attempt) — không lưu trùng:
-- total_stars      : tổng sao tích luỹ từ game.
+- total_stars      : sao game + sao phát âm (mastery-based).
 - games_played     : số ván game đã chơi.
+- game_stars       : sao từ game (Sum GameResult.stars).
+- speech_stars     : sao từ phát âm (thành thạo*3 + đang học*1).
 - words_practiced  : số lần luyện phát âm.
 - streak_days      : số ngày học/chơi LIÊN TIẾP tính đến hôm nay.
 - pet_level/pet_emoji : "linh vật lớn dần" theo tổng sao (hạt → cây → …).
@@ -30,14 +32,31 @@ def _pet_stages():
 
 
 def _counts(child):
-    """Đếm các chỉ số thô của bé (1 lượt truy vấn mỗi loại)."""
+    """Đếm các chỉ số thô của bé. Trả dict. Kết quả được gọi nhiều lần (summary + badges)."""
+    from catalog.models import Word
+
     game_stars = GameResult.objects.filter(child=child).aggregate(s=Sum('stars'))['s'] or 0
-    speech_stars = (Attempt.objects.filter(child=child, stars__isnull=False)
-                    .aggregate(s=Sum('stars'))['s'] or 0)
-    stars = game_stars + speech_stars
     games = GameResult.objects.filter(child=child).count()
     words = Attempt.objects.filter(child=child).count()
-    return stars, games, words
+
+    # Sao phát âm dựa trên mastery: chống farm (mỗi từ đóng góp 1 lần).
+    attempted_words = Word.objects.filter(attempts__child=child).distinct()
+    wm = word_mastery_data(child, attempted_words) if attempted_words else {}
+    mastered = sum(1 for m in wm.values() if m['level'] == 'mastered')
+    familiar = sum(1 for m in wm.values() if m['level'] == 'familiar')
+    learning = sum(1 for m in wm.values() if m['level'] == 'learning')
+    speech_stars = mastered * 3 + familiar * 2 + learning * 1
+
+    return {
+        'game_stars': game_stars,
+        'speech_stars': speech_stars,
+        'mastered': mastered,
+        'familiar': familiar,
+        'learning': learning,
+        'total_stars': game_stars + speech_stars,
+        'games': games,
+        'words': words,
+    }
 
 
 def _streak_days(child):
@@ -102,12 +121,12 @@ def check_and_award_badges(child):
     Idempotent: huy hiệu đã có thì bỏ qua (UniqueConstraint chặn trùng). Gọi sau
     mỗi ván chơi / lần luyện để trao kịp thời.
     """
-    stars, games, words = _counts(child)
+    c = _counts(child)
     streak = _streak_days(child)
     metric = {
-        Badge.Kind.TOTAL_STARS: stars,
-        Badge.Kind.GAMES_PLAYED: games,
-        Badge.Kind.WORDS_PRACTICED: words,
+        Badge.Kind.TOTAL_STARS: c['total_stars'],
+        Badge.Kind.GAMES_PLAYED: c['games'],
+        Badge.Kind.WORDS_PRACTICED: c['words'],
         Badge.Kind.STREAK_DAYS: streak,
     }
 
@@ -129,16 +148,17 @@ def summary(child):
     Toàn bộ tiến độ của bé để hiển thị (trang chủ/màn kết thúc). Không mở khoá gì
     thêm — chỉ đọc. Trả dict thuần (dễ đưa vào template / json_script).
     """
-    stars, games, words = _counts(child)
+    c = _counts(child)
+    total_stars = c['total_stars']
     streak = _streak_days(child)
     stages = _pet_stages()
-    level, emoji, name, stage = pet_stage(stars, stages)
-    remain, next_need = _next_pet_target(stars, stages)
+    level, emoji, name, stage = pet_stage(total_stars, stages)
+    remain, next_need = _next_pet_target(total_stars, stages)
     # % tiến tới mốc kế: từ ngưỡng mốc HIỆN TẠI đến ngưỡng mốc KẾ (để thanh đầy dần).
     if next_need:
         cur_need = stages[level].threshold if stages else 0
         span = next_need - cur_need
-        pet_percent = int((stars - cur_need) / span * 100) if span > 0 else 0
+        pet_percent = int((total_stars - cur_need) / span * 100) if span > 0 else 0
     else:
         pet_percent = 100  # đã tối đa
     # icon_src: URL <img> của linh vật (ảnh upload/SVG offline); rỗng → fallback emoji text.
@@ -150,9 +170,14 @@ def summary(child):
     all_badges = list(Badge.objects.filter(active='Y'))
 
     return {
-        'total_stars': stars,
-        'games_played': games,
-        'words_practiced': words,
+        'total_stars': total_stars,
+        'game_stars': c['game_stars'],
+        'speech_stars': c['speech_stars'],
+        'mastered_words': c['mastered'],
+        'familiar_words': c['familiar'],
+        'learning_words': c['learning'],
+        'games_played': c['games'],
+        'words_practiced': c['words'],
         'streak_days': streak,
         'pet_level': level,
         'pet_emoji': emoji,            # fallback text nếu không có SVG/ảnh
@@ -173,8 +198,9 @@ def summary(child):
 # ĐỘ THÀNH THẠO CHO TỪNG TỪ (per-word mastery)
 # ==============================================================================
 
-# Ngưỡng: trung bình 3 lần gần nhất >= 60% → thành thạo.
-WORD_MASTERY_THRESHOLD = 60
+# Ngưỡng: trung bình 3 lần gần nhất.
+WORD_FAMILIAR_THRESHOLD = 40  # >= 40% → gần thuộc (2⭐)
+WORD_MASTERY_THRESHOLD = 60   # >= 60% → thành thạo (3⭐)
 
 
 def word_mastery_data(child, words):
@@ -183,9 +209,9 @@ def word_mastery_data(child, words):
 
     `words` là iterable các Word objects. Trả về dict:
         {word_id: {
-            'level': 'new' | 'learning' | 'mastered',
-            'level_label': 'Chưa học' | 'Đang học' | 'Thành thạo',
-            'icon': 'new' | 'book' | 'star',
+            'level': 'new' | 'learning' | 'familiar' | 'mastered',
+            'level_label': 'Chưa học' | 'Đang học' | 'Gần đạt' | 'Thành thạo',
+            'icon': 'new' | 'book' | 'thumbs' | 'star',
             'avg_score': int (0-100),
             'attempts': int,
             'scores': list[int] (tối đa 3 lần gần nhất),
@@ -193,9 +219,11 @@ def word_mastery_data(child, words):
 
     Thuật toán:
       - 3 lần gần nhất (có score), trung bình >= WORD_MASTERY_THRESHOLD
-        VÀ có ít nhất 2 lần attempt → 'mastered'
-      - Đã có attempt → 'learning'
-      - Chưa có attempt nào → 'new'
+        VÀ có ít nhất 2 lần attempt → 'mastered' (3⭐)
+      - Trung bình >= WORD_FAMILIAR_THRESHOLD VÀ có ít nhất 2 lần attempt
+        → 'familiar' (2⭐)
+      - Đã có attempt → 'learning' (1⭐)
+      - Chưa có attempt nào → 'new' (0⭐)
     """
     from pronunciation.models import Attempt
 
@@ -220,13 +248,11 @@ def word_mastery_data(child, words):
         scores = entry['scores']
         avg = sum(scores) / len(scores) if scores else 0
         if entry['attempts'] >= 2 and avg >= WORD_MASTERY_THRESHOLD:
-            level = 'mastered'
-            label = 'Thành thạo'
-            icon = 'star'
+            level, label, icon = 'mastered', 'Thành thạo', 'star'
+        elif entry['attempts'] >= 2 and avg >= WORD_FAMILIAR_THRESHOLD:
+            level, label, icon = 'familiar', 'Gần đạt', 'thumbs'
         else:
-            level = 'learning'
-            label = 'Đang học'
-            icon = 'book'
+            level, label, icon = 'learning', 'Đang học', 'book'
         mastery[wid] = {
             'level': level,
             'level_label': label,
@@ -274,7 +300,7 @@ def topic_mastery_data(child, topics):
         if w.topic_id not in tmp:
             tmp[w.topic_id] = {'total': 0, 'practiced': 0}
         tmp[w.topic_id]['total'] += 1
-        if wm.get(w.id, {}).get('level') in ('learning', 'mastered'):
+        if wm.get(w.id, {}).get('level') in ('learning', 'familiar', 'mastered'):
             tmp[w.topic_id]['practiced'] += 1
 
     result = {}

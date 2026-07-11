@@ -77,7 +77,7 @@ def practice(request, child_id, slug):
     } for w in words]
 
     # Sắp xếp: chưa học lên đầu — giúp bé tập trung từ mới.
-    level_order = {'new': 0, 'learning': 1, 'mastered': 2}
+    level_order = {'new': 0, 'learning': 1, 'familiar': 2, 'mastered': 3}
     words_data.sort(key=lambda wd: level_order.get(wd['mastery_level'], 99))
 
     return render(request, 'pronunciation/practice.html', {

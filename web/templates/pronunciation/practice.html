@@ -28,12 +28,14 @@
 
   <div class="card child-card text-center p-4 mb-3"
        :class="{'border-success': current.mastery_level === 'mastered',
+                'border-warning': current.mastery_level === 'familiar',
                 'border-info': current.mastery_level === 'learning',
                 '': current.mastery_level === 'new'}">
     {# Badge độ thành thạo #}
     <div class="d-flex justify-content-center gap-1 mb-1">
       <span class="badge fs-6"
             :class="{'bg-success': current.mastery_level === 'mastered',
+                     'bg-warning text-dark': current.mastery_level === 'familiar',
                      'bg-info text-dark': current.mastery_level === 'learning',
                      'bg-secondary': current.mastery_level === 'new'}"
             x-text="current.mastery_label">
@@ -95,6 +97,7 @@
         <span class="badge bg-success bg-opacity-10 text-success fs-6 px-3 py-2">
           <span x-show="current.mastery_level === 'new'">🆕 Chuyển sang</span>
           <span x-show="current.mastery_level === 'learning'">📖 Tiến bộ hơn</span>
+          <span x-show="current.mastery_level === 'familiar'">👍 Gần đạt rồi!</span>
           <span x-show="current.mastery_level === 'mastered'">⭐ Đã thành thạo</span>
         </span>
       </div>

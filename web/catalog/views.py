@@ -76,7 +76,7 @@ def word_list(request, slug):
         for w in words:
             w.mastery = word_mastery.get(w.id, _DEFAULT_MASTERY)
         # Sort: level (new→learning→mastered), cùng level thì alphabet.
-        level_order = {'new': 0, 'learning': 1, 'mastered': 2}
+        level_order = {'new': 0, 'learning': 1, 'familiar': 2, 'mastered': 3}
         words.sort(key=lambda w: (
             level_order.get(w.mastery['level'], 99),
             w.text_en.lower(),
