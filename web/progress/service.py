@@ -31,7 +31,10 @@ def _pet_stages():
 
 def _counts(child):
     """Đếm các chỉ số thô của bé (1 lượt truy vấn mỗi loại)."""
-    stars = GameResult.objects.filter(child=child).aggregate(s=Sum('stars'))['s'] or 0
+    game_stars = GameResult.objects.filter(child=child).aggregate(s=Sum('stars'))['s'] or 0
+    speech_stars = (Attempt.objects.filter(child=child, stars__isnull=False)
+                    .aggregate(s=Sum('stars'))['s'] or 0)
+    stars = game_stars + speech_stars
     games = GameResult.objects.filter(child=child).count()
     words = Attempt.objects.filter(child=child).count()
     return stars, games, words
