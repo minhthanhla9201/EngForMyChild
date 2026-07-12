@@ -67,19 +67,19 @@
 
       {# Thu âm: bấm để bắt đầu / dừng #}
       <button class="btn" :class="recording ? 'btn-danger' : 'btn-success'"
-              @click="toggleRecord()" :disabled="busy && !recording">
+              @click="toggleRecord()" :disabled="uploading || (busy && !recording)">
         <span x-show="!recording"><i class="bi bi-mic-fill"></i> Thu giọng (Bấm)</span>
         <span x-show="recording"><i class="bi bi-stop-fill"></i> Dừng</span>
       </button>
 
-      {# Nhấn giữ thu âm #}
+      {# Nhấn giữ thu âm — chỉ khoá khi uploading, không khoá khi đang phát mẫu (listen) #}
       <button class="btn btn-warning"
               @mousedown="startRecord()"
               @mouseup="stopRecord()"
               @mouseleave="stopRecord()"
               @touchstart.prevent="startRecord()"
               @touchend.prevent="stopRecord()"
-              :disabled="busy && !recording">
+              :disabled="uploading">
         <span x-show="!recording"><i class="bi bi-mic-fill"></i> Nhấn & Giữ để nói</span>
         <span x-show="recording" class="text-danger fw-bold"><i class="bi bi-record-fill"></i> Đang thu...</span>
       </button>
@@ -153,6 +153,7 @@
       words: [],
       index: 0,
       busy: false,
+      uploading: false,  // riêng — không gộp với busy (listen làm busy=true nhưng không khoá nút thu)
       recording: false,
       message: '',
       messageOk: true,
@@ -182,9 +183,9 @@
         finally { this.busy = false; }
       },
 
-      // Bắt đầu thu âm
+      // Bắt đầu thu âm — chỉ khoá khi đang upload, không khoá khi đang phát mẫu (listen)
       async startRecord() {
-        if (this.recording || this.busy) return;
+        if (this.recording || this.uploading) return;
         try {
           const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
           this.chunks = [];
@@ -223,7 +224,7 @@
 
       // Gửi bản ghi lên server (lưu Attempt).
       async upload(blob) {
-        this.recording = false; this.busy = true;
+        this.recording = false; this.uploading = true;
         const fd = new FormData();
         fd.append('audio', blob, 'recording.webm');
         try {
@@ -247,7 +248,7 @@
             kidFx.badges(d.badges);
           }
         } catch (e) { this.show('Có lỗi khi gửi bản ghi.', false); }
-        finally { this.busy = false; }
+        finally { this.uploading = false; this.busy = false; }
       },
 
       // Thử lại từ hiện tại: xoá kết quả cũ rồi thu âm lại luôn.
