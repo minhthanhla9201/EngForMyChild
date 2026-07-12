@@ -27,6 +27,7 @@ Website **học tiếng Anh chạy local** cho **bé 6–7 tuổi**, giúp bé l
 - Bé bấm 🔊 **nghe mẫu** (TTS hoặc file thu sẵn).
 - Bé bấm 🎤 **thu giọng** → gửi sang service ASR (faster-whisper) → so khớp với từ đích → cho **sao** + animation vui. Sai thì khuyến khích nghe lại, **không trừ điểm**.
 - Mỗi lần luyện lưu một bản ghi **`Attempt`** (audio bé + text ASR + điểm) → dữ liệu tích luỹ.
+- **Độ thành thạo (4 level):** Chưa học → Đang học → Gần đạt → Thành thạo. Tính từ Attempt (không farm được). Hiển thị badge + sort ưu tiên từ mới.
 - Game đại diện: **"Nhại con vẹt" 🦜** — nghe và lặp lại để vẹt vỗ tay.
 
 ### 4.2. Từ vựng (ưu tiên 2)
@@ -42,12 +43,18 @@ Website **học tiếng Anh chạy local** cho **bé 6–7 tuổi**, giúp bé l
 - Game: **kéo–thả xếp câu**, **chọn a/an/the**.
 
 ### 4.4. Hệ thống thưởng (xuyên suốt)
-- **Sao ⭐, huy hiệu, mở khoá dần** (vd "vườn thú" mở thêm con vật khi học xong chủ đề) — tạo động lực quay lại.
+- **Sao ⭐, huy hiệu, mở khoá dần** — tạo động lực quay lại.
+  - **Tổng sao** = game_stars + speech_stars (mastery-based: thành thạo×3 + gần đạt×2 + đang học×1).
+  - **Linh vật lớn dần** 🌱→🌿→🪴→🌳→🌸→🌟 theo tổng sao (bảng `PetStage`).
+  - **Huy hiệu** tự động mở khi đạt ngưỡng (tổng sao, số ván, số lần luyện, chuỗi ngày).
+  - Trang chủ hiển thị tách: **🎮 game / 🎤 phát âm** để bé thấy rõ tiến bộ.
 
 ### 4.5. Khu phụ huynh
 - Đăng nhập; tạo/sửa **hồ sơ bé**.
 - **Thêm từ vựng:** form trong app **và** import hàng loạt từ **CSV** (1 lệnh `manage.py import_words`), audio + IPA **tự sinh**.
-- **Xem tiến độ:** bé học chủ đề nào, bao nhiêu sao, nghe lại bản ghi âm.
+- **Xem tiến độ:** bé học chủ đề nào, bao nhiêu sao, nghe lại bản ghi âm. Có phân trang + thời gian.
+- **Tạo lại media:** khi mất file (xoá nhầm), dùng lệnh `recreate_media` + `fetch_images` + `gen_praise`.
+- **Gen lại hình từng từ:** nút "Gen lại hình" ở form sửa từ (tải SVG emoji từ CDN).
 
 ## 5. Quản lý nội dung — "thu thập dữ liệu dần vào local"
 - 4 cách nhập từ vựng (dễ → tự động): **CSV import** · **Django Admin** · **form phụ huynh trong app** · (audio/IPA **tự sinh** không cần thao tác tay).
@@ -70,6 +77,7 @@ Website **học tiếng Anh chạy local** cho **bé 6–7 tuổi**, giúp bé l
 - **GĐ 0 (XONG):** Khung Django + Docker (`web`), `core` (AuditedModel, mixin), `base.html` thân thiện trẻ, `accounts` + `ChildProfile`.
 - **GĐ 1 (XONG):** `catalog` (Topic/Word/AudioClip), import CSV + sinh IPA (eng-to-ipa) + audio (edge-tts ưu tiên, dự phòng pyttsx3 offline, có cache), trang xem từ vựng + nghe mẫu (Alpine.js).
 - **GĐ 2 (XONG):** `pronunciation` — nghe mẫu + ghi âm trình duyệt (MediaRecorder + Alpine.js), lưu `Attempt` (chưa chấm điểm).
-- **GĐ 3:** Container `asr` (faster-whisper) + chấm điểm → sao.
-- **GĐ 4 (XONG):** `games` — kiến trúc khuôn+dữ liệu (`GameType` cấu hình DB + engine module). 2 game đầu: "Nghe & chọn" (`listen_pick`), "Lật thẻ tìm cặp" (`match_pairs`); chấm sao + lưu `GameResult`. (Hệ thống huy hiệu để GĐ 5.)
-- **GĐ 5:** Ngữ pháp + khu phụ huynh (tiến độ) hoàn chỉnh.
+- **GĐ 3 (XONG):** Container `asr` (faster-whisper) + chấm điểm → sao + độ thành thạo.
+- **GĐ 4 (XONG):** `games` — 5 game (Nghe & chọn, Lật thẻ, Nghe & chọn hình, Nhìn hình & chọn tiếng, Ghép hình với tiếng). Chấm sao + lưu `GameResult`.
+- **GĐ 5 (XONG):** Huy hiệu + linh vật lớn dần + tiến độ phụ huynh hoàn chỉnh + độ thành thạo.
+- **GĐ 6 (CHƯA):** Câu đơn ngắn theo chủ đề (Sentence model) + luyện phát âm cả câu (ASR mức câu). Chấm sao + độ thành thạo tương tự phát âm từ.
