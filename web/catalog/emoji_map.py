@@ -164,6 +164,20 @@ EMOJI_MAP = {
     'monday': '📅', 'tuesday': '📅', 'wednesday': '📅', 'thursday': '📅',
     'friday': '📅', 'saturday': '📅', 'sunday': '📅',
 
+    # --- Math (Toán học) ---
+    'count': '🔢', 'number': '🔢', 'add': '➕', 'subtract': '➖', 'plus': '➕',
+    'minus': '➖', 'equals': '🟰', 'total': '📊', 'solve': '🧮', 'problem': '❓',
+    'answer': '✅', 'question': '❓', 'whole': '🔵', 'half': '½',
+    'pair': '👫', 'even': '⚖️', 'odd': '🎲', 'big': '🐘', 'small': '🐜',
+    'long': '📏', 'short': '📐', 'tall': '🌳', 'wide': '↔️', 'narrow': '↔️',
+    'heavy': '🏋️', 'light': '🪶', 'full': '📥', 'empty': '📭',
+    'more': '➕', 'less': '➖', 'many': '📚', 'few': '🔹', 'same': '🟰',
+    'different': '♻️', 'middle': '🎯', 'between': '↔️', 'above': '⬆️',
+    'below': '⬇️', 'left': '⬅️', 'right': '➡️', 'time': '⏰',
+    'hour': '🕐', 'minute': '⏱️', 'coin': '🪙', 'dollar': '💵',
+    'cent': '🪙', 'group': '👥', 'row': '➖', 'column': '📊',
+    'order': '🔢', 'next': '⏭️', 'most': '🏆', 'least': '🔽',
+
     # --- Shapes bổ sung (khối 3D không có emoji riêng → dùng hình gần nhất) ---
     'oval': '⭕', 'cube': '🧊', 'cone': '🍦', 'cylinder': '🥫', 'pentagon': '🔷',
     'line': '➖',
