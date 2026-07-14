@@ -53,7 +53,7 @@
           {# % tiến tới mốc kế: dựa trên sao hiện tại / ngưỡng mốc kế #}
           <div class="pet-progress-bar" style="width: {{ progress.pet_percent }}%"></div>
         </div>
-        <div class="small text-muted mt-1">Còn {{ progress.pet_remain_stars }} ⭐ để lớn hơn!</div>
+        <div class="small text-muted mt-1">Còn {{ progress.pet_remain_stars }} ⭐ để thành {{ progress.pet_next_emoji }} {{ progress.pet_next_name }}!</div>
         {% else %}
         <div class="small text-muted mt-2">Đã lớn hết cỡ rồi, giỏi quá! 🎉</div>
         {% endif %}

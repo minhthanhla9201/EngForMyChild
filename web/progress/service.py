@@ -164,6 +164,15 @@ def summary(child):
     # icon_src: URL <img> của linh vật (ảnh upload/SVG offline); rỗng → fallback emoji text.
     pet_icon_src = stage.icon_src if stage else ''
 
+    # Mốc kế tiếp (để hiển thị "còn X sao để thành Y").
+    if stages and level + 1 < len(stages):
+        next_stage = stages[level + 1]
+        pet_next_emoji = next_stage.emoji
+        pet_next_name = next_stage.name_vi
+    else:
+        pet_next_emoji = ''
+        pet_next_name = ''
+
     earned = list(ChildBadge.objects.filter(child=child).select_related('badge')
                   .order_by('badge__order', 'badge__threshold'))
     earned_ids = {cb.badge_id for cb in earned}
@@ -186,6 +195,8 @@ def summary(child):
         'pet_remain_stars': remain,      # còn thiếu bao nhiêu sao để lên mốc kế
         'pet_next_need': next_need,
         'pet_percent': pet_percent,      # % đầy thanh tiến tới mốc kế
+        'pet_next_emoji': pet_next_emoji,  # emoji mốc kế (dùng cho khích lệ)
+        'pet_next_name': pet_next_name,    # tên mốc kế
 
         # Huy hiệu: đã mở + tổng số (để hiện "3/8" và các ô khoá).
         'badges_earned': [cb.badge for cb in earned],
