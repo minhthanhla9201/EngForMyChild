@@ -15,7 +15,7 @@
             <button type="submit" class="btn btn-kid">Lưu</button>
             <a href="{% url 'catalog_manage:word_manage' %}{% if return_qs %}?{{ return_qs }}{% endif %}" class="btn btn-outline-secondary">Huỷ</a>
             {% if not is_add %}
-            <a href="{% url 'catalog_manage:word_fetch_image' form.instance.pk %}"
+            <a href="{% url 'catalog_manage:word_fetch_image' form.instance.pk %}{% if return_qs %}?return_qs={{ return_qs|urlencode }}{% endif %}"
                class="btn btn-outline-warning ms-auto"
                onclick="return confirm('Tải lại hình emoji từ CDN (cần internet)?')">
               <i class="bi bi-arrow-repeat"></i> Gen lại hình
