@@ -189,14 +189,19 @@ def word_form(request, pk=None):
     """Tạo/sửa từ vựng. IPA tự sinh khi phonetic để trống (eng-to-ipa)."""
     word = get_object_or_404(Word, pk=pk) if pk else None
     form = WordForm(request.POST or None, request.FILES or None, instance=word)
+    next_url = request.POST.get('next') or request.GET.get('next', '')
     if request.method == 'POST' and form.is_valid():
         obj = form.save(commit=False)
         if not obj.phonetic:  # tự sinh IPA khi để trống
             obj.phonetic = ipa_service.to_ipa(obj.text_en)
         obj.save()
         messages.success(request, f'Đã lưu từ "{obj.text_en}".')
-        return redirect('catalog_manage:word_manage')
-    return render(request, 'catalog/manage/word_form.html', {'form': form, 'is_add': word is None})
+        return redirect(next_url or 'catalog_manage:word_manage')
+    return render(request, 'catalog/manage/word_form.html', {
+        'form': form,
+        'is_add': word is None,
+        'next': next_url,
+    })
 
 
 @manage_required
