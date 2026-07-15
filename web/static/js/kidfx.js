@@ -143,8 +143,12 @@
     // Hiện các huy hiệu VỪA mở khoá, lần lượt (list: [{icon, name_vi, desc_vi, voice_url}]).
     // Mỗi huy hiệu: banner giữa màn + confetti + đọc lời khen bằng GIỌNG NAM edge-tts
     // (voice_url — khác giọng động viên game). Thiếu mp3 thì bỏ qua giọng, vẫn có banner.
+    // Dừng giọng nữ trước khi phát giọng nam huy hiệu — tránh chồng âm.
+    _BADGE_DELAY: 500,
     badges: function (list) {
       if (!list || !list.length) return;
+      // Tắt giọng nữ (cheer/correct) đang phát dở.
+      try { praiseAudio.pause(); praiseAudio.currentTime = 0; } catch (e) {}
       list.forEach(function (b, i) {
         setTimeout(function () {
           showBadge(b);
@@ -156,7 +160,7 @@
               a.play().catch(function () {});
             } catch (e) {}
           }
-        }, i * 2200);  // cách nhau để bé kịp xem từng cái
+        }, i * 2200 + kidFx._BADGE_DELAY);  // delay đầu tránh chồng với giọng nữ
       });
     },
   };

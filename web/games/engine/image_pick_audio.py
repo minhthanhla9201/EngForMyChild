@@ -52,4 +52,9 @@ def score_round(payload):
     answers = payload.get('answers', []) or []
     total = len(answers)
     score = sum(1 for a in answers if a.get('picked_id') == a.get('answer_id'))
-    return {'score': score, 'total': total, 'stars': stars_from_ratio(score, total)}
+    word_results = [
+        {'word_id': a['answer_id'], 'correct': a.get('picked_id') == a.get('answer_id')}
+        for a in answers if a.get('answer_id')
+    ]
+    return {'score': score, 'total': total, 'stars': stars_from_ratio(score, total),
+            'word_results': word_results}

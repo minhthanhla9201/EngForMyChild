@@ -164,6 +164,15 @@ def summary(child):
     # icon_src: URL <img> của linh vật (ảnh upload/SVG offline); rỗng → fallback emoji text.
     pet_icon_src = stage.icon_src if stage else ''
 
+    # Mốc kế tiếp (để hiển thị "còn X sao để thành Y").
+    if stages and level + 1 < len(stages):
+        next_stage = stages[level + 1]
+        pet_next_emoji = next_stage.emoji
+        pet_next_name = next_stage.name_vi
+    else:
+        pet_next_emoji = ''
+        pet_next_name = ''
+
     earned = list(ChildBadge.objects.filter(child=child).select_related('badge')
                   .order_by('badge__order', 'badge__threshold'))
     earned_ids = {cb.badge_id for cb in earned}
@@ -186,6 +195,8 @@ def summary(child):
         'pet_remain_stars': remain,      # còn thiếu bao nhiêu sao để lên mốc kế
         'pet_next_need': next_need,
         'pet_percent': pet_percent,      # % đầy thanh tiến tới mốc kế
+        'pet_next_emoji': pet_next_emoji,  # emoji mốc kế (dùng cho khích lệ)
+        'pet_next_name': pet_next_name,    # tên mốc kế
 
         # Huy hiệu: đã mở + tổng số (để hiện "3/8" và các ô khoá).
         'badges_earned': [cb.badge for cb in earned],
@@ -309,6 +320,56 @@ def topic_mastery_data(child, topics):
         result[tid] = {
             'total_words': entry['total'],
             'practiced_words': entry['practiced'],
+            'pct': pct,
+        }
+    return result
+
+
+def game_word_progress_data(child, topics):
+    """
+    Tính tiến độ game cho từng chủ đề dựa trên word_results từ GameResult.
+
+    Không dùng Attempt (pronunciation) — mỗi GameResult có word_results
+    (JSONField) ghi lại word_id + correct/sai cho từng từ trong ván chơi.
+
+    Trả về dict:
+        {topic_id: {
+            'total_words': int,
+            'played_words': int,   # từ đã trả lời ĐÚNG trong ít nhất 1 ván game
+            'pct': int,
+        }}
+    """
+    from catalog.models import Word
+
+    # Đếm tổng số từ active trong mỗi chủ đề.
+    words = Word.objects.filter(topic__in=topics, active='Y').select_related('topic')
+    total_by_topic = {}
+    for w in words:
+        total_by_topic[w.topic_id] = total_by_topic.get(w.topic_id, 0) + 1
+
+    # Lấy word_results từ GameResult, lọc rỗng trong Python.
+    qs = GameResult.objects.filter(child=child, topic__in=topics).values_list('topic_id', 'word_results')
+
+    # Tập hợp word_id đã trả lời ĐÚNG trong game, theo topic.
+    played_by_topic = {}
+    for tid, wr_list in qs:
+        if not wr_list:
+            continue
+        if tid not in played_by_topic:
+            played_by_topic[tid] = set()
+        for wr in wr_list:
+            wid = wr.get('word_id') if isinstance(wr, dict) else None
+            if wid and wr.get('correct'):         # chỉ tính khi trả lời đúng
+                played_by_topic[tid].add(wid)
+
+    result = {}
+    for tid in total_by_topic:
+        total = total_by_topic[tid]
+        played = len(played_by_topic.get(tid, set()))
+        pct = int(played / total * 100) if total > 0 else 0
+        result[tid] = {
+            'total_words': total,
+            'played_words': played,
             'pct': pct,
         }
     return result

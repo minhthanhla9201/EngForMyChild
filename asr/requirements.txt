@@ -1,5 +1,7 @@
 # Service chấm phát âm (ASR) — GĐ 3. Chạy riêng trong Docker.
-fastapi>=0.110
-uvicorn[standard]>=0.29
-python-multipart>=0.0.9      # nhận file upload (UploadFile)
-faster-whisper>=1.0         # nhận dạng giọng nói, chạy offline sau khi tải model
+# Dùng ~= để giữ bản vá (patch) nhưng không nhảy major/minor bất ngờ.
+fastapi~=0.115.0
+uvicorn[standard]~=0.34.0
+python-multipart~=0.0.19     # nhận file upload (UploadFile)
+faster-whisper~=1.1.0       # nhận dạng giọng nói, chạy offline sau khi tải model
+requests~=2.32.0            # faster-whisper cần để download model

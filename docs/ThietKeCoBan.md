@@ -3,7 +3,7 @@
 > Tài liệu **thiết kế cơ bản** (basic design) cho website học tiếng Anh cho bé 6–7 tuổi, chạy **local**.
 > Mục đích: giúp người bảo trì nắm nhanh **cấu trúc project**, **chức năng đã làm theo từng mục**, và **luồng xử lý** để dễ sửa/mở rộng.
 >
-> Cập nhật: 2026-07-02. Tài liệu liên quan: [YeuCau.md](YeuCau.md) (yêu cầu), [ThietKeDuLieu.md](ThietKeDuLieu.md) (mô hình dữ liệu chi tiết), [CongNghe.md](CongNghe.md) (công nghệ).
+> Cập nhật: 2026-07-12. Tài liệu liên quan: [YeuCau.md](YeuCau.md) (yêu cầu), [ThietKeDuLieu.md](ThietKeDuLieu.md) (mô hình dữ liệu chi tiết), [CongNghe.md](CongNghe.md) (công nghệ).
 
 ---
 
@@ -178,7 +178,7 @@ ManagePasscode (singleton pk=1)
 - **Hồ sơ bé (CRUD)** — thêm/sửa/**xoá** bé; `owner` luôn gán theo phụ huynh đăng nhập; sửa/xoá/xem lọc theo owner (404 nếu của người khác).
   - **Xoá bé (xoá cứng có chủ đích):** nút "Xoá bé" chỉ hiện ở màn **sửa** → modal xác nhận, phải **gõ đúng tên bé** mới xoá (chống nhầm). Chỉ nhận **POST**. Xoá kéo theo **toàn bộ dữ liệu của bé**: `Attempt` + `GameResult` tự xoá theo (`on_delete=CASCADE`), và **file ghi âm** trong `media/recordings/` được **dọn tay** trước khi xoá bản ghi (Django không tự xoá file). Đây là ngoại lệ có chủ đích so với quy ước "xoá mềm" chung — hợp lý cho app local trong gia đình.
 - **Bảng điều khiển** — số bé / chủ đề / từ đang dùng + lối tắt + danh sách bé.
-- **Trang tiến độ** — gộp `GameResult` + `Attempt` của các bé thuộc phụ huynh; lọc theo 1 bé qua `?child=<pk>`; tổng sao / số ván / số lần luyện.
+- **Trang tiến độ** — gộp `GameResult` + `Attempt` của các bé thuộc phụ huynh; lọc theo 1 bé qua `?child=<pk>`; tổng sao / số ván / số lần luyện. Có **phân trang** (20 dòng/trang) + **cột thời gian** (`created_at`).
 
 ### 5.2. Nội dung học & nghe mẫu (app `catalog`) — GĐ 1
 - **Xem học (khu bé)** — danh sách chủ đề → danh sách từ (kèm nút 🔊 Nghe).
@@ -192,11 +192,22 @@ ManagePasscode (singleton pk=1)
 - **Hình minh hoạ tự động** ([emoji_map.py](../web/catalog/emoji_map.py) + lệnh `fetch_images`) — map mỗi `text_en` → emoji phù hợp, tải **SVG** về `media/images/` **một lần** rồi gán vào `Word.image`. Sau đó **học offline** (file đã ở máy). Lệnh idempotent; `--force` gán lại tất cả, `--offline` chỉ dùng SVG có sẵn, `--words a,b,c` chỉ áp cho từ chỉ định. Bộ dữ liệu hiện gán hình cho ~99% từ (còn lại là số ≥11 — emoji không có).
   - **Hai bộ hình** qua `--style`: `twemoji` (mặc định, khối màu đầy, CC-BY 4.0) lưu `images/`; `openmoji` (vẽ tay, nét mảnh, CC BY-SA 4.0) lưu `images/openmoji/` — hai bộ tách thư mục nên không đè nhau. Hiện ~33 từ tiêu biểu đã đổi sang OpenMoji.
   - **Thứ tự ưu tiên hiển thị:** ảnh upload tay > emoji SVG (Twemoji/OpenMoji) > icon 🔤 tạm.
+	  - **Nút "Gen lại hình"** ở form sửa từ (`word_edit` → `word_fetch_image`): tải lại SVG emoji cho 1 từ từ CDN (khi hình bị lỗi/mất file).
+	- **Tạo lại media từ DB** — lệnh `recreate_media` dùng khi `media/` bị mất nhưng DB còn. Tái tạo `audio/` + `instructions/`. Sau chạy `fetch_images --force` + `gen_praise --force` để phục hồi hoàn toàn.
+	- **Chủ đề Toán học** — file `math_words.csv` (53 từ), nhập bằng `import_words web\math_words.csv --no-audio`.
 
 ### 5.3. Luyện phát âm (app `pronunciation`) — GĐ 2
 - **Luồng:** chọn bé + chủ đề → màn luyện hiện từng từ → bé **Nghe mẫu** (dùng lại API audio catalog) → **Thu giọng** (MediaRecorder trình duyệt) → POST multipart → lưu `Attempt` → từ kế tiếp.
 - Client dùng **Alpine.js**; danh sách từ truyền qua `json_script` (không `json.dumps` phía view → tránh mã hoá 2 lần).
-- **Chưa chấm điểm** — `save_attempt` chỉ lưu bản ghi + trả thông điệp khích lệ. `asr_text/score/stars` để trống chờ **GĐ 3**.
+- **Chấm điểm qua ASR** (faster-whisper trong Docker): view `save_attempt` gọi `asr_service.score()` → transcribe + so khớp → điền `asr_text/score/stars`. Nếu ASR lỗi/tắt thì bỏ qua (không block).
+- **Độ thành thạo (mastery) cho từng từ** ([service.py](../web/progress/service.py) `word_mastery_data()`): từ dữ liệu `Attempt` (child + word + score), tính 4 level:
+  - 🆕 **Chưa học** (0⭐) — chưa có attempt nào.
+  - 📖 **Đang học** (1⭐) — có attempt.
+  - 👍 **Gần đạt** (2⭐) — ≥2 attempt, TB ≥40%.
+  - ⭐ **Thành thạo** (3⭐) — ≥2 attempt, TB ≥60%.
+  Mỗi từ chỉ đóng góp **1 lần** ở mức cao nhất → chống farm sao.
+- **Hiển thị mastery:** badge (🆕📖👍⭐) + viền thẻ đổi màu trên màn luyện (`practice.html`) và danh sách từ (`word_list.html`).
+- **Sort từ:** chưa học → đang học → gần đạt → thành thạo (trên cả màn học từ và luyện phát âm).
 - Kiểm owner: chỉ luyện trên hồ sơ bé của chính phụ huynh.
 
 ### 5.4. Trò chơi (app `games`) — GĐ 4
@@ -235,10 +246,11 @@ Nhóm template theo app: `templates/accounts/`, `catalog/` (+ `catalog/manage/`)
 |---|---|---|
 | GĐ 0 | Khung + đăng nhập + hồ sơ bé + passcode | ✅ Xong |
 | GĐ 1 | Từ vựng + nhập CSV + nghe mẫu (TTS/IPA) | ✅ Xong |
-| GĐ 2 | Luyện phát âm + ghi âm | ✅ Xong (chưa chấm điểm) |
-| GĐ 4 | Trò chơi (Nghe & chọn, Lật thẻ) + sao | ✅ Xong |
-| **GĐ 3** | **Chấm điểm phát âm bằng faster-whisper** (điền `asr_text/score/stars` của `Attempt`; cần Docker) | ⏳ Chưa |
-| **GĐ 5** | **Ngữ pháp + huy hiệu + trang tiến độ phụ huynh nâng cao** | ⏳ Chưa |
+| GĐ 2 | Luyện phát âm + ghi âm + ASR + mastery | ✅ Xong |
+| GĐ 4 | Trò chơi (5 game) + sao + huy hiệu | ✅ Xong |
+| **GĐ 3** | **ASR (faster-whisper)** — chấm phát âm qua Docker | ✅ Xong |
+| GĐ 5 | Huy hiệu + linh vật + tiến độ phụ huynh | ✅ Xong |
+| **GĐ 6** | **Câu đơn + luyện phát âm câu** — mẫu câu ngắn theo chủ đề; bé nghe & đọc theo cả câu (ASR mức câu). Chấm sao + độ thành thạo tương tự phát âm từ | ⏳ Chưa |
 
 **Điểm mở rộng đã chuẩn bị sẵn (dễ nối GĐ sau):**
 - Cột chấm điểm trong `Attempt` + `ASR_URL` trong settings → sẵn cho GĐ 3.

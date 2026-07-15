@@ -37,7 +37,7 @@ def choose(request):
     child = get_active_child(request)
     topic_list = [(t, None) for t in topics]
     if child:
-        td = progress_service.topic_mastery_data(child, topics)
+        td = progress_service.game_word_progress_data(child, topics)
         topic_list = sorted(
             [(t, td.get(t.id)) for t in topics],
             key=lambda x: (x[1] or {}).get('pct', 0),
@@ -105,6 +105,7 @@ def submit(request, child_id, code, slug):
         score=result.get('score', 0),
         total=result.get('total', 0),
         duration_sec=int(payload.get('duration_sec', 0) or 0),
+        word_results=result.get('word_results', []),
     )
     logger.info('Ván chơi: bé=%s game=%s chủ đề=%s → %s sao', child.name, game.code, topic.slug,
                 result.get('stars'))
