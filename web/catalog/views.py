@@ -224,11 +224,19 @@ def word_fetch_image(request, pk):
     import urllib.request
 
     word = get_object_or_404(Word, pk=pk)
+
+    # Giữ search params để quay lại edit page đúng vị trí.
+    return_qs = request.GET.get('return_qs', '')
+
+    def _edit_redirect():
+        url = reverse('catalog_manage:word_edit', kwargs={'pk': pk})
+        return redirect(f'{url}?{return_qs}' if return_qs else url)
+
     emoji = EMOJI_MAP.get(word.text_en.lower())
 
     if not emoji:
         messages.warning(request, f'Từ "{word.text_en}" chưa có emoji trong bảng ánh xạ.')
-        return redirect('catalog_manage:word_edit', pk=pk)
+        return _edit_redirect()
 
     # Cấu hình giống fetch_images — mặc định dùng Twemoji.
     from core.icons import emoji_to_filename
@@ -247,13 +255,13 @@ def word_fetch_image(request, pk):
     except (urllib.error.URLError, urllib.error.HTTPError, OSError) as e:
         messages.error(request, f'Không tải được hình cho "{word.text_en}": {e}')
         logger.warning('Fetch image lỗi cho từ %s (id=%s): %s', word.text_en, pk, e)
-        return redirect('catalog_manage:word_edit', pk=pk)
+        return _edit_redirect()
 
     # Gán đường dẫn mới cho word.
     word.image = rel_path
     word.save(update_fields=['image'])
     messages.success(request, f'Đã tải hình cho "{word.text_en}" thành công.')
-    return redirect('catalog_manage:word_edit', pk=pk)
+    return _edit_redirect()
 
 
 @manage_required
