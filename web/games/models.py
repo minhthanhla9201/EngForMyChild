@@ -56,6 +56,8 @@ class GameResult(AuditedModel):
     score = models.PositiveSmallIntegerField('Điểm (số câu đúng)', default=0)
     total = models.PositiveSmallIntegerField('Tổng số câu', default=0)
     duration_sec = models.PositiveIntegerField('Thời lượng (giây)', default=0)
+    word_results = models.JSONField('Kết quả từng từ', blank=True, default=list)
+    # Mỗi phần tử: {"word_id": int, "correct": bool}
 
     class Meta:
         verbose_name = 'Kết quả chơi'

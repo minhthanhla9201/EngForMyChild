@@ -26,10 +26,39 @@ logger = logging.getLogger('eng.asr')
 STAR_THRESHOLDS = ((85, 3), (60, 2), (35, 1))
 
 
+def _digits_to_words(text):
+    """Chuyển số thành chữ tiếng Anh trong text (vd '11' → 'eleven')."""
+    _ONES = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven',
+             'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen',
+             'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen']
+    _TENS = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy',
+             'eighty', 'ninety']
+
+    def _convert(n):
+        """Chuyển số nguyên (int) 0-999 thành chữ."""
+        if n < 20:
+            return _ONES[n]
+        if n < 100:
+            ten, one = divmod(n, 10)
+            return _TENS[ten] + (f' {_ONES[one]}' if one else '')
+        hundred, rest = divmod(n, 100)
+        return _ONES[hundred] + ' hundred' + (f' {_convert(rest)}' if rest else '')
+
+    def _replace(m):
+        n = int(m.group())
+        # Chỉ chuyển số trong khoảng từ vựng có thể có (0-999).
+        if 0 <= n <= 999:
+            return _convert(n)
+        return m.group()
+
+    return re.sub(r'\d+', _replace, text)
+
+
 def _normalize(text):
-    """Chuẩn hoá để so khớp: thường hoá, bỏ dấu câu, gộp khoảng trắng."""
+    """Chuẩn hoá để so khớp: thường hoá, bỏ dấu câu, chuyển số→chữ, gộp khoảng trắng."""
     text = (text or '').lower().strip()
     text = re.sub(r"[^a-z0-9\s']", ' ', text)   # bỏ dấu câu, giữ chữ/số/nháy
+    text = _digits_to_words(text)                # '11' → 'eleven'
     return re.sub(r'\s+', ' ', text).strip()
 
 

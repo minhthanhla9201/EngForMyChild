@@ -11,7 +11,8 @@ WORKDIR /app
 
 # ffmpeg: faster-whisper cần để giải mã audio webm/mp3 bé thu từ trình duyệt.
 RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && mkdir -p /models
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt

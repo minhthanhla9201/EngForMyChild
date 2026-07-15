@@ -69,11 +69,13 @@
   function matchImageAudio() {
     return {
       cards: [], up: [], matched: 0, mistakes: 0, pairsTotal: 0,
+      pairIds: [], matchedIds: [],
       busy: false, finished: false, starText: '', newBadges: [],
       init() {
         const data = JSON.parse(document.getElementById('round-data').textContent);
         this.cards = (data.cards || []).map(c => ({...c, done: false}));
         this.pairsTotal = (data.pairs || []).length;
+        this.pairIds = (data.pairs || []).map(p => p.pair_id);
         if (!this.pairsTotal) { this.finished = true; }
       },
       isUp(i){ return this.up.includes(i); },
@@ -101,6 +103,7 @@
           if (this.cards[a].pair_id === this.cards[b].pair_id) {
             this.cards[a].done = true; this.cards[b].done = true;
             this.matched++;
+            this.matchedIds.push(this.cards[a].pair_id);
             if (window.kidFx) kidFx.correct();  // ghép đúng cặp → khích lệ
             this.up = []; this.busy = false;
             if (this.matched === this.pairsTotal) this.submit();
@@ -116,7 +119,11 @@
           const r = await fetch(SUBMIT_URL, {
             method: 'POST',
             headers: {'Content-Type':'application/json','X-CSRFToken':getCookie('csrftoken')},
-            body: JSON.stringify({pairs_total: this.pairsTotal, pairs_matched: this.matched, mistakes: this.mistakes}),
+            body: JSON.stringify({
+              pairs_total: this.pairsTotal, pairs_matched: this.matched,
+              mistakes: this.mistakes, matched_pair_ids: this.matchedIds,
+              pair_ids: this.pairIds,
+            }),
           });
           const d = await r.json();
           this.starText = '⭐'.repeat(d.stars || 0) || '🌱';

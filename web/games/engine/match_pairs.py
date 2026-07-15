@@ -35,18 +35,29 @@ def build_round(words, count=DEFAULT_PAIRS):
 
 def score_round(payload):
     """
-    Chấm. payload = {'pairs_total': int, 'pairs_matched': int, 'mistakes': int}.
+    Chấm. payload = {'pairs_total': int, 'pairs_matched': int, 'mistakes': int,
+                     'matched_pair_ids': [int, ...]}.
 
     Sao tính theo tỉ lệ ghép đúng, trừ nhẹ theo số lần sai (mỗi 2 lần sai coi như
     'mất' 1 điểm hiệu quả) — vẫn khích lệ, tối thiểu giữ số cặp đã ghép.
+    word_results: mỗi pair_id = word_id.
     """
     total = int(payload.get('pairs_total', 0) or 0)
     matched = int(payload.get('pairs_matched', 0) or 0)
     mistakes = int(payload.get('mistakes', 0) or 0)
-    # Điểm hiệu quả: số cặp đúng trừ phạt nhẹ vì lật sai (không âm).
     effective = max(matched - mistakes // 2, 0)
+
+    # word_results từ matched_pair_ids.
+    matched_ids = set(payload.get('matched_pair_ids', []) or [])
+    pair_ids = set(payload.get('pair_ids', []) or [])
+    word_results = [
+        {'word_id': pid, 'correct': pid in matched_ids}
+        for pid in pair_ids
+    ]
+
     return {
         'score': matched,
         'total': total,
         'stars': stars_from_ratio(effective, total),
+        'word_results': word_results,
     }
