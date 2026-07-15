@@ -7,6 +7,7 @@ GĐ 1: danh sách chủ đề → danh sách từ trong chủ đề (có nút �
 """
 
 import logging
+from urllib.parse import urlencode
 
 from django.conf import settings
 from django.contrib import messages
@@ -14,7 +15,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Count
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils.text import slugify
 
 from core.decorators import manage_required
@@ -189,18 +190,26 @@ def word_form(request, pk=None):
     """Tạo/sửa từ vựng. IPA tự sinh khi phonetic để trống (eng-to-ipa)."""
     word = get_object_or_404(Word, pk=pk) if pk else None
     form = WordForm(request.POST or None, request.FILES or None, instance=word)
-    next_url = request.POST.get('next') or request.GET.get('next', '')
+
+    # Giữ search params để quay lại đúng vị trí sau khi lưu/huỷ.
+    # request.GET còn trên cả GET & POST vì form không có action → submit về URL hiện tại.
+    topic_slug = request.GET.get('topic', '')
+    query = request.GET.get('q', '')
+    page = request.GET.get('page', '')
+    return_qs = urlencode({k: v for k, v in [('topic', topic_slug), ('q', query), ('page', page)] if v})
+
     if request.method == 'POST' and form.is_valid():
         obj = form.save(commit=False)
         if not obj.phonetic:  # tự sinh IPA khi để trống
             obj.phonetic = ipa_service.to_ipa(obj.text_en)
         obj.save()
         messages.success(request, f'Đã lưu từ "{obj.text_en}".')
-        return redirect(next_url or 'catalog_manage:word_manage')
+        manage_url = reverse('catalog_manage:word_manage')
+        return redirect(f'{manage_url}?{return_qs}' if return_qs else manage_url)
     return render(request, 'catalog/manage/word_form.html', {
         'form': form,
         'is_add': word is None,
-        'next': next_url,
+        'return_qs': return_qs,
     })
 
 

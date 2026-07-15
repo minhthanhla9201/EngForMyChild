@@ -10,11 +10,10 @@
         {# enctype: form có upload ảnh minh hoạ #}
         <form method="post" enctype="multipart/form-data">
           {% csrf_token %}
-          {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
           {% include 'catalog/manage/_form_fields.html' %}
           <div class="d-flex gap-2">
             <button type="submit" class="btn btn-kid">Lưu</button>
-            <a href="{% if next %}{{ next }}{% else %}{% url 'catalog_manage:word_manage' %}{% endif %}" class="btn btn-outline-secondary">Huỷ</a>
+            <a href="{% url 'catalog_manage:word_manage' %}{% if return_qs %}?{{ return_qs }}{% endif %}" class="btn btn-outline-secondary">Huỷ</a>
             {% if not is_add %}
             <a href="{% url 'catalog_manage:word_fetch_image' form.instance.pk %}"
                class="btn btn-outline-warning ms-auto"
