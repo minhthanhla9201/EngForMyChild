@@ -58,7 +58,7 @@
           {% else %}<span class="badge text-bg-secondary">Tạm ẩn</span>{% endif %}
         </td>
         <td class="text-end">
-          <a href="{% url 'catalog_manage:word_edit' word.pk %}"
+          <a href="{% url 'catalog_manage:word_edit' word.pk %}?next={{ request.get_full_path|urlencode }}"
              class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i> Sửa</a>
         </td>
       </tr>
