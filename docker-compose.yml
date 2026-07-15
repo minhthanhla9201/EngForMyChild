@@ -15,6 +15,21 @@ services:
       ASR_MODEL: base            # cỡ model (tiny/base/small) — base cân bằng cho từ đơn
       ASR_LANG: en
     restart: unless-stopped
+    init: true
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: 3
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate --url http://host.docker.internal:8000
+    restart: unless-stopped
 
   # --- WEB (Django) — đang CHẠY LOCAL nên comment lại. Bật khi muốn chạy web trong Docker. ---
   # web:
