@@ -10,7 +10,7 @@ Website chạy **trên máy của bạn** (local) giúp bé 6–7 tuổi học t
 
 Bạn chỉ cần **một trong hai** cách dưới đây:
 
-- **Cách A — Chạy web bằng Python** (cách chính, dùng hằng ngày): cần **Python** (đã có sẵn trên máy bạn — bản 3.9).
+- **Cách A — Chạy web bằng Python** (cách chính, dùng hằng ngày): cần **Python** (bản 3.14 — tải từ [python.org/downloads](https://www.python.org/downloads/)).
 - **Cách B — Docker** (chỉ để bật dịch vụ **chấm phát âm** — ASR): cần **Docker Desktop** (máy bạn đã cài). Web vẫn chạy bằng Cách A.
 
 Mở **PowerShell** để gõ lệnh: bấm phím `Windows`, gõ `powershell`, Enter.
@@ -105,7 +105,7 @@ Tất cả lệnh chạy từ thư mục gốc dự án, dùng Python trong `.ve
 | Việc | Lệnh |
 |---|---|
 | Chạy web | `.\.venv\Scripts\python.exe web\manage.py runserver` |
-| Tạo tài khoản quản trị mới | `.\.venv\Scripts\python.exe web\manage.py createsuperuser` |
+| Khởi tạo CSDL lần đầu | `.\.venv\Scripts\python.exe web\manage.py migrate` |
 | Đổi mật khẩu admin | `.\.venv\Scripts\python.exe web\manage.py changepassword admin` |
 | Cập nhật cơ sở dữ liệu sau khi đổi cấu trúc | `.\.venv\Scripts\python.exe web\manage.py makemigrations` rồi `... migrate` |
 | Kiểm tra cấu hình có lỗi không | `.\.venv\Scripts\python.exe web\manage.py check` |
@@ -117,6 +117,10 @@ Tất cả lệnh chạy từ thư mục gốc dự án, dùng Python trong `.ve
 | Tạo giọng động viên tiếng Việt (mp3 Neural, cần mạng 1 lần) | `.\.venv\Scripts\python.exe web\manage.py gen_praise` |
 | Tải hình minh hoạ emoji (SVG) cho từ vựng | `.\.venv\Scripts\python.exe web\manage.py fetch_images` |
 | Tạo lại toàn bộ media từ DB (khi mất file) | `.\.venv\Scripts\python.exe web\manage.py recreate_media` |
+| Cập nhật Django lên bản mới nhất trong dòng 5.2 LTS | `.\.venv\Scripts\pip.exe install --upgrade "Django>=5.2,<5.3"` |
+| Kiểm tra phiên bản Django | `.\.venv\Scripts\python.exe -c "import django; print(django.VERSION)"` |
+
+> **Phiên bản hiện tại:** Python **3.14.3** · Django **5.2.16 LTS**. Dự án dùng Django 5.2 LTS (tương thích Python 3.14), không nâng lên 6.x nếu chưa test kỹ.
 
 ### Nhập từ vựng (thu thập dữ liệu dần)
 Tạo file CSV (mở bằng Excel/Google Sheet rồi lưu dạng CSV) với các cột:
@@ -236,12 +240,34 @@ Chi tiết & cách đồng bộ khi đổi `style.css`: xem `wireframe/README.md
 
 ---
 
-## 5. Cấu hình (file `web\.env`)
+## 5. Triển khai lên máy khác
+
+1. **Copy** toàn bộ thư mục dự án sang máy mới.
+2. **Tạo môi trường ảo + cài thư viện** (Django 5.2 LTS):
+   ```powershell
+   python -m venv .venv
+   .\.venv\Scripts\pip.exe install -r web\requirements.txt
+   ```
+3. **Nạp cấu hình** (nếu chưa có): `copy web\.env.example web\.env`
+4. **Tạo CSDL:** `.\.venv\Scripts\python.exe web\manage.py migrate`
+5. **Tạo tài khoản admin:** `.\.venv\Scripts\python.exe web\manage.py createsuperuser`
+6. **(Tuỳ chọn) Nhập từ & tải hình:**
+   ```powershell
+   .\.venv\Scripts\python.exe web\manage.py import_words web\words_backup.csv --no-audio
+   .\.venv\Scripts\python.exe web\manage.py fetch_images
+   ```
+7. **Chạy web:** `.\.venv\Scripts\python.exe web\manage.py runserver`
+
+> Sau khi triển khai, nếu cần cập nhật Django: chạy `.\.venv\Scripts\pip.exe install --upgrade "Django>=5.2,<5.3"` rồi `.\.venv\Scripts\python.exe web\manage.py migrate`.
+
+---
+
+## 6. Cấu hình (file `web\.env`)
 
 Các thiết lập đổi theo máy nằm trong **`web\.env`** (đã tạo sẵn). Mở bằng Notepad để xem/sửa. Vài mục quan trọng:
 
 - `DEBUG=True` — chế độ phát triển (hiện lỗi chi tiết). Khi chạy thật để `False`.
-- `DATABASE_URL=sqlite:///db.sqlite3` — đang dùng **SQLite** (một file, không cần cài gì). Có thể đổi sang MySQL sau (xem mục 7).
+- `DATABASE_URL=sqlite:///db.sqlite3` — đang dùng **SQLite** (một file, không cần cài gì). Có thể đổi sang MySQL sau (xem [mục 8](#8-chuyển-sang-mysql-về-sau-khi-cần)).
 - `TTS_VOICE=en-US-AnaNeural` — giọng đọc mẫu (edge-tts). Cách đổi giọng: xem mục **Đổi giọng đọc** ở phần 4.
 - `ASR_URL` — địa chỉ dịch vụ chấm phát âm (mặc định `http://localhost:9002` khi web chạy local). Cần bật service `asr` bằng Docker (xem [mục 3](#bật-chấm-phát-âm-asr--web-chạy-local-chỉ-asr-trong-docker)).
 
@@ -249,7 +275,7 @@ Các thiết lập đổi theo máy nằm trong **`web\.env`** (đã tạo sẵn
 
 ---
 
-## 6. Lỗi thường gặp
+## 7. Lỗi thường gặp
 
 | Hiện tượng | Cách xử lý |
 |---|---|
@@ -261,7 +287,7 @@ Các thiết lập đổi theo máy nằm trong **`web\.env`** (đã tạo sẵn
 
 ---
 
-## 7. Chuyển sang MySQL về sau (khi cần)
+## 8. Chuyển sang MySQL về sau (khi cần)
 
 Hiện dùng SQLite cho gọn. Khi muốn dùng MySQL, **không phải sửa code** — chỉ:
 1. Bật service `db` (MySQL) trong `docker-compose.yml` (đã để sẵn, đang comment).
@@ -273,7 +299,7 @@ Chi tiết kỹ thuật: `docs/ThietKeDuLieu.md` mục **0.1**.
 
 ---
 
-## 8. Tài liệu dự án
+## 9. Tài liệu dự án
 
 | File | Nội dung |
 |---|---|
@@ -285,7 +311,7 @@ Chi tiết kỹ thuật: `docs/ThietKeDuLieu.md` mục **0.1**.
 
 ---
 
-## 9. Tóm tắt nhanh nhất
+## 10. Tóm tắt nhanh nhất
 
 ```powershell
 cd e:\Thanhhm\Others\Learning\EngForMyChild

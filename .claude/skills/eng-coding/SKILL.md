@@ -9,7 +9,7 @@ Mục tiêu: mọi lần code đều theo cùng một khuôn để dễ đọc, 
 
 ## 1. Ngữ cảnh dự án
 - **Mục đích:** web học tiếng Anh chạy local cho bé. Ưu tiên **Phát âm → Từ vựng → Ngữ pháp**, bọc trong **trò chơi**. Dữ liệu (từ vựng, bản ghi của bé) **thu thập dần vào local**.
-- **Stack:** Python 3.11 · Django 5.x (hoặc 4.2 LTS) · Django Templates + Bootstrap 5 + **HTMX** + **Alpine.js** (server-rendered, KHÔNG SPA).
+- **Stack:** Python 3.14 · Django 5.2 LTS (5.2.16) · Django Templates + Bootstrap 5 + **HTMX** + **Alpine.js** (server-rendered, KHÔNG SPA).
 - **CSDL:** SQLite (cả dev lẫn chạy local). Không dùng MySQL/Postgres.
 - **Audio/ASR:** TTS sinh bằng `edge-tts` (cache mp3 vào `media/`), IPA bằng `eng-to-ipa`; chấm phát âm bằng `faster-whisper` chạy ở **service `asr` riêng** (FastAPI), gọi qua HTTP nội bộ.
 - **Đóng gói:** Docker Compose — `web` (Django) + `asr` (faster-whisper). DB + `media/` gắn volume để giữ dữ liệu.

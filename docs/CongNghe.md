@@ -13,8 +13,8 @@
 
 | Lớp | Công nghệ | Phiên bản | Vì sao |
 |---|---|---|---|
-| Ngôn ngữ | Python | 3.11 | Ổn định, nhiều thư viện audio/ASR |
-| Web framework | Django | 5.x (hoặc 4.2 LTS) | ORM + Admin (nhập liệu nhanh) + template sẵn |
+| Ngôn ngữ | Python | 3.14 | Phiên bản mới nhất, nhiều thư viện audio/ASR |
+| Web framework | Django | 5.2 LTS (5.2.16) | ORM + Admin (nhập liệu nhanh) + template sẵn. Tương thích Python 3.14 |
 | CSDL | SQLite (dev/local) → **MySQL 8** (về sau) | (kèm Python) / 8.x | Chạy local 1 máy bằng SQLite; **thiết kế để chuyển MySQL không sửa code** — chỉ đổi `DATABASE_URL` (xem `ThietKeDuLieu.md` mục 0.1) |
 | Template | Django Templates | — | Server-rendered |
 | CSS | Bootstrap | 5 | Bố cục nhanh, responsive, miễn phí |

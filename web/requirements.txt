@@ -1,5 +1,5 @@
 # Web app (Django) — GĐ 0
-Django>=4.2,<5.0
+Django>=5.2,<5.3
 python-dotenv>=1.0
 dj-database-url>=2.1
 
