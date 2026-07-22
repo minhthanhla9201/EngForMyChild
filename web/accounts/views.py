@@ -172,9 +172,17 @@ def progress(request):
 
     # Tổng quan — aggregate riêng để không ảnh hưởng queryset gốc.
     from django.db.models import Sum
-    total_stars = results.aggregate(s=Sum('stars'))['s'] or 0
     total_games = results.count()
     total_attempts = attempts.count()
+    game_stars = results.aggregate(s=Sum('stars'))['s'] or 0
+
+    # Sao phát âm dựa trên mastery (đồng bộ với progress/service.py).
+    if selected:
+        speech_stars = progress_service._counts(selected)['speech_stars']
+    else:
+        speech_stars = sum(progress_service._counts(c)['speech_stars'] for c in children)
+
+    total_stars = game_stars + speech_stars
 
     # Phân trang: mỗi bảng 20 dòng.
     page_r = request.GET.get('page_r', 1)
@@ -192,6 +200,8 @@ def progress(request):
         'total_stars': total_stars,
         'total_games': total_games,
         'total_attempts': total_attempts,
+        'game_stars': game_stars,
+        'speech_stars': speech_stars,
     }
     return render(request, 'accounts/progress.html', context)
 

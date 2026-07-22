@@ -27,7 +27,13 @@
 <div class="row g-3 mb-4">
   <div class="col-4">
     <div class="card stat-card text-center"><div class="card-body py-3">
-      <div class="stat-num">{{ total_stars }}⭐</div><div class="text-muted small">Tổng sao</div>
+      <div class="stat-num">{{ total_stars }}⭐</div>
+      <div class="text-muted small">Tổng sao</div>
+      <div class="text-muted" style="font-size:0.8rem">
+        <span class="text-warning-emphasis">{{ game_stars }}⭐</span> Game
+        +
+        <span class="text-info-emphasis">{{ speech_stars }}⭐</span> Phát âm
+      </div>
     </div></div>
   </div>
   <div class="col-4">
