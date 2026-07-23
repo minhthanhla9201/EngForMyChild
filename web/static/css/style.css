@@ -264,32 +264,32 @@ body.body-manage { background: #eef1f4; }
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 16px;
+    gap: 10px;
 }
+.pet-emoji { flex-shrink: 0; }
 .pet-level-box {
     background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
-    border: 3px solid #e85d26;
-    border-radius: 16px;
-    padding: 12px 10px;
-    min-width: 70px;
+    border: 2px solid #e85d26;
+    border-radius: 10px;
+    padding: 4px 6px;
+    min-width: 42px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    box-shadow: 0 4px 16px rgba(255, 107, 53, .35);
+    box-shadow: 0 2px 8px rgba(255, 107, 53, .3);
 }
 .pet-level-num {
-    font-size: 32px;
+    font-size: 16px;
     font-weight: 900;
     color: #fff;
     line-height: 1;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, .2);
 }
 .pet-level-label {
-    font-size: 11px;
+    font-size: 7px;
     font-weight: 700;
     color: rgba(255, 255, 255, .85);
-    letter-spacing: 2px;
-    margin-top: 2px;
+    letter-spacing: 1px;
+    margin-top: 1px;
 }
 .pet-level-badge {
     display: inline-block;

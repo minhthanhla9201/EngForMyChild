@@ -53,8 +53,7 @@
           <div class="pet-level-label">CẤP</div>
           <div class="pet-level-num">{{ progress.pet_level_num }}</div>
         </div>
-        <div class="pet-emoji">{% icon_img emoji=progress.pet_emoji src=progress.pet_icon_src size=120
-          alt=progress.pet_name %}</div>
+        <div class="pet-emoji">{% icon_img emoji=progress.pet_emoji src=progress.pet_icon_src size=120 alt=progress.pet_name %}</div>
       </div>
       <div class="pet-name">{{ progress.pet_name }}</div>
       {% if progress.pet_description %}
@@ -66,8 +65,7 @@
         <div class="pet-progress-bar" style="width: {{ progress.pet_percent }}%"></div>
       </div>
       <div class="small text-muted mt-1">
-        Còn {{ progress.pet_remain_stars }}⭐ để thành {% icon_img emoji=progress.pet_next_emoji
-        src=progress.pet_next_icon_src size=24 alt=progress.pet_next_name %} {{ progress.pet_next_name }}!
+        Còn {{ progress.pet_remain_stars }}⭐ để thành {% icon_img emoji=progress.pet_next_emoji src=progress.pet_next_icon_src size=24 alt=progress.pet_next_name %} {{ progress.pet_next_name }}!
       </div>
       {% else %}
       <div class="small text-muted mt-2">Đã lớn hết cỡ rồi, giỏi quá! 🎉</div>
@@ -91,18 +89,15 @@
   {# Huy hiệu (mở khoá dần) — hàng riêng full-width để trải thành KHỐI nhiều cột #}
   <hr class="my-3">
   <div class="text-center fw-bold text-dark mb-2">
-    {% icon_img emoji='🏅' size=24 alt='Huy hiệu' %} Huy hiệu {{ progress.badges_earned|length }}/{{
-    progress.badges_total }}
+    {% icon_img emoji='🏅' size=24 alt='Huy hiệu' %} Huy hiệu {{ progress.badges_earned|length }}/{{ progress.badges_total }}
   </div>
   <div class="badge-grid">
     {% for item in progress.badges_all %}
     {# tabindex=0 để hover VÀ focus (bàn phím/chạm) đều hiện tooltip #}
     <div class="badge-chip {% if item.earned %}earned{% else %}locked{% endif %}" tabindex="0"
       data-tip="{{ item.badge.name_vi }}{% if item.badge.desc_vi %} — {{ item.badge.desc_vi }}{% endif %}{% if not item.earned %} (chưa đạt){% endif %}">
-      <span class="badge-icon">{% icon_img emoji=item.badge.icon src=item.badge.icon_src size=36 alt=item.badge.name_vi
-        %}</span>
-      {% if not item.earned %}<span class="badge-lock">{% icon_img emoji='🔒' size=20 alt='Chưa đạt' %}</span>{% endif
-      %}
+      <span class="badge-icon">{% icon_img emoji=item.badge.icon src=item.badge.icon_src size=36 alt=item.badge.name_vi %}</span>
+      {% if not item.earned %}<span class="badge-lock">{% icon_img emoji='🔒' size=20 alt='Chưa đạt' %}</span>{% endif %}
     </div>
     {% endfor %}
   </div>
