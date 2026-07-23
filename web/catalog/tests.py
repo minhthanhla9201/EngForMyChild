@@ -292,17 +292,22 @@ class PraiseTests(TestCase):
         """Sinh mp3 cho mọi câu động viên + lời khen huy hiệu; chạy lại thì bỏ qua."""
         from django.conf import settings
         from catalog import praise
-        # Tổng = số FILE mp3 DUY NHẤT sẽ sinh. generate_all lặp qua nhiều nguồn có thể
-        # TRÙNG câu (vd _page_hint_lines lấy lại từ PRAISE_LINES) — cùng (câu+giọng) →
-        # cùng 1 file, chỉ sinh 1 lần. Đếm theo tên file để khớp hành vi thật (dedupe).
+        # generate_all giờ sinh PRAISE_LINES × 2 giọng (nữ + nam) + _hint_lines (nữ)
+        # + _badge_lines (nam). Không còn _page_hint_lines vì PRAISE_LINES đã gồm chúng.
         voice = praise._default_voice()
         badge_voice = getattr(settings, 'TTS_VOICE_BADGE', 'vi-VN-NamMinhNeural')
-        female = ([t for lines in praise.PRAISE_LINES.values() for t in lines]
-                  + praise._hint_lines() + praise._page_hint_lines())
-        # Số FILE duy nhất (dedupe theo câu+giọng): generate_all lặp qua nhiều nguồn
-        # có thể TRÙNG câu (vd _page_hint_lines lấy lại từ PRAISE_LINES) → cùng 1 file.
-        unique_files = {praise.filename_for(t, voice) for t in female}
-        unique_files |= {praise.filename_for(t, badge_voice) for t in praise._badge_lines()}
+
+        unique_files = set()
+        # PRAISE_LINES: mỗi câu × 2 giọng
+        for t in [ln for lines in praise.PRAISE_LINES.values() for ln in lines]:
+            unique_files.add(praise.filename_for(t, voice))
+            unique_files.add(praise.filename_for(t, badge_voice))
+        # _hint_lines: giọng nữ
+        for t in praise._hint_lines():
+            unique_files.add(praise.filename_for(t, voice))
+        # _badge_lines: giọng nam
+        for t in praise._badge_lines():
+            unique_files.add(praise.filename_for(t, badge_voice))
         with mock.patch('catalog.praise.tts._edge_tts_save', side_effect=self._fake_edge):
             gen, skip, fail = praise.generate_all()
             # Lần 1: mỗi FILE duy nhất được sinh đúng 1 lần (câu trùng → skip trong cùng lượt).

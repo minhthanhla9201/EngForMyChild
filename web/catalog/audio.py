@@ -63,16 +63,20 @@ def generate_tts_clip(word):
     return clip
 
 
-def get_vi_instruction(word):
+def get_vi_instruction(word, force=False):
     """
     Sinh & cache audio câu hướng dẫn tiếng Việt: 'X tiếng Anh đọc là Y'.
     Trả URL hoặc None nếu lỗi (vd mất mạng).
+    Khi force=True, xóa file cũ và tạo lại.
     """
     instruction = f"{word.text_vi} .. tiếng Anh em đọc là ..."
     voice = getattr(settings, 'TTS_VOICE_VI', 'vi-VN-HoaiMyNeural')
 
     filename = f'inst_{word.pk}.mp3'
     out_path = settings.MEDIA_ROOT / 'instructions' / filename
+
+    if force and out_path.exists():
+        out_path.unlink()
 
     if not out_path.exists():
         out_path.parent.mkdir(parents=True, exist_ok=True)

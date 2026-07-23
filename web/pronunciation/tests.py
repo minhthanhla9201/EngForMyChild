@@ -157,10 +157,11 @@ class AsrScoringTests(TestCase):
         self.assertEqual(asr_service.match_score('', 'cat'), 0)
 
     def test_stars_thresholds(self):
-        """Quy điểm khớp → sao theo ngưỡng khích lệ của phát âm (85/60/35)."""
-        self.assertEqual(asr_service.stars_from_score(100), 3)
-        self.assertEqual(asr_service.stars_from_score(85), 3)
-        self.assertEqual(asr_service.stars_from_score(70), 2)
+        """Quy điểm khớp → sao theo ngưỡng khích lệ mới (5 sao)."""
+        self.assertEqual(asr_service.stars_from_score(100), 5)
+        self.assertEqual(asr_service.stars_from_score(95), 4)
+        self.assertEqual(asr_service.stars_from_score(80), 3)
+        self.assertEqual(asr_service.stars_from_score(60), 2)
         self.assertEqual(asr_service.stars_from_score(40), 1)
         self.assertEqual(asr_service.stars_from_score(10), 0)
 
@@ -175,4 +176,4 @@ class AsrScoringTests(TestCase):
         with mock.patch('pronunciation.asr.transcribe', return_value='cat'):
             r = asr_service.score(SimpleUploadedFile('r.webm', b'x'), 'cat')
         self.assertEqual(r['heard'], 'cat')
-        self.assertEqual(r['stars'], 3)
+        self.assertEqual(r['stars'], 5)

@@ -4,11 +4,11 @@
 
 {% block content %}
 {% if empty %}
-  <div class="card child-card text-center p-5">
-    <div class="display-6 mb-2">🐣</div>
-    <p class="mb-3">Chủ đề này chưa có từ nào để luyện.</p>
-    <div><a href="{% url 'pronunciation:choose' %}" class="btn btn-kid">Chọn chủ đề khác</a></div>
-  </div>
+<div class="card child-card text-center p-5">
+  <div class="display-6 mb-2">🐣</div>
+  <p class="mb-3">Chủ đề này chưa có từ nào để luyện.</p>
+  <div><a href="{% url 'pronunciation:choose' %}" class="btn btn-kid">Chọn chủ đề khác</a></div>
+</div>
 {% else %}
 {# Dữ liệu các từ truyền sang Alpine dưới dạng JSON #}
 {{ words_data|json_script:"words-data" }}
@@ -26,30 +26,27 @@
     Từ <span x-text="index + 1"></span> / <span x-text="words.length"></span>
   </div>
 
-  <div class="card child-card text-center p-4 mb-3"
-       :class="{'border-success': current.mastery_level === 'mastered',
+  <div class="card child-card text-center p-4 mb-3" :class="{'border-success': current.mastery_level === 'mastered',
                 'border-warning': current.mastery_level === 'familiar',
                 'border-info': current.mastery_level === 'learning',
                 '': current.mastery_level === 'new'}">
     {# Badge độ thành thạo #}
     <div class="d-flex justify-content-center gap-1 mb-1">
-      <span class="badge fs-6"
-            :class="{'bg-success': current.mastery_level === 'mastered',
+      <span class="badge fs-6" :class="{'bg-success': current.mastery_level === 'mastered',
                      'bg-warning text-dark': current.mastery_level === 'familiar',
                      'bg-info text-dark': current.mastery_level === 'learning',
-                     'bg-secondary': current.mastery_level === 'new'}"
-            x-text="current.mastery_label">
+                     'bg-secondary': current.mastery_level === 'new'}" x-text="current.mastery_label">
       </span>
       <span class="badge bg-light text-muted fs-6" x-show="current.mastery_attempts > 0"
-            x-text="`${current.mastery_attempts} lần`">
+        x-text="`${current.mastery_attempts} lần`">
       </span>
     </div>
 
     {# Hình thật của từ (nếu có) để bé nhận ra nghĩa; chưa có ảnh thì icon chữ. #}
     <div class="mb-2">
       <template x-if="current.image">
-        <img :src="current.image" :alt="current.text_en"
-             class="img-fluid rounded" style="height:140px;object-fit:contain">
+        <img :src="current.image" :alt="current.text_en" class="img-fluid rounded"
+          style="height:140px;object-fit:contain">
       </template>
       <template x-if="!current.image">
         <div class="display-1">🔤</div>
@@ -60,26 +57,26 @@
     <div class="text-secondary mb-3" x-text="current.text_vi"></div>
 
     <div class="d-flex justify-content-center gap-2 flex-wrap">
+      {# Nghe hướng dẫn tiếng Việt: dùng vi_url từ cùng API #}
+      <button class="btn btn-kid" @click="listenVi()" :disabled="busy">
+        <i class="bi bi-ear-fill"></i> Nghe hướng dẫn
+      </button>
+
       {# Nghe mẫu: dùng lại API audio của catalog #}
       <button class="btn btn-kid" @click="listen()" :disabled="busy">
         <i class="bi bi-volume-up-fill"></i> Nghe mẫu
       </button>
 
       {# Thu âm: bấm để bắt đầu / dừng #}
-      <button class="btn" :class="recording ? 'btn-danger' : 'btn-success'"
-              @click="toggleRecord()" :disabled="uploading || (busy && !recording)">
+      <button class="btn" :class="recording ? 'btn-danger' : 'btn-success'" @click="toggleRecord()"
+        :disabled="uploading || (busy && !recording)">
         <span x-show="!recording"><i class="bi bi-mic-fill"></i> Thu giọng (Bấm)</span>
         <span x-show="recording"><i class="bi bi-stop-fill"></i> Dừng</span>
       </button>
 
       {# Nhấn giữ thu âm — chỉ khoá khi uploading, không khoá khi đang phát mẫu (listen) #}
-      <button class="btn btn-warning"
-              @mousedown="startRecord()"
-              @mouseup="stopRecord()"
-              @mouseleave="stopRecord()"
-              @touchstart.prevent="startRecord()"
-              @touchend.prevent="stopRecord()"
-              :disabled="uploading">
+      <button class="btn btn-warning" @mousedown="startRecord()" @mouseup="stopRecord()" @mouseleave="stopRecord()"
+        @touchstart.prevent="startRecord()" @touchend.prevent="stopRecord()" :disabled="uploading">
         <span x-show="!recording"><i class="bi bi-mic-fill"></i> Nhấn & Giữ để nói</span>
         <span x-show="recording" class="text-danger fw-bold"><i class="bi bi-record-fill"></i> Đang thu...</span>
       </button>
@@ -180,6 +177,18 @@
           if (d.ok) { this.$refs.sample.src = d.url; this.$refs.sample.play(); }
           else { this.show(d.message || 'Chưa nghe được, thử lại nhé.', false); }
         } catch (e) { this.show('Có lỗi khi tải âm thanh.', false); }
+        finally { this.busy = false; }
+      },
+
+      // Nghe hướng dẫn tiếng Việt — dùng vi_url từ cùng API.
+      async listenVi() {
+        this.busy = true; this.message = '';
+        try {
+          const r = await fetch(`/learn/word/${this.current.id}/audio/`);
+          const d = await r.json();
+          if (d.ok && d.vi_url) { this.$refs.sample.src = d.vi_url; this.$refs.sample.play(); }
+          else { this.show('Chưa có giọng hướng dẫn, thử lại nhé.', false); }
+        } catch (e) { this.show('Có lỗi khi tải giọng hướng dẫn.', false); }
         finally { this.busy = false; }
       },
 

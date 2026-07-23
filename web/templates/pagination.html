@@ -1,0 +1,68 @@
+{% if page_obj.paginator.num_pages > 1 %}
+<nav aria-label="Phân trang">
+  <ul class="pagination pagination-sm justify-content-center mb-0">
+    {# Đầu #}
+    {% if first_url %}
+    <li class="page-item">
+      <a class="page-link" href="{{ first_url }}" aria-label="Đầu">
+        <i class="bi bi-chevron-double-left"></i>
+      </a>
+    </li>
+    {% else %}
+    <li class="page-item disabled">
+      <span class="page-link"><i class="bi bi-chevron-double-left"></i></span>
+    </li>
+    {% endif %}
+
+    {# Trước #}
+    {% if prev_url %}
+    <li class="page-item">
+      <a class="page-link" href="{{ prev_url }}" aria-label="Trước">
+        <i class="bi bi-chevron-left"></i>
+      </a>
+    </li>
+    {% else %}
+    <li class="page-item disabled">
+      <span class="page-link"><i class="bi bi-chevron-left"></i></span>
+    </li>
+    {% endif %}
+
+    {# Các button số trang #}
+    {% for item in items %}
+      {% if item.page is None %}
+        <li class="page-item disabled"><span class="page-link">&hellip;</span></li>
+      {% else %}
+        <li class="page-item {% if item.is_active %}active{% endif %}">
+          <a class="page-link" href="{{ item.url }}">{{ item.page }}</a>
+        </li>
+      {% endif %}
+    {% endfor %}
+
+    {# Sau #}
+    {% if next_url %}
+    <li class="page-item">
+      <a class="page-link" href="{{ next_url }}" aria-label="Sau">
+        <i class="bi bi-chevron-right"></i>
+      </a>
+    </li>
+    {% else %}
+    <li class="page-item disabled">
+      <span class="page-link"><i class="bi bi-chevron-right"></i></span>
+    </li>
+    {% endif %}
+
+    {# Cuối #}
+    {% if last_url %}
+    <li class="page-item">
+      <a class="page-link" href="{{ last_url }}" aria-label="Cuối">
+        <i class="bi bi-chevron-double-right"></i>
+      </a>
+    </li>
+    {% else %}
+    <li class="page-item disabled">
+      <span class="page-link"><i class="bi bi-chevron-double-right"></i></span>
+    </li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}

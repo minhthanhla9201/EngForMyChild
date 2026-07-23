@@ -35,22 +35,55 @@ PRAISE_DIR = 'praise'
 # Các câu động viên, gom theo tình huống. Thêm/bớt câu ở đây (dữ liệu, không sửa code).
 PRAISE_LINES = {
     'correct': [
+        # ── Cổ điển ──
         'Em giỏi quá!',
         'Em tuyệt vời!',
         'Chính xác rồi!',
         'Em làm hay lắm!',
         'Xuất sắc đó em!',
         'Đúng rồi, em giỏi ghê!',
+        # ── Vui nhộn ──
+        'Bùm chíu! Em đúng rồi!',
+        'Em đọc chuẩn không cần chỉnh luôn!',
+        'Wow, em siêu sao phát âm!',
+        'Đỉnh của đỉnh luôn em ơi!',
+        'Em giỏi quá, tự thưởng cho em một tràng pháo tay nào!',
+        'Chuẩn từng milimet! Em làm tốt lắm!',
+        'Ôi trời ơi, em đọc hay quá đi mất!',
+        'Chính xác! Em là nhất!',
+        '10 điểm không có nhưng mà siêu sao!',
+        'Em đọc giống người bản xứ quá!',
     ],
     'wrong': [
-        'Sai rồi, thử lại em nhé!',
+        # ── Cổ điển ──
+        'Chưa chính xác, thử lại em nhé!',
         'Gần đúng rồi, em cố lên nào!',
         'Chưa đúng, nghe lại một lần nữa nhé!',
+        'Hít thở sâu, đọc lại lần nữa nhé!',
+        # ── Vui nhộn ──
+        'Suýt soát rồi! Lần sau em sẽ đúng!',
+        'Không sao đâu, thử lại liền nha em!',
+        'Em sắp đúng rồi đó, cố lên tí nữa thôi!',
+        'Lần đầu chưa được, lần hai em sẽ chuẩn hơn!',
+        'Chưa đúng nhưng em yêu cầu đừng nản nhé!',
+        'Ê sao kỳ vậy ta? Thử lại phát nữa xem!',
+        'Chưa ăn thua, em bình tĩnh đọc lại nha!',
+        'Có mùi gần đúng rồi đó, đọc tiếp đi em!',
     ],
     'cheer': [
+        # ── Cổ điển ──
         'Hoan hô, em giỏi lắm!',
         'Tuyệt vời ông mặt trời đó em!',
         'Em làm được rồi đó, giỏi quá!',
+        # ── Vui nhộn ──
+        'Hoan hô! Hoan hô! Cả nhà cùng vui nào!',
+        'Em là chiến thần phát âm! Hoan hô!',
+        'Dzô dzô! Em đã làm được rồi!',
+        'Quá tuyệt vời! Cả thế giới đều vỗ tay cho em!',
+        'Bùm! Em lại tỏa sáng rồi!',
+        'Xuất sắc! Thưởng cho em một nụ cười thật tươi!',
+        'Yes! Em làm được rồi!',
+        'Cảm ơn em! Em đọc hay quá chừng luôn!',
     ],
     # Câu hướng dẫn hiển thị khi bé vào trang chọn chủ đề.
     'topic_select': [
@@ -152,20 +185,10 @@ def _hint_lines():
     return out
 
 
-def _page_hint_lines():
-    """Tất cả câu hướng dẫn trang (topic_select, word_select, speak_choose, games_choose) — dùng bởi generate_all."""
-    seen, out = set(), []
-    for key in ('topic_select', 'word_select', 'speak_choose', 'games_choose'):
-        for text in PRAISE_LINES.get(key, []):
-            if text and text not in seen:
-                seen.add(text)
-                out.append(text)
-    return out
-
-
 def generate_all(force=False):
     """
-    Sinh mp3 cho MỌI câu động viên (giọng nữ) + lời khen huy hiệu (giọng nam)
+    Sinh mp3 cho MỌI câu động viên (cả giọng nữ lẫn nam cho PRAISE_LINES,
+    để client bốc ngẫu nhiên mỗi lần) + lời khen huy hiệu (giọng nam)
     + câu hướng dẫn trang (topic_select, word_select).
     Trả (đã_sinh, bỏ_qua, lỗi). Dùng bởi lệnh `gen_praise`. CHỈ edge-tts (retry).
     """
@@ -173,16 +196,21 @@ def generate_all(force=False):
     badge_voice = getattr(settings, 'TTS_VOICE_BADGE', 'vi-VN-NamMinhNeural')
 
     generated = skipped = failed = 0
-    # Lời động viên game + câu hướng dẫn game + câu hướng dẫn trang — giọng nữ.
-    female_lines = (
-        [t for lines in PRAISE_LINES.values() for t in lines]
-        + _hint_lines()
-        + _page_hint_lines()
-    )
-    for text in female_lines:
+
+    # PRAISE_LINES (correct/wrong/cheer + hướng dẫn trang) — sinh cả GIỌNG NAM & NỮ
+    # để client bốc ngẫu nhiên, bé nghe đa dạng hơn.
+    for text in [t for lines in PRAISE_LINES.values() for t in lines]:
+        r = generate_line(text, voice, force)       # nữ
+        generated += r == 'gen'; skipped += r == 'skip'; failed += r == 'fail'
+        r = generate_line(text, badge_voice, force)  # nam
+        generated += r == 'gen'; skipped += r == 'skip'; failed += r == 'fail'
+
+    # Câu hướng dẫn game — giọng nữ.
+    for text in _hint_lines():
         r = generate_line(text, voice, force)
         generated += r == 'gen'; skipped += r == 'skip'; failed += r == 'fail'
-    # Lời khen huy hiệu — giọng nam (khác giọng động viên để bé thấy đặc biệt).
+
+    # Lời khen huy hiệu — giọng nam (đặc biệt).
     for text in _badge_lines():
         r = generate_line(text, badge_voice, force)
         generated += r == 'gen'; skipped += r == 'skip'; failed += r == 'fail'
@@ -198,13 +226,21 @@ def _url_if_exists(text, voice):
 
 def manifest():
     """
-    Trả manifest lời động viên game (giọng nữ): {tình_huống: [url_mp3_đã_có, ...]}.
-    Rỗng → client bỏ qua giọng, vẫn có confetti + âm thanh.
+    Trả manifest lời động viên game: {tình_huống: [url_mp3_đã_có, ...]}.
+    Gồm cả giọng NỮ và NAM cho cùng tình huống — client bốc ngẫu nhiên 1 URL,
+    bé nghe đa dạng. Rỗng → client bỏ qua giọng, vẫn có confetti + âm thanh.
     """
     voice = _default_voice()
+    male_voice = getattr(settings, 'TTS_VOICE_BADGE', 'vi-VN-NamMinhNeural')
     data = {}
     for key, lines in PRAISE_LINES.items():
-        data[key] = [u for u in (_url_if_exists(t, voice) for t in lines) if u]
+        urls = []
+        for t in lines:
+            u = _url_if_exists(t, voice)
+            if u: urls.append(u)
+            u = _url_if_exists(t, male_voice)
+            if u: urls.append(u)
+        data[key] = urls
     return data
 
 

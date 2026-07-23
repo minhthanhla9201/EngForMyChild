@@ -76,7 +76,7 @@ Các lệnh này **cần internet** (CDN emoji + edge-tts), **chạy sau `migrat
 Web chạy bằng `waitress`, ASR trong Docker. Phù hợp 1 người (hoặc LAN). Hướng dẫn cho **máy mới (chưa cài gì)**.
 
 ### 1.1. Cài đặt Python
-1. Tải Python mới nhất từ [python.org/downloads](https://www.python.org/downloads/).
+1. Tải Python **3.14** từ [python.org/downloads](https://www.python.org/downloads/).
 2. Chạy bộ cài, **tick "Add python.exe to PATH"**, bấm *Install Now*.
 3. Kiểm tra: `python --version`.
 
@@ -218,7 +218,7 @@ Web + MariaDB + ASR trong container, chạy bằng `docker compose`. Phù hợp 
 ### 2.1. Tạo `web/Dockerfile`
 
 ```dockerfile
-FROM python:3.11-slim
+FROM python:3.14-slim
 ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1
 RUN apt-get update && apt-get install -y --no-install-recommends \
         build-essential default-libmysqlclient-dev pkg-config \
