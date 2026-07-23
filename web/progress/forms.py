@@ -16,10 +16,13 @@ class PetStageForm(forms.ModelForm):
 
     class Meta:
         model = PetStage
-        fields = ['threshold', 'name_vi', 'icon_static', 'emoji', 'image', 'order', 'active']
+        fields = ['threshold', 'name_vi', 'description', 'level', 'icon_static', 'emoji', 'image', 'order', 'active']
         widgets = {
             'threshold': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'VD: 10'}),
             'name_vi': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'VD: Chồi non'}),
+            'description': forms.TextInput(attrs={'class': 'form-control',
+                                                  'placeholder': 'VD: "Khởi đầu hành trình"'}),
+            'level': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'VD: 1'}),
             'icon_static': forms.TextInput(attrs={'class': 'form-control',
                                                   'placeholder': 'VD: icons/pet/tree.svg (SVG mặc định)'}),
             'emoji': forms.TextInput(attrs={'class': 'form-control',
@@ -28,6 +31,10 @@ class PetStageForm(forms.ModelForm):
             'order': forms.NumberInput(attrs={'class': 'form-control'}),
             'active': forms.Select(attrs={'class': 'form-select'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['level'].required = False  # model có default=1
 
 
 class BadgeForm(forms.ModelForm):

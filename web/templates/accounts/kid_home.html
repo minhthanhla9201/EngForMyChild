@@ -47,7 +47,11 @@
       <div class="col-6 text-center">
         {# Icon linh vật render bằng <img> SVG offline (fallback emoji text) — không phụ thuộc font #}
         <div class="pet-emoji">{% icon_img emoji=progress.pet_emoji src=progress.pet_icon_src size=120 alt=progress.pet_name %}</div>
+        <div class="pet-level-badge">Lv.{{ progress.pet_level_num }}</div>
         <div class="pet-name">{{ progress.pet_name }}</div>
+        {% if progress.pet_description %}
+        <div class="pet-description">{{ progress.pet_description }}</div>
+        {% endif %}
         {% if progress.pet_remain_stars %}
         <div class="pet-progress mt-2">
           {# % tiến tới mốc kế: dựa trên sao hiện tại / ngưỡng mốc kế #}

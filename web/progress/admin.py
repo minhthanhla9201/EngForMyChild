@@ -7,7 +7,7 @@ from .models import Badge, ChildBadge, PetStage
 
 @admin.register(PetStage)
 class PetStageAdmin(admin.ModelAdmin):
-    list_display = ('threshold', 'name_vi', 'icon_static', 'emoji', 'image', 'order', 'active')
+    list_display = ('threshold', 'name_vi', 'description', 'level', 'icon_static', 'emoji', 'order', 'active')
     list_filter = ('active',)
     ordering = ('threshold',)
 
