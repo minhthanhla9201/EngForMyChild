@@ -27,6 +27,10 @@ class PetStage(AuditedModel):
 
     threshold = models.PositiveIntegerField('Ngưỡng sao', unique=True)
     name_vi = models.CharField('Tên mốc', max_length=100)
+    description = models.CharField('Câu mô tả', max_length=200, blank=True,
+                                   help_text='Ví dụ: "Khởi đầu hành trình", "Tự tin giao tiếp"...')
+    level = models.PositiveSmallIntegerField('Cấp độ', default=1,
+                                             help_text='Số thứ tự cấp (1, 2, 3...)')
     # icon_static: đường dẫn SVG CỐ ĐỊNH trong static (vd 'icons/pet/tree.svg') —
     # commit theo repo, deploy máy khác luôn có, KHÔNG phụ thuộc mạng/font. Ưu tiên
     # sau ảnh upload. Là nguồn icon MẶC ĐỊNH của app.

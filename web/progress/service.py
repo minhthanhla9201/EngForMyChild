@@ -23,7 +23,7 @@ from .models import Badge, ChildBadge, PetStage
 
 # Mốc mặc định khi bảng PetStage RỖNG (chưa seed) — để trang không vỡ.
 # Bình thường các mốc lấy từ DB (PetStage) để phụ huynh tự chỉnh qua trang quản lý.
-_DEFAULT_STAGE = (0, '🌱', 'Hạt mầm')
+_DEFAULT_STAGE = (0, '🌱', 'Hạt mầm', '', 1)
 
 
 def _pet_stages():
@@ -90,7 +90,8 @@ def pet_stage(total_stars, stages=None):
     Trả (level_index, emoji, name_vi, stage) của linh vật theo tổng sao.
 
     Chọn mốc CAO NHẤT mà tổng sao đạt. `stage` là đối tượng PetStage (hoặc None
-    khi bảng rỗng) để lấy icon_src. `stages` truyền vào để tránh truy vấn lặp.
+    khi bảng rỗng) để lấy icon_src, description, level. `stages` truyền vào để
+    tránh truy vấn lặp.
     """
     if stages is None:
         stages = _pet_stages()
@@ -192,6 +193,8 @@ def summary(child):
         'pet_emoji': emoji,            # fallback text nếu không có SVG/ảnh
         'pet_icon_src': pet_icon_src,  # URL icon để render <img> (ưu tiên)
         'pet_name': name,
+        'pet_description': stage.description if stage else _DEFAULT_STAGE[3],
+        'pet_level_num': stage.level if stage else _DEFAULT_STAGE[4],
         'pet_remain_stars': remain,      # còn thiếu bao nhiêu sao để lên mốc kế
         'pet_next_need': next_need,
         'pet_percent': pet_percent,      # % đầy thanh tiến tới mốc kế
