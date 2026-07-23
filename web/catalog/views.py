@@ -198,6 +198,18 @@ def word_form(request, pk=None):
     page = request.GET.get('page', '')
     return_qs = urlencode({k: v for k, v in [('topic', topic_slug), ('q', query), ('page', page)] if v})
 
+    # Audio & hình cho trường hợp edit (khi word có sẵn).
+    from django.core.files.storage import default_storage
+    from pathlib import Path
+    extra = {}
+    if word:
+        extra['english_clip'] = audio_service.get_existing_clip(word)
+        inst_path = Path(settings.MEDIA_ROOT) / 'instructions' / f'inst_{word.pk}.mp3'
+        extra['vi_instruction_url'] = (
+            default_storage.url(f'instructions/inst_{word.pk}.mp3')
+            if inst_path.exists() else None
+        )
+
     if request.method == 'POST' and form.is_valid():
         obj = form.save(commit=False)
         if not obj.phonetic:  # tự sinh IPA khi để trống
@@ -206,11 +218,14 @@ def word_form(request, pk=None):
         messages.success(request, f'Đã lưu từ "{obj.text_en}".')
         manage_url = reverse('catalog_manage:word_manage')
         return redirect(f'{manage_url}?{return_qs}' if return_qs else manage_url)
-    return render(request, 'catalog/manage/word_form.html', {
+
+    context = {
         'form': form,
         'is_add': word is None,
         'return_qs': return_qs,
-    })
+    }
+    context.update(extra)
+    return render(request, 'catalog/manage/word_form.html', context)
 
 
 @manage_required
@@ -261,6 +276,41 @@ def word_fetch_image(request, pk):
     word.image = rel_path
     word.save(update_fields=['image'])
     messages.success(request, f'Đã tải hình cho "{word.text_en}" thành công.')
+    return _edit_redirect()
+
+
+@manage_required
+def word_regenerate_audio(request, pk, lang):
+    """
+    Tạo lại audio cho một từ — phát âm tiếng Anh (lang='en') hoặc
+    hướng dẫn tiếng Việt (lang='vi'). Xoá clip/file cũ, sinh lại, redirect về edit.
+    """
+    from pathlib import Path
+
+    word = get_object_or_404(Word, pk=pk)
+    return_qs = request.GET.get('return_qs', '')
+
+    def _edit_redirect():
+        url = reverse('catalog_manage:word_edit', kwargs={'pk': pk})
+        return redirect(f'{url}?{return_qs}' if return_qs else url)
+
+    if lang == 'en':
+        # Xoá clip TTS cũ, tạo mới
+        word.clips.filter(source=audio_service.AudioClip.Source.TTS).delete()
+        clip = audio_service.generate_tts_clip(word)
+        if clip:
+            messages.success(request, f'✅ Đã tạo lại giọng đọc tiếng Anh cho "{word.text_en}".')
+        else:
+            messages.error(request, f'❌ Không thể tạo giọng đọc tiếng Anh — kiểm tra kết nối mạng.')
+    elif lang == 'vi':
+        url = audio_service.get_vi_instruction(word, force=True)
+        if url:
+            messages.success(request, f'✅ Đã tạo lại giọng hướng dẫn tiếng Việt cho "{word.text_en}".')
+        else:
+            messages.error(request, f'❌ Không thể tạo giọng hướng dẫn — kiểm tra kết nối mạng.')
+    else:
+        messages.error(request, 'Loại audio không hợp lệ.')
+
     return _edit_redirect()
 
 
