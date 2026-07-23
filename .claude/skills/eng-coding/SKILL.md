@@ -9,7 +9,7 @@ Mục tiêu: mọi lần code đều theo cùng một khuôn để dễ đọc, 
 
 ## 1. Ngữ cảnh dự án
 - **Mục đích:** web học tiếng Anh chạy local cho bé. Ưu tiên **Phát âm → Từ vựng → Ngữ pháp**, bọc trong **trò chơi**. Dữ liệu (từ vựng, bản ghi của bé) **thu thập dần vào local**.
-- **Stack:** Python 3.11 · Django 5.x (hoặc 4.2 LTS) · Django Templates + Bootstrap 5 + **HTMX** + **Alpine.js** (server-rendered, KHÔNG SPA).
+- **Stack:** Python 3.14 · Django 5.2 LTS (5.2.16) · Django Templates + Bootstrap 5 + **HTMX** + **Alpine.js** (server-rendered, KHÔNG SPA).
 - **CSDL:** SQLite (cả dev lẫn chạy local). Không dùng MySQL/Postgres.
 - **Audio/ASR:** TTS sinh bằng `edge-tts` (cache mp3 vào `media/`), IPA bằng `eng-to-ipa`; chấm phát âm bằng `faster-whisper` chạy ở **service `asr` riêng** (FastAPI), gọi qua HTTP nội bộ.
 - **Đóng gói:** Docker Compose — `web` (Django) + `asr` (faster-whisper). DB + `media/` gắn volume để giữ dữ liệu.
@@ -65,7 +65,7 @@ Mục tiêu: mọi lần code đều theo cùng một khuôn để dễ đọc, 
 - **Phát audio:** luôn lấy qua hàm tiện ích chung (vd `catalog.audio.get_clip(word)`): ưu tiên `AudioClip` có (recorded/is_default); nếu chưa có thì sinh TTS, **lưu lại** rồi trả về (cache — không gọi TTS lại lần sau). KHÔNG gọi `edge-tts` trực tiếp rải rác trong view.
 - **IPA:** sinh tự động bằng `eng-to-ipa` khi `phonetic` trống; không nhập tay nếu không cần.
 - **ASR:** chỉ gọi service `asr` qua `ASR_URL` (từ `.env`), gói trong một service/hàm riêng (vd `pronunciation.asr.score(audio, target)`); xử lý lỗi mạng/timeout gọn, không để 500 khi ASR tắt — báo "thử lại" thân thiện. Giọng bé **không gửi ra ngoài**, chỉ tới service local.
-- **Chấm điểm = sao, KHÔNG điểm gây áp lực:** quy score → 0–3 sao; sai thì khuyến khích nghe lại, không trừ.
+- **Chấm điểm = sao, KHÔNG điểm gây áp lực:** quy score → 0–5 sao (ASR: =100→5⭐, ≥90→4⭐, ≥75→3⭐, ≥55→2⭐, ≥35→1⭐); sai thì khuyến khích nghe lại, không trừ.
 
 ## 7. Forms
 - Dùng `ModelForm`. Gắn class Bootstrap (`form-control`, `form-select`) qua widget hoặc helper.

@@ -146,7 +146,7 @@ erDiagram
         string recording "audio bé"
         string asr_text "blank"
         int score "0-100"
-        int stars "0-3"
+        int stars "0-5"
     }
     GameType {
         int id PK
@@ -275,7 +275,7 @@ erDiagram
 | `recording` | FileField | bản ghi giọng bé (`media/recordings/`) |
 | `asr_text` | CharField, blank | text faster-whisper nhận dạng (máy nghe bé đọc thành gì) |
 | `score` | IntegerField, null | điểm khớp (0–100) → quy ra sao |
-| `stars` | IntegerField, null | 0–3 sao |
+| `stars` | IntegerField, null | 0–5 sao (ASR) — ngưỡng: =100→5⭐, ≥90→4⭐, ≥75→3⭐, ≥55→2⭐, ≥35→1⭐ |
 
 > **Chấm phát âm (GĐ 3 — đã làm):** view `save_attempt` lưu bản ghi → gọi `pronunciation/asr.py` (service `asr` Docker) so text bé đọc với `word.text_en` (mức từ) → điền `asr_text/score/stars`. `score`/`stars` **null khi chưa chấm** (ASR tắt/lỗi) — `is_scored` dùng `score is not None`. Xem `docs/CongNghe.md` mục 4.
 

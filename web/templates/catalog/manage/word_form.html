@@ -7,10 +7,61 @@
     <div class="card child-card p-2">
       <div class="card-body">
         <h1 class="h4 mb-3">{% if is_add %}➕ Thêm từ{% else %}✏️ Sửa từ{% endif %}</h1>
+
+        {% if form.instance.pk and form.instance.image %}
+        {# Ô hiển thị hình ảnh #}
+        <div class="mb-3 text-center">
+          <img src="{{ form.instance.image.url }}" alt="{{ form.instance.text_en }}"
+               class="img-thumbnail" style="max-height:150px">
+          <div class="text-muted small mt-1">Hình minh hoạ hiện tại</div>
+        </div>
+        {% endif %}
+
         {# enctype: form có upload ảnh minh hoạ #}
         <form method="post" enctype="multipart/form-data">
           {% csrf_token %}
           {% include 'catalog/manage/_form_fields.html' %}
+
+          {# Audio section — chỉ hiển thị khi edit #}
+          {% if not is_add %}
+          <hr>
+          <h5 class="mb-3">🔊 Audio</h5>
+
+          {# Giọng đọc tiếng Anh #}
+          <div class="mb-3">
+            <label class="form-label">Giọng đọc tiếng Anh</label>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+              {% if english_clip %}
+              <audio controls src="{{ english_clip.file.url }}" style="height:36px" preload="none"></audio>
+              {% else %}
+              <span class="text-muted"><i>Chưa có</i></span>
+              {% endif %}
+              <a href="{% url 'catalog_manage:word_regenerate_audio' form.instance.pk 'en' %}{% if return_qs %}?return_qs={{ return_qs|urlencode }}{% endif %}"
+                 class="btn btn-outline-secondary btn-sm ms-2"
+                 onclick="return confirm('Tạo lại giọng đọc tiếng Anh?')">
+                <i class="bi bi-arrow-repeat"></i> Tạo lại
+              </a>
+            </div>
+          </div>
+
+          {# Giọng hướng dẫn tiếng Việt #}
+          <div class="mb-3">
+            <label class="form-label">Giọng hướng dẫn tiếng Việt</label>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+              {% if vi_instruction_url %}
+              <audio controls src="{{ vi_instruction_url }}" style="height:36px" preload="none"></audio>
+              {% else %}
+              <span class="text-muted"><i>Chưa có</i></span>
+              {% endif %}
+              <a href="{% url 'catalog_manage:word_regenerate_audio' form.instance.pk 'vi' %}{% if return_qs %}?return_qs={{ return_qs|urlencode }}{% endif %}"
+                 class="btn btn-outline-secondary btn-sm ms-2"
+                 onclick="return confirm('Tạo lại giọng hướng dẫn tiếng Việt?')">
+                <i class="bi bi-arrow-repeat"></i> Tạo lại
+              </a>
+            </div>
+          </div>
+          {% endif %}
+
           <div class="d-flex gap-2">
             <button type="submit" class="btn btn-kid">Lưu</button>
             <a href="{% url 'catalog_manage:word_manage' %}{% if return_qs %}?{{ return_qs }}{% endif %}" class="btn btn-outline-secondary">Huỷ</a>

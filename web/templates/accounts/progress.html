@@ -1,5 +1,6 @@
 {% extends 'base_manage.html' %}
 {% load tz %}
+{% load pagination %}
 {% block title %}Tiến độ của bé{% endblock %}
 
 {% block content %}
@@ -26,7 +27,13 @@
 <div class="row g-3 mb-4">
   <div class="col-4">
     <div class="card stat-card text-center"><div class="card-body py-3">
-      <div class="stat-num">{{ total_stars }}⭐</div><div class="text-muted small">Tổng sao</div>
+      <div class="stat-num">{{ total_stars }}⭐</div>
+      <div class="text-muted small">Tổng sao</div>
+      <div class="text-muted" style="font-size:0.8rem">
+        <span class="text-warning-emphasis">{{ game_stars }}⭐</span> Game
+        +
+        <span class="text-info-emphasis">{{ speech_stars }}⭐</span> Phát âm
+      </div>
     </div></div>
   </div>
   <div class="col-4">
@@ -63,15 +70,7 @@
         </tbody>
       </table>
     </div>
-    {% if results_page.paginator.num_pages > 1 %}
-    <nav><ul class="pagination pagination-sm justify-content-center">
-      {% for p in results_page.paginator.page_range %}
-      <li class="page-item {% if p == results_page.number %}active{% endif %}">
-        <a class="page-link" href="?{% if selected %}child={{ selected.pk }}&{% endif %}page_r={{ p }}">{{ p }}</a>
-      </li>
-      {% endfor %}
-    </ul></nav>
-    {% endif %}
+    {% render_pagination results_page "page_r" %}
     {% else %}
     <p class="text-muted">Chưa có kết quả chơi nào.</p>
     {% endif %}
@@ -98,15 +97,7 @@
         </tbody>
       </table>
     </div>
-    {% if attempts_page.paginator.num_pages > 1 %}
-    <nav><ul class="pagination pagination-sm justify-content-center">
-      {% for p in attempts_page.paginator.page_range %}
-      <li class="page-item {% if p == attempts_page.number %}active{% endif %}">
-        <a class="page-link" href="?{% if selected %}child={{ selected.pk }}&{% endif %}page_a={{ p }}">{{ p }}</a>
-      </li>
-      {% endfor %}
-    </ul></nav>
-    {% endif %}
+    {% render_pagination attempts_page "page_a" %}
     {% else %}
     <p class="text-muted">Chưa có lần luyện phát âm nào.</p>
     {% endif %}
