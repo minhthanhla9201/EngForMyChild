@@ -65,7 +65,7 @@ Mục tiêu: mọi lần code đều theo cùng một khuôn để dễ đọc, 
 - **Phát audio:** luôn lấy qua hàm tiện ích chung (vd `catalog.audio.get_clip(word)`): ưu tiên `AudioClip` có (recorded/is_default); nếu chưa có thì sinh TTS, **lưu lại** rồi trả về (cache — không gọi TTS lại lần sau). KHÔNG gọi `edge-tts` trực tiếp rải rác trong view.
 - **IPA:** sinh tự động bằng `eng-to-ipa` khi `phonetic` trống; không nhập tay nếu không cần.
 - **ASR:** chỉ gọi service `asr` qua `ASR_URL` (từ `.env`), gói trong một service/hàm riêng (vd `pronunciation.asr.score(audio, target)`); xử lý lỗi mạng/timeout gọn, không để 500 khi ASR tắt — báo "thử lại" thân thiện. Giọng bé **không gửi ra ngoài**, chỉ tới service local.
-- **Chấm điểm = sao, KHÔNG điểm gây áp lực:** quy score → 0–3 sao; sai thì khuyến khích nghe lại, không trừ.
+- **Chấm điểm = sao, KHÔNG điểm gây áp lực:** quy score → 0–5 sao (ASR: =100→5⭐, ≥90→4⭐, ≥75→3⭐, ≥55→2⭐, ≥35→1⭐); sai thì khuyến khích nghe lại, không trừ.
 
 ## 7. Forms
 - Dùng `ModelForm`. Gắn class Bootstrap (`form-control`, `form-select`) qua widget hoặc helper.

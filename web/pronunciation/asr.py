@@ -21,9 +21,9 @@ from django.conf import settings
 
 logger = logging.getLogger('eng.asr')
 
-# Ngưỡng quy sao cho PHÁT ÂM (nới hơn game vì ASR khó khớp tuyệt đối, và để khích lệ):
-#   >=85% → 3 sao | >=60% → 2 sao | >=35% → 1 sao | còn lại → 0 (mầm 🌱).
-STAR_THRESHOLDS = ((85, 3), (60, 2), (35, 1))
+# Ngưỡng quy sao cho PHÁT ÂM (khích lệ, tối đa 5 sao):
+#   =100% → 5 sao | >=90% → 4 sao | >=75% → 3 sao | >=55% → 2 sao | >=35% → 1 sao | còn lại → 0 (🌱).
+STAR_THRESHOLDS = ((100, 5), (90, 4), (75, 3), (55, 2), (35, 1))
 
 
 def _digits_to_words(text):
@@ -77,7 +77,7 @@ def match_score(heard, target):
 
 
 def stars_from_score(score):
-    """Quy điểm khớp 0–100 → sao 0–3 theo ngưỡng khích lệ của phát âm."""
+    """Quy điểm khớp 0–100 → sao 0–5 theo ngưỡng khích lệ của phát âm."""
     for threshold, stars in STAR_THRESHOLDS:
         if score >= threshold:
             return stars
@@ -111,7 +111,7 @@ def score(audio_file, target_en):
     """
     Chấm một lần đọc. Trả dict hoặc None (khi ASR không phản hồi).
 
-    dict: {'heard': str, 'target': str, 'score': 0-100, 'stars': 0-3}.
+    dict: {'heard': str, 'target': str, 'score': 0-100, 'stars': 0-5}.
     """
     heard = transcribe(audio_file)
     if heard is None:

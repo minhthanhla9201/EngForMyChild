@@ -219,7 +219,7 @@ Vài giọng tiếng Anh hợp cho bé: `en-US-AnaNeural` (bé gái Mỹ), `en-U
 ### Luyện phát âm (ghi âm)
 Bấm **Luyện phát âm** ở trang chủ → chọn bé → chọn chủ đề. Ở mỗi từ: bé bấm **Nghe mẫu**, rồi bấm **Thu giọng** để đọc theo (bấm lần nữa để dừng). Bản ghi được lưu lại; phụ huynh xem ở khu quản lý **→ Tiến độ** (chi tiết bản ghi xem trong Django Admin).
 - **Lưu ý:** trình duyệt sẽ hỏi quyền dùng **micro** — hãy bấm Cho phép. Ghi âm chạy được trên `localhost` (Chrome/Edge/Firefox).
-- **Chấm điểm tự động** (máy nghe bé đọc đúng chưa) đã có: bật service ASR (xem [mục 3](#bật-chấm-phát-âm-asr--web-chạy-local-chỉ-asr-trong-docker)) rồi bé đọc → máy chấm **sao (0–3)** + gợi ý thử lại. Không bật ASR thì bé vẫn thu âm/nghe lại bình thường, chỉ không có điểm.
+- **Chấm điểm tự động** (máy nghe bé đọc đúng chưa) đã có: bật service ASR (xem [mục 3](#bật-chấm-phát-âm-asr--web-chạy-local-chỉ-asr-trong-docker)) rồi bé đọc → máy chấm **sao (0–5)** (ngưỡng: =100→5⭐, ≥90→4⭐, ≥75→3⭐, ≥55→2⭐, ≥35→1⭐) + gợi ý thử lại. Không bật ASR thì bé vẫn thu âm/nghe lại bình thường, chỉ không có điểm.
 
 ### Trò chơi
 Bấm **Trò chơi** ở trang chủ → chọn bé → chọn game → chọn chủ đề. Hiện có:
