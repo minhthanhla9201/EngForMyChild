@@ -23,8 +23,8 @@
   <table class="table align-middle">
     <thead>
       <tr>
-        <th>Icon</th><th>Tên mốc</th><th class="text-center">Ngưỡng sao</th>
-        <th class="text-center">Thứ tự</th><th class="text-center">Đang dùng</th><th></th>
+        <th>Icon</th><th>Tên mốc</th><th class="text-center">Cấp độ</th><th class="text-center">Ngưỡng sao</th>
+        <th>Câu mô tả</th><th class="text-center">Thứ tự</th><th class="text-center">Đang dùng</th><th></th>
       </tr>
     </thead>
     <tbody>
@@ -32,7 +32,9 @@
       <tr>
         <td>{% icon_img emoji=stage.emoji src=stage.icon_src size=40 alt=stage.name_vi %}</td>
         <td class="fw-bold">{{ stage.name_vi }}</td>
+        <td class="text-center"><span class="badge text-bg-warning">Lv.{{ stage.level }}</span></td>
         <td class="text-center">{{ stage.threshold }} ⭐</td>
+        <td class="small text-muted">{{ stage.description|default:'—' }}</td>
         <td class="text-center">{{ stage.order }}</td>
         <td class="text-center">
           {% if stage.is_active %}<span class="badge text-bg-success">Có</span>

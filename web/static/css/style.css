@@ -260,6 +260,23 @@ body.body-manage { background: #eef1f4; }
     50% { transform: translateY(-8px); }
 }
 .pet-name { font-weight: 800; color: #d96a00; font-size: 24px; }
+.pet-level-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #ff6b35, #f7931e);
+    color: #fff;
+    font-weight: 800;
+    font-size: 14px;
+    padding: 2px 12px;
+    border-radius: 20px;
+    margin-top: 4px;
+    box-shadow: 0 2px 8px rgba(255, 107, 53, .3);
+}
+.pet-description {
+    font-size: 15px;
+    color: #8a6d3b;
+    font-style: italic;
+    margin-top: 2px;
+}
 
 /* Số sao TO, vàng, có bóng cho nổi bật (bé nhìn rõ thành quả) */
 .stars-big {
