@@ -5,124 +5,144 @@
 {% block content %}
 
 {% if not active_child %}
-  {# Chưa chọn bé (có nhiều bé) → hiện màn chọn bé bằng avatar to #}
-  <div class="text-center mb-4">
-    <h1 class="h3">🦜 Bé nào đang học nào?</h1>
-  </div>
-  {% if children %}
-    <div class="row g-3 justify-content-center">
-      {% for child in children %}
-      <div class="col-6 col-md-3">
-        <a href="{% url 'accounts:set_active_child' child.pk %}" class="text-decoration-none">
-          <div class="card child-card text-center h-100"><div class="card-body py-4">
-            <div class="child-avatar mb-2">{{ child.avatar }}</div>
-            <div class="fw-bold fs-5 text-dark">{{ child.name }}</div>
-          </div></div>
-        </a>
+{# Chưa chọn bé (có nhiều bé) → hiện màn chọn bé bằng avatar to #}
+<div class="text-center mb-4">
+  <h1 class="h3">🦜 Bé nào đang học nào?</h1>
+</div>
+{% if children %}
+<div class="row g-3 justify-content-center">
+  {% for child in children %}
+  <div class="col-6 col-md-3">
+    <a href="{% url 'accounts:set_active_child' child.pk %}" class="text-decoration-none">
+      <div class="card child-card text-center h-100">
+        <div class="card-body py-4">
+          <div class="child-avatar mb-2">{{ child.avatar }}</div>
+          <div class="fw-bold fs-5 text-dark">{{ child.name }}</div>
+        </div>
       </div>
-      {% endfor %}
-    </div>
-  {% else %}
-    <div class="card child-card text-center p-4">
-      <p class="mb-2">Chưa có hồ sơ bé nào.</p>
-      <div><a href="{% url 'accounts:child_add' %}" class="btn btn-kid">Thêm bé</a></div>
-    </div>
-  {% endif %}
+    </a>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card child-card text-center p-4">
+  <p class="mb-2">Chưa có hồ sơ bé nào.</p>
+  <div><a href="{% url 'accounts:child_add' %}" class="btn btn-kid">Thêm bé</a></div>
+</div>
+{% endif %}
 
 {% else %}
-  {# Đã chọn bé → dải tiến độ sinh động + 3 hoạt động #}
-  <div class="d-flex align-items-center justify-content-between mb-3">
-    <h1 class="h4 m-0">🦜 Chào {{ active_child.avatar }} {{ active_child.name }}!</h1>
-    {% if children.count > 1 %}
-    <a href="{% url 'accounts:home' %}?switch=1" class="btn btn-outline-secondary btn-sm">
-      <i class="bi bi-people"></i> Đổi bé
-    </a>
-    {% endif %}
-  </div>
+{# Đã chọn bé → dải tiến độ sinh động + 3 hoạt động #}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <h1 class="h4 m-0">🦜 Chào {{ active_child.avatar }} {{ active_child.name }}!</h1>
+  {% if children.count > 1 %}
+  <a href="{% url 'accounts:home' %}?switch=1" class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-people"></i> Đổi bé
+  </a>
+  {% endif %}
+</div>
 
-  {# ---- Dải tiến độ: linh vật + sao (hàng trên), huy hiệu (hàng riêng full-width) ---- #}
-  <div class="card progress-card p-3 mb-4">
-    <div class="row align-items-center g-3">
-      {# Linh vật lớn dần theo sao #}
-      <div class="col-6 text-center">
-        {# Icon linh vật render bằng <img> SVG offline (fallback emoji text) — không phụ thuộc font #}
-        <div class="pet-emoji">{% icon_img emoji=progress.pet_emoji src=progress.pet_icon_src size=120 alt=progress.pet_name %}</div>
-        <div class="pet-level-badge">Lv.{{ progress.pet_level_num }}</div>
-        <div class="pet-name">{{ progress.pet_name }}</div>
-        {% if progress.pet_description %}
-        <div class="pet-description">{{ progress.pet_description }}</div>
-        {% endif %}
-        {% if progress.pet_remain_stars %}
-        <div class="pet-progress mt-2">
-          {# % tiến tới mốc kế: dựa trên sao hiện tại / ngưỡng mốc kế #}
-          <div class="pet-progress-bar" style="width: {{ progress.pet_percent }}%"></div>
+{# ---- Dải tiến độ: linh vật + sao (hàng trên), huy hiệu (hàng riêng full-width) ---- #}
+<div class="card progress-card p-3 mb-4">
+  <div class="row align-items-center g-3">
+    {# Linh vật lớn dần theo sao #}
+    <div class="col-6 text-center">
+      {# Icon linh vật render bằng <img> SVG offline (fallback emoji text) — không phụ thuộc font #}
+      <div class="pet-card-wrapper">
+        <div class="pet-level-box">
+          <div class="pet-level-label">CẤP</div>
+          <div class="pet-level-num">{{ progress.pet_level_num }}</div>
         </div>
-        <div class="small text-muted mt-1">Còn {{ progress.pet_remain_stars }} ⭐ để thành {{ progress.pet_next_emoji }} {{ progress.pet_next_name }}!</div>
-        {% else %}
-        <div class="small text-muted mt-2">Đã lớn hết cỡ rồi, giỏi quá! 🎉</div>
-        {% endif %}
+        <div class="pet-emoji">{% icon_img emoji=progress.pet_emoji src=progress.pet_icon_src size=120
+          alt=progress.pet_name %}</div>
       </div>
-
-      {# Tổng sao + chuỗi ngày #}
-      <div class="col-6 text-center">
-        <div class="stars-big"><span class="star-icon">⭐</span> {{ progress.total_stars }}</div>
-        <div class="small text-muted">Tổng số sao</div>
-        <div class="d-flex justify-content-center gap-3 mt-1 small">
-          <span><span class="fw-bold text-warning">🎮</span> {{ progress.game_stars }} sao</span>
-          <span><span class="fw-bold text-info">🎤</span> {{ progress.speech_stars }} sao</span>
-        </div>
-        {% if progress.streak_days %}
-        <div class="mt-1"><span class="streak-chip">🔥 {{ progress.streak_days }} ngày</span></div>
-        {% endif %}
+      <div class="pet-name">{{ progress.pet_name }}</div>
+      {% if progress.pet_description %}
+      <div class="pet-description">{{ progress.pet_description }}</div>
+      {% endif %}
+      {% if progress.pet_remain_stars %}
+      <div class="pet-progress mt-2">
+        {# % tiến tới mốc kế: dựa trên sao hiện tại / ngưỡng mốc kế #}
+        <div class="pet-progress-bar" style="width: {{ progress.pet_percent }}%"></div>
       </div>
+      <div class="small text-muted mt-1">
+        Còn {{ progress.pet_remain_stars }}⭐ để thành {% icon_img emoji=progress.pet_next_emoji
+        src=progress.pet_next_icon_src size=24 alt=progress.pet_next_name %} {{ progress.pet_next_name }}!
+      </div>
+      {% else %}
+      <div class="small text-muted mt-2">Đã lớn hết cỡ rồi, giỏi quá! 🎉</div>
+      {% endif %}
     </div>
 
-    {# Huy hiệu (mở khoá dần) — hàng riêng full-width để trải thành KHỐI nhiều cột #}
-    <hr class="my-3">
-    <div class="text-center fw-bold text-dark mb-2">
-      {% icon_img emoji='🏅' size=24 alt='Huy hiệu' %} Huy hiệu {{ progress.badges_earned|length }}/{{ progress.badges_total }}
-    </div>
-    <div class="badge-grid">
-      {% for item in progress.badges_all %}
-      {# tabindex=0 để hover VÀ focus (bàn phím/chạm) đều hiện tooltip #}
-      <div class="badge-chip {% if item.earned %}earned{% else %}locked{% endif %}" tabindex="0"
-           data-tip="{{ item.badge.name_vi }}{% if item.badge.desc_vi %} — {{ item.badge.desc_vi }}{% endif %}{% if not item.earned %} (chưa đạt){% endif %}">
-        <span class="badge-icon">{% icon_img emoji=item.badge.icon src=item.badge.icon_src size=36 alt=item.badge.name_vi %}</span>
-        {% if not item.earned %}<span class="badge-lock">{% icon_img emoji='🔒' size=20 alt='Chưa đạt' %}</span>{% endif %}
+    {# Tổng sao + chuỗi ngày #}
+    <div class="col-6 text-center">
+      <div class="stars-big"><span class="star-icon">⭐</span> {{ progress.total_stars }}</div>
+      <div class="small text-muted">Tổng số sao</div>
+      <div class="d-flex justify-content-center gap-3 mt-1 small">
+        <span><span class="fw-bold text-warning">🎮</span> {{ progress.game_stars }} sao</span>
+        <span><span class="fw-bold text-info">🎤</span> {{ progress.speech_stars }} sao</span>
       </div>
-      {% endfor %}
+      {% if progress.streak_days %}
+      <div class="mt-1"><span class="streak-chip">🔥 {{ progress.streak_days }} ngày</span></div>
+      {% endif %}
     </div>
   </div>
 
-  {# ---- 3 hoạt động lớn (mỗi nút một màu tươi) ---- #}
-  <div class="row g-3 justify-content-center">
-    <div class="col-6 col-md-4">
-      <a href="{% url 'catalog:topic_list' %}" class="text-decoration-none">
-        <div class="card zone-card zone-kid zone-a text-center h-100"><div class="card-body py-4">
+  {# Huy hiệu (mở khoá dần) — hàng riêng full-width để trải thành KHỐI nhiều cột #}
+  <hr class="my-3">
+  <div class="text-center fw-bold text-dark mb-2">
+    {% icon_img emoji='🏅' size=24 alt='Huy hiệu' %} Huy hiệu {{ progress.badges_earned|length }}/{{
+    progress.badges_total }}
+  </div>
+  <div class="badge-grid">
+    {% for item in progress.badges_all %}
+    {# tabindex=0 để hover VÀ focus (bàn phím/chạm) đều hiện tooltip #}
+    <div class="badge-chip {% if item.earned %}earned{% else %}locked{% endif %}" tabindex="0"
+      data-tip="{{ item.badge.name_vi }}{% if item.badge.desc_vi %} — {{ item.badge.desc_vi }}{% endif %}{% if not item.earned %} (chưa đạt){% endif %}">
+      <span class="badge-icon">{% icon_img emoji=item.badge.icon src=item.badge.icon_src size=36 alt=item.badge.name_vi
+        %}</span>
+      {% if not item.earned %}<span class="badge-lock">{% icon_img emoji='🔒' size=20 alt='Chưa đạt' %}</span>{% endif
+      %}
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+{# ---- 3 hoạt động lớn (mỗi nút một màu tươi) ---- #}
+<div class="row g-3 justify-content-center">
+  <div class="col-6 col-md-4">
+    <a href="{% url 'catalog:topic_list' %}" class="text-decoration-none">
+      <div class="card zone-card zone-kid zone-a text-center h-100">
+        <div class="card-body py-4">
           <div class="zone-icon">📚</div>
           <div class="fw-bold fs-5">Học từ vựng</div>
           <div class="small">Nghe & xem từ mới</div>
-        </div></div>
-      </a>
-    </div>
-    <div class="col-6 col-md-4">
-      <a href="{% url 'pronunciation:choose' %}" class="text-decoration-none">
-        <div class="card zone-card zone-kid zone-b text-center h-100"><div class="card-body py-4">
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="col-6 col-md-4">
+    <a href="{% url 'pronunciation:choose' %}" class="text-decoration-none">
+      <div class="card zone-card zone-kid zone-b text-center h-100">
+        <div class="card-body py-4">
           <div class="zone-icon">🎤</div>
           <div class="fw-bold fs-5">Luyện phát âm</div>
           <div class="small">Đọc theo & ghi âm</div>
-        </div></div>
-      </a>
-    </div>
-    <div class="col-6 col-md-4">
-      <a href="{% url 'games:choose' %}" class="text-decoration-none">
-        <div class="card zone-card zone-kid zone-c text-center h-100"><div class="card-body py-4">
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="col-6 col-md-4">
+    <a href="{% url 'games:choose' %}" class="text-decoration-none">
+      <div class="card zone-card zone-kid zone-c text-center h-100">
+        <div class="card-body py-4">
           <div class="zone-icon">🎮</div>
           <div class="fw-bold fs-5">Trò chơi</div>
           <div class="small">Vừa chơi vừa học</div>
-        </div></div>
-      </a>
-    </div>
+        </div>
+      </div>
+    </a>
   </div>
+</div>
 {% endif %}
 {% endblock %}
