@@ -260,6 +260,37 @@ body.body-manage { background: #eef1f4; }
     50% { transform: translateY(-8px); }
 }
 .pet-name { font-weight: 800; color: #d96a00; font-size: 24px; }
+.pet-card-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+}
+.pet-level-box {
+    background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+    border: 3px solid #e85d26;
+    border-radius: 16px;
+    padding: 12px 10px;
+    min-width: 70px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 4px 16px rgba(255, 107, 53, .35);
+}
+.pet-level-num {
+    font-size: 32px;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, .2);
+}
+.pet-level-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, .85);
+    letter-spacing: 2px;
+    margin-top: 2px;
+}
 .pet-level-badge {
     display: inline-block;
     background: linear-gradient(135deg, #ff6b35, #f7931e);

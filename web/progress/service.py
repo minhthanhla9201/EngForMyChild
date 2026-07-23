@@ -170,9 +170,11 @@ def summary(child):
         next_stage = stages[level + 1]
         pet_next_emoji = next_stage.emoji
         pet_next_name = next_stage.name_vi
+        pet_next_icon_src = next_stage.icon_src
     else:
         pet_next_emoji = ''
         pet_next_name = ''
+        pet_next_icon_src = ''
 
     earned = list(ChildBadge.objects.filter(child=child).select_related('badge')
                   .order_by('badge__order', 'badge__threshold'))
@@ -200,6 +202,7 @@ def summary(child):
         'pet_percent': pet_percent,      # % đầy thanh tiến tới mốc kế
         'pet_next_emoji': pet_next_emoji,  # emoji mốc kế (dùng cho khích lệ)
         'pet_next_name': pet_next_name,    # tên mốc kế
+        'pet_next_icon_src': pet_next_icon_src,  # icon mốc kế (SVG/ảnh)
 
         # Huy hiệu: đã mở + tổng số (để hiện "3/8" và các ô khoá).
         'badges_earned': [cb.badge for cb in earned],
