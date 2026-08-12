@@ -34,7 +34,7 @@ PRAISE_DIR = 'praise'
 
 # Các câu động viên, gom theo tình huống. Thêm/bớt câu ở đây (dữ liệu, không sửa code).
 PRAISE_LINES = {
-    'correct': [
+    'game_correct': [
         # ── Cổ điển ──
         'Em giỏi quá!',
         'Em tuyệt vời!',
@@ -44,46 +44,64 @@ PRAISE_LINES = {
         'Đúng rồi, em giỏi ghê!',
         # ── Vui nhộn ──
         'Bùm chíu! Em đúng rồi!',
+        'Tuyệt cú mèo luôn em ơi!',
+        'Em giỏi quá, tự thưởng cho em một tràng pháo tay nào!',
+        'Chuẩn không cần chỉnh! Em làm tốt lắm!',
+        'Wow, em làm tuyệt quá đi mất!',
+        'Chính xác! Em là số một!',
+        '10 điểm trọn vẹn cho siêu sao của chúng ta!',
+    ],
+    'speak_correct': [
+        'Em giỏi quá!',
+        'Chính xác rồi!',
         'Em đọc chuẩn không cần chỉnh luôn!',
         'Wow, em siêu sao phát âm!',
-        'Đỉnh của đỉnh luôn em ơi!',
-        'Em giỏi quá, tự thưởng cho em một tràng pháo tay nào!',
-        'Chuẩn từng milimet! Em làm tốt lắm!',
         'Ôi trời ơi, em đọc hay quá đi mất!',
-        'Chính xác! Em là nhất!',
-        '10 điểm không có nhưng mà siêu sao!',
-        'Em đọc giống người bản xứ quá!',
+        'Em đọc tiếng Anh siêu như người nước ngoài luôn!',
+        'Xuất sắc đó em, phát âm rất chuẩn!',
     ],
-    'wrong': [
+    'game_wrong': [
         # ── Cổ điển ──
+        'Chưa chính xác, thử lại em nhé!',
+        'Gần đúng rồi, em cố lên nào!',
+        'Hít thở sâu, làm lại lần nữa nhé!',
+        # ── Vui nhộn ──
+        'Suýt nữa thì đúng rồi! Lần sau em sẽ làm được!',
+        'Không sao đâu, thử lại liền nha em!',
+        'Em sắp đúng rồi đó, cố lên tí nữa thôi!',
+        'Lần đầu chưa được, lần hai em sẽ chuẩn hơn!',
+        'Chưa đúng, nhưng em đừng buồn nhé!',
+        'Ui da, nhầm một xíu rồi! Thử lại nha em!',
+        'Gần đúng rồi, em bình tĩnh thử lại nha!',
+        'Cố lên nào, em sắp làm được rồi đó!',
+    ],
+    'speak_wrong': [
         'Chưa chính xác, thử lại em nhé!',
         'Gần đúng rồi, em cố lên nào!',
         'Chưa đúng, nghe lại một lần nữa nhé!',
         'Hít thở sâu, đọc lại lần nữa nhé!',
-        # ── Vui nhộn ──
-        'Suýt soát rồi! Lần sau em sẽ đúng!',
-        'Không sao đâu, thử lại liền nha em!',
-        'Em sắp đúng rồi đó, cố lên tí nữa thôi!',
-        'Lần đầu chưa được, lần hai em sẽ chuẩn hơn!',
-        'Chưa đúng nhưng em yêu cầu đừng nản nhé!',
-        'Ê sao kỳ vậy ta? Thử lại phát nữa xem!',
-        'Chưa ăn thua, em bình tĩnh đọc lại nha!',
-        'Có mùi gần đúng rồi đó, đọc tiếp đi em!',
+        'Cố lên, em bình tĩnh đọc lại nha!',
+        'Sắp đúng rồi, em đọc to lên nào!',
     ],
-    'cheer': [
+    'game_cheer': [
         # ── Cổ điển ──
         'Hoan hô, em giỏi lắm!',
         'Tuyệt vời ông mặt trời đó em!',
         'Em làm được rồi đó, giỏi quá!',
         # ── Vui nhộn ──
         'Hoan hô! Hoan hô! Cả nhà cùng vui nào!',
-        'Em là chiến thần phát âm! Hoan hô!',
-        'Dzô dzô! Em đã làm được rồi!',
+        'Yeah yeah! Em đã làm được rồi!',
         'Quá tuyệt vời! Cả thế giới đều vỗ tay cho em!',
         'Bùm! Em lại tỏa sáng rồi!',
         'Xuất sắc! Thưởng cho em một nụ cười thật tươi!',
         'Yes! Em làm được rồi!',
-        'Cảm ơn em! Em đọc hay quá chừng luôn!',
+    ],
+    'speak_cheer': [
+        'Hoan hô, em giỏi lắm!',
+        'Tuyệt vời ông mặt trời đó em!',
+        'Em là siêu nhân phát âm! Hoan hô!',
+        'Chà! Em đọc hay quá chừng luôn!',
+        'Hoan hô, em đọc siêu quá!',
     ],
     # Câu hướng dẫn hiển thị khi bé vào trang chọn chủ đề.
     'topic_select': [

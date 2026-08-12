@@ -63,7 +63,9 @@
   }
 
   function speakPraise(kind) {
-    var url = pick(praise[kind]);
+    var isSpeak = location.pathname.indexOf('/pronunciation/') !== -1 || location.pathname.indexOf('/speak/') !== -1;
+    var prefix = isSpeak ? 'speak_' : 'game_';
+    var url = pick(praise[prefix + kind]) || pick(praise[kind]);
     if (!url) return;  // chưa sinh mp3 cho tình huống này
     try {
       praiseAudio.src = url;
