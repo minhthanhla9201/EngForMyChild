@@ -345,12 +345,12 @@ class PraiseTests(TestCase):
         """Manifest chỉ chứa URL của file đã sinh; chưa sinh → danh sách rỗng."""
         from catalog import praise
         empty = praise.manifest()
-        self.assertEqual(empty['correct'], [])
+        self.assertEqual(empty['game_correct'], [])
         with mock.patch('catalog.praise.tts._edge_tts_save', side_effect=self._fake_edge):
             praise.generate_all()
         full = praise.manifest()
-        self.assertTrue(len(full['correct']) > 0)
-        self.assertTrue(all(u.endswith('.mp3') for u in full['correct']))
+        self.assertTrue(len(full['game_correct']) > 0)
+        self.assertTrue(all(u.endswith('.mp3') for u in full['game_correct']))
 
     def test_manifest_api_requires_login_and_returns_json(self):
         """API manifest: cần đăng nhập; trả JSON đúng cấu trúc."""
@@ -361,7 +361,7 @@ class PraiseTests(TestCase):
         self.assertEqual(resp.status_code, 200)
         data = resp.json()
         self.assertTrue(data['ok'])
-        self.assertIn('correct', data['lines'])
+        self.assertIn('game_correct', data['lines'])
 
 
 # GIF 1x1 hợp lệ để test upload ImageField (Pillow đọc được).

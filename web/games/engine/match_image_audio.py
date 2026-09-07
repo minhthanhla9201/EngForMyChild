@@ -10,7 +10,7 @@ chữ. Chỉ dùng từ có ảnh (needs_image='Y'). Chấm dùng chung stars_fr
 import random
 
 from catalog.audio import get_vi_name
-from .base import stars_from_ratio
+from .base import score_match_round
 
 DEFAULT_PAIRS = 6
 
@@ -44,27 +44,5 @@ def build_round(words, count=DEFAULT_PAIRS):
 
 
 def score_round(payload):
-    """
-    Chấm giống match_pairs: payload = {'pairs_total', 'pairs_matched', 'mistakes',
-                                        'matched_pair_ids': [int, ...]}.
-    Sao theo tỉ lệ ghép đúng, trừ nhẹ theo số lần lật sai (khích lệ, không âm).
-    word_results: mỗi pair_id = word_id.
-    """
-    total = int(payload.get('pairs_total', 0) or 0)
-    matched = int(payload.get('pairs_matched', 0) or 0)
-    mistakes = int(payload.get('mistakes', 0) or 0)
-    effective = max(matched - mistakes // 2, 0)
-
-    matched_ids = set(payload.get('matched_pair_ids', []) or [])
-    pair_ids = set(payload.get('pair_ids', []) or [])
-    word_results = [
-        {'word_id': pid, 'correct': pid in matched_ids}
-        for pid in pair_ids
-    ]
-
-    return {
-        'score': matched,
-        'total': total,
-        'stars': stars_from_ratio(effective, total),
-        'word_results': word_results,
-    }
+    """Chấm ghép cặp hình–tiếng — luật chung của game lật thẻ (xem base)."""
+    return score_match_round(payload)

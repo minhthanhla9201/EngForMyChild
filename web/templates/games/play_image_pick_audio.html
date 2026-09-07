@@ -5,12 +5,7 @@
 {{ round_data|json_script:"round-data" }}
 
 <div x-data="imagePickAudio()" x-init="init()">
-  <div class="d-flex align-items-center justify-content-between mb-3">
-    <h1 class="h5 m-0">🖼️🔊 {{ child.avatar }} {{ child.name }} — {{ topic.name_vi }}</h1>
-    <a href="{% url 'games:choose' %}" class="btn btn-outline-secondary btn-sm">
-      <i class="bi bi-arrow-left"></i> Thoát
-    </a>
-  </div>
+  {% include 'games/_play_header.html' with icon='🖼️🔊' %}
 
   {# Đang chơi #}
   <div x-show="!finished">
@@ -19,7 +14,7 @@
     <div class="card child-card text-center p-4 mb-3">
       <p class="mb-2">{{ game.hint_vi }}</p>
       <div>
-        <img :src="current.image" class="img-fluid rounded"
+        <img :src="current().image" class="img-fluid rounded"
              style="height:220px;object-fit:contain" alt="">
       </div>
       {# Bé chưa biết chữ → nút đọc TÊN tiếng Việt của hình đề bài #}
@@ -31,7 +26,7 @@
     </div>
 
     <div class="row g-3">
-      <template x-for="choice in current.choices" :key="choice.id">
+      <template x-for="choice in current().choices" :key="choice.id">
         <div class="col-6">
           <button class="btn btn-outline-primary w-100 p-4 fs-3"
                   :class="{'btn-warning': playingId === choice.id}"
@@ -55,15 +50,7 @@
     </div>
   </div>
 
-  {# Kết thúc: hiện sao #}
-  <div x-show="finished" x-transition class="card child-card text-center p-5">
-    <div class="display-4 mb-2" x-text="starText"></div>
-    <p class="fs-5">Đúng <span x-text="score"></span> / <span x-text="questions.length"></span> câu</p>
-    <div class="d-flex justify-content-center gap-2">
-      <a href="{% url 'games:choose' %}" class="btn btn-outline-primary">Chọn game khác</a>
-      <button class="btn btn-kid" @click="location.reload()">Chơi lại</button>
-    </div>
-  </div>
+  {% include 'games/_play_finished.html' with result_template='games/_result_quiz.html' %}
 
   <audio x-ref="player"></audio>
   {# player riêng cho giọng đọc TÊN tiếng Việt của hình đề bài #}
@@ -75,72 +62,34 @@
 {% block extra_js %}
 <script>
   const SUBMIT_URL = "{% url 'games:submit' child.pk game.code topic.slug %}";
-  // Đọc câu hướng dẫn cho bé 1 lần khi vào màn.
-  (function(){ var u = JSON.parse(document.getElementById('hint-url').textContent);
-    window.addEventListener('load', function(){ if(window.kidFx) kidFx.playHint(u); }); })();
-  function getCookie(n){const m=document.cookie.match('(^|;)\\s*'+n+'\\s*=\\s*([^;]+)');return m?m.pop():'';}
+  gameCommon.playHintOnLoad();
 
   function imagePickAudio() {
     return {
-      questions: [], index: 0, answered: false, lastCorrect: false,
-      score: 0, finished: false, answers: [], starText: '', newBadges: [],
+      ...gameCommon.quizState(),
       chosenId: null, playingId: null,
-      init() {
-        const data = JSON.parse(document.getElementById('round-data').textContent);
-        this.questions = data.questions || [];
-        if (!this.questions.length) { this.finished = true; }
-      },
-      get current(){ return this.questions[this.index] || {choices: []}; },
-      // Đọc TÊN tiếng Việt của hình đề bài ("con mèo") — bé chưa biết chữ.
+      init() { this.loadQuestions(); },
+      /** Đọc TÊN tiếng Việt của hình đề bài ("con mèo") — bé chưa biết chữ. */
       sayPromptName() {
-        const u = this.current && this.current.image_vi_name_url;
-        if (!u) return;
-        try { this.$refs.viplayer.src = u; this.$refs.viplayer.currentTime = 0;
-              this.$refs.viplayer.play().catch(function(){}); } catch(e){}
+        gameCommon.playViName(this.current().image_vi_name_url, this.$refs.viplayer);
       },
-      // Vị trí (1-based) của loa đang chọn để bé dễ nhận biết.
-      get chosenPos(){
-        const i = this.current.choices.findIndex(c => c.id === this.chosenId);
+      /** Vị trí (1-based) của loa đang chọn để bé dễ nhận biết. */
+      get chosenPos() {
+        const i = this.current().choices.findIndex(c => c.id === this.chosenId);
         return i >= 0 ? i + 1 : '';
       },
-      // Chạm loa: phát audio của lựa chọn đó VÀ đánh dấu là lựa chọn hiện tại.
+      /** Chạm loa: phát audio của lựa chọn đó VÀ đánh dấu là lựa chọn hiện tại. */
       async listen(choiceId) {
         if (this.answered) return;
         this.chosenId = choiceId;
         this.playingId = choiceId;
-        try {
-          const r = await fetch(`/learn/word/${choiceId}/audio/`);
-          const d = await r.json();
-          if (d.ok) { this.$refs.player.src = d.url; await this.$refs.player.play(); }
-        } catch(e){}
+        await gameCommon.playWordAudio(choiceId, this.$refs.player);
         setTimeout(() => { if (this.playingId === choiceId) this.playingId = null; }, 600);
       },
       confirm() {
         if (this.answered || this.chosenId === null) return;
-        this.answered = true;
-        this.lastCorrect = (this.chosenId === this.current.answer_id);
-        if (this.lastCorrect) this.score++;
-        if (window.kidFx) { this.lastCorrect ? kidFx.correct() : kidFx.wrong(); }
-        this.answers.push({answer_id: this.current.answer_id, picked_id: this.chosenId});
-        setTimeout(() => {
-          if (this.index < this.questions.length - 1) {
-            this.index++; this.answered = false; this.chosenId = null;
-          } else { this.submit(); }
-        }, 900);
-      },
-      async submit() {
-        try {
-          const r = await fetch(SUBMIT_URL, {
-            method: 'POST',
-            headers: {'Content-Type':'application/json','X-CSRFToken':getCookie('csrftoken')},
-            body: JSON.stringify({answers: this.answers}),
-          });
-          const d = await r.json();
-          this.starText = '⭐'.repeat(d.stars || 0) || '🌱';
-          this.newBadges = d.badges || [];   // huy hiệu vừa mở (hiện sau khi reo)
-        } catch(e){ this.starText = '🌱'; }
-        this.finished = true;
-        if (window.kidFx) { kidFx.cheer(); kidFx.badges(this.newBadges); }
+        this.record(this.chosenId);
+        this.advance(SUBMIT_URL, 900, function () { this.chosenId = null; });
       },
     };
   }

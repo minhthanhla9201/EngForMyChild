@@ -1,0 +1,12 @@
+{# Màn kết thúc ván chơi: sao + kết quả + 2 nút. Dùng chung mọi game. #}
+{# Dòng kết quả khác nhau giữa các game (số câu đúng / số cặp ghép) nên để game #}
+{# tự vẽ: đặt nội dung đó trong _play_result.html của riêng game, truyền tên qua #}
+{#   {% include 'games/_play_finished.html' with result_template='games/_result_quiz.html' %} #}
+<div x-show="finished" x-transition class="card child-card text-center p-5">
+  <div class="display-4 mb-2" x-text="starText"></div>
+  {% include result_template %}
+  <div class="d-flex justify-content-center gap-2">
+    <a href="{% url 'games:choose' %}" class="btn btn-outline-primary">Chọn game khác</a>
+    <button class="btn btn-kid" @click="location.reload()">Chơi lại</button>
+  </div>
+</div>

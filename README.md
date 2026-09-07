@@ -230,7 +230,7 @@ Chơi xong được thưởng **sao ⭐**, kết quả lưu lại để theo dõ
 > Thêm trò chơi mới chỉ cần thêm 1 module trong `web/games/engine/` và 1 bản ghi `GameType` (không phải sửa màn hình chọn game).
 
 ### Chạy offline (không cần internet)
-Toàn bộ thư viện giao diện (Bootstrap, Bootstrap Icons, HTMX, Alpine.js) đã được **tải sẵn** vào `web/static/vendor/` và nạp từ đó — **không gọi CDN**, nên giao diện chạy được khi không có mạng. Không cần làm gì thêm.
+Toàn bộ thư viện giao diện (Bootstrap, Bootstrap Icons, Alpine.js) đã được **tải sẵn** vào `web/static/vendor/` và nạp từ đó — **không gọi CDN**, nên giao diện chạy được khi không có mạng. Không cần làm gì thêm.
 
 ### Xem trước giao diện (wireframe)
 Muốn xem nhanh bố cục các màn quản lý mà **không cần chạy server**: mở thẳng file

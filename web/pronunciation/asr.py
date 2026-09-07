@@ -2,7 +2,7 @@
 Chấm phát âm cho bé — gọi service ASR (faster-whisper) rồi SO KHỚP mức từ.
 
 Kiến trúc: nhận dạng giọng nằm ở service `asr` riêng (Docker); file này chỉ
-điều phối — gọi HTTP, so text bé đọc với từ đích, quy ra 0–3 sao KHÍCH LỆ.
+điều phối — gọi HTTP, so text bé đọc với từ đích, quy ra 0–5 sao KHÍCH LỆ.
 
 Nguyên tắc (skill eng-coding mục 6):
 - Chấm = sao khích lệ, KHÔNG điểm gây áp lực; sai thì khuyến khích nghe lại.

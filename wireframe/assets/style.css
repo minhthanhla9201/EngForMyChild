@@ -260,6 +260,54 @@ body.body-manage { background: #eef1f4; }
     50% { transform: translateY(-8px); }
 }
 .pet-name { font-weight: 800; color: #d96a00; font-size: 24px; }
+.pet-card-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+.pet-emoji { flex-shrink: 0; }
+.pet-level-box {
+    background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+    border: 2px solid #e85d26;
+    border-radius: 10px;
+    padding: 4px 6px;
+    min-width: 42px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(255, 107, 53, .3);
+}
+.pet-level-num {
+    font-size: 16px;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1;
+}
+.pet-level-label {
+    font-size: 7px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, .85);
+    letter-spacing: 1px;
+    margin-top: 1px;
+}
+.pet-level-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #ff6b35, #f7931e);
+    color: #fff;
+    font-weight: 800;
+    font-size: 14px;
+    padding: 2px 12px;
+    border-radius: 20px;
+    margin-top: 4px;
+    box-shadow: 0 2px 8px rgba(255, 107, 53, .3);
+}
+.pet-description {
+    font-size: 15px;
+    color: #8a6d3b;
+    font-style: italic;
+    margin-top: 2px;
+}
 
 /* Số sao TO, vàng, có bóng cho nổi bật (bé nhìn rõ thành quả) */
 .stars-big {

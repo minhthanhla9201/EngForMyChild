@@ -1,6 +1,6 @@
 ---
 name: eng-coding
-description: Tiêu chuẩn & quy ước coding cho dự án EngForMyChild (website học tiếng Anh chạy local cho bé 6–7 tuổi — phát âm/từ vựng/ngữ pháp qua trò chơi; Django + Bootstrap + HTMX + Alpine.js, ASR faster-whisper, TTS edge-tts, Docker, SQLite). Dùng MỖI KHI viết hoặc sửa code trong dự án này — models, views, forms, templates, urls, migrations, game module, service TTS/ASR. Đọc skill này trước khi tạo file/màn hình mới.
+description: Tiêu chuẩn & quy ước coding cho dự án EngForMyChild (website học tiếng Anh chạy local cho bé 6–7 tuổi — phát âm/từ vựng/ngữ pháp qua trò chơi; Django + Bootstrap + Alpine.js, ASR faster-whisper, TTS edge-tts, Docker, SQLite). Dùng MỖI KHI viết hoặc sửa code trong dự án này — models, views, forms, templates, urls, migrations, game module, service TTS/ASR. Đọc skill này trước khi tạo file/màn hình mới.
 ---
 
 # Tiêu chuẩn coding — Dự án EngForMyChild
@@ -9,7 +9,7 @@ Mục tiêu: mọi lần code đều theo cùng một khuôn để dễ đọc, 
 
 ## 1. Ngữ cảnh dự án
 - **Mục đích:** web học tiếng Anh chạy local cho bé. Ưu tiên **Phát âm → Từ vựng → Ngữ pháp**, bọc trong **trò chơi**. Dữ liệu (từ vựng, bản ghi của bé) **thu thập dần vào local**.
-- **Stack:** Python 3.14 · Django 5.2 LTS (5.2.16) · Django Templates + Bootstrap 5 + **HTMX** + **Alpine.js** (server-rendered, KHÔNG SPA).
+- **Stack:** Python 3.14 · Django 5.2 LTS (5.2.16) · Django Templates + Bootstrap 5 + **Alpine.js** (server-rendered, KHÔNG SPA; gọi server bằng `fetch()` JSON).
 - **CSDL:** SQLite (cả dev lẫn chạy local). Không dùng MySQL/Postgres.
 - **Audio/ASR:** TTS sinh bằng `edge-tts` (cache mp3 vào `media/`), IPA bằng `eng-to-ipa`; chấm phát âm bằng `faster-whisper` chạy ở **service `asr` riêng** (FastAPI), gọi qua HTTP nội bộ.
 - **Đóng gói:** Docker Compose — `web` (Django) + `asr` (faster-whisper). DB + `media/` gắn volume để giữ dữ liệu.
@@ -48,7 +48,7 @@ Mục tiêu: mọi lần code đều theo cùng một khuôn để dễ đọc, 
 - **Lọc theo chủ sở hữu** với dữ liệu riêng của phụ huynh: `ChildProfile.objects.filter(owner=request.user, ...)`. Không để phụ huynh thấy hồ sơ bé của người khác. Dùng `get_object_or_404` + kiểm tra `owner`.
 - View khu **bé chơi/học** (chọn chủ đề, chơi game, luyện phát âm) gắn theo `ChildProfile` đang chọn; giữ đơn giản, không bắt đăng nhập phức tạp.
 - Ưu tiên class-based views hoặc function views gọn.
-- Tương tác động (cập nhật mảnh trang, nộp kết quả game) ưu tiên **HTMX**; trạng thái client nhỏ (lật thẻ, đếm giờ, kéo–thả) dùng **Alpine.js** — tránh viết JS rời rạc.
+- Tương tác động (nộp kết quả game, lấy audio) dùng **Alpine.js** + `fetch()` JSON qua tiện ích chung `static/js/game-common.js` (`gameCommon.postJson`); trạng thái client nhỏ (lật thẻ, đếm giờ, kéo–thả) giữ trong `x-data` — tránh viết JS rời rạc, KHÔNG copy lại `getCookie`/submit ở từng template.
 
 ## 5. Game — kiến trúc "Khuôn chơi + Dữ liệu" (BẮT BUỘC khi thêm game)
 - Tách **luật chơi** (code) khỏi **nội dung** (kho `Word`/`Sentence`). Game lấy từ ngẫu nhiên theo `topic`/`level`, KHÔNG tạo dữ liệu riêng cho từng game.
@@ -81,7 +81,7 @@ Mục tiêu: mọi lần code đều theo cùng một khuôn để dễ đọc, 
 - Hiển thị cờ Y/N qua `get_<field>_display` hoặc property, không in thẳng `'Y'/'N'`.
 - **Phân trang:** chỉ render `page_obj.previous_page_number`/`next_page_number` BÊN TRONG `{% if page_obj.has_previous %}`/`has_next` (gọi ở trang đầu/cuối raise `EmptyPage` → 500).
 - **Nạp JS:** Bootstrap bundle + Alpine.js + `app.js` nạp ở CUỐI `base.html`. Alpine nạp với `defer` (Alpine khởi tạo sau khi DOM có `x-data`). Script trang phụ thuộc `bootstrap` (vd `new bootstrap.Modal`) PHẢI đặt trong `{% block extra_js %}` (render sau bundle) — KHÔNG để trong `{% block content %}` (chạy trước → `bootstrap is not defined`).
-- **Alpine.js:** dùng cho trạng thái client cục bộ của game (lật thẻ, chọn đáp án, đếm giờ). Giữ logic trong `x-data` gọn; logic nặng/đụng server đẩy sang HTMX hoặc view.
+- **Alpine.js:** dùng cho trạng thái client cục bộ của game (lật thẻ, chọn đáp án, đếm giờ). Giữ logic trong `x-data` gọn; logic nặng đẩy về view. Phần dùng chung mọi game (CSRF, nộp ván, đọc câu hướng dẫn) gọi qua `gameCommon` — xem mục 5.
 - **Truyền dữ liệu sang JS dùng `{{ data|json_script:"id" }}` (QUAN TRỌNG — đã từng gây bug):** view truyền **đối tượng Python thuần (dict/list)**, template dùng `json_script`; KHÔNG `json.dumps()` ở view rồi lại `json_script` (mã hoá 2 lần → client `JSON.parse` ra **chuỗi**, không phải object, game/màn không chạy mà KHÔNG báo lỗi). Client đọc: `JSON.parse(document.getElementById("id").textContent)`. Mỗi màn truyền JSON kiểu này PHẢI có test parse lại khẳng định ra dict/list (xem `games`/`pronunciation` tests).
 
 ## 9. URLs

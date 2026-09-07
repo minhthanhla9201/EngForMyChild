@@ -25,7 +25,7 @@ class Attempt(AuditedModel):
     # --- Phần chấm điểm: GĐ 3 (Faster-Whisper) mới điền ---
     asr_text = models.CharField('Máy nghe được', max_length=255, blank=True)
     score = models.PositiveSmallIntegerField('Điểm khớp (0–100)', null=True, blank=True)
-    stars = models.PositiveSmallIntegerField('Số sao (0–3)', null=True, blank=True)
+    stars = models.PositiveSmallIntegerField('Số sao (0–5)', null=True, blank=True)
 
     class Meta:
         verbose_name = 'Lần luyện phát âm'

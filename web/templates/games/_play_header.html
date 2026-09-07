@@ -1,0 +1,8 @@
+{# Đầu màn chơi: icon game + tên bé + chủ đề, kèm nút Thoát. Dùng chung mọi game. #}
+{# Truyền icon qua {% include ... with icon='👂' %} #}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <h1 class="h5 m-0">{{ icon }} {{ child.avatar }} {{ child.name }} — {{ topic.name_vi }}</h1>
+  <a href="{% url 'games:choose' %}" class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-arrow-left"></i> Thoát
+  </a>
+</div>

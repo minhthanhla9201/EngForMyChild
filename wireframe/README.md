@@ -10,7 +10,7 @@ trên cùng để **về mục lục** hoặc xem **màn trước/sau**. Không 
 - `index.html` — trang mục lục, liên kết tới 19 file màn.
 - `<tên-màn>.html` — mỗi màn một file độc lập (vd `login.html`, `dashboard.html`, `pass-enter.html`...).
 - `assets/` — asset dùng chung:
-  - `vendor/` (Bootstrap, Bootstrap Icons, HTMX, Alpine.js) + `style.css` (CSS thật của app).
+  - `vendor/` (Bootstrap, Bootstrap Icons, Alpine.js) + `style.css` (CSS thật của app).
   - `wf-frame.css` — CSS khung wireframe (nhãn màn, viền "cửa sổ", nav xám...).
   - `wf-frame.js` — chèn navbar mẫu (bé / quản lý / khách) + dựng thanh điều hướng trước/sau.
 

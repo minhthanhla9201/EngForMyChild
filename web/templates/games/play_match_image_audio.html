@@ -5,12 +5,7 @@
 {{ round_data|json_script:"round-data" }}
 
 <div x-data="matchImageAudio()" x-init="init()">
-  <div class="d-flex align-items-center justify-content-between mb-3">
-    <h1 class="h5 m-0">🖼️🔊 {{ child.avatar }} {{ child.name }} — {{ topic.name_vi }}</h1>
-    <a href="{% url 'games:choose' %}" class="btn btn-outline-secondary btn-sm">
-      <i class="bi bi-arrow-left"></i> Thoát
-    </a>
-  </div>
+  {% include 'games/_play_header.html' with icon='🖼️🔊' %}
 
   <div x-show="!finished">
     <div class="text-muted small mb-2">
@@ -41,15 +36,7 @@
     </div>
   </div>
 
-  <div x-show="finished" x-transition class="card child-card text-center p-5">
-    <div class="display-4 mb-2" x-text="starText"></div>
-    <p class="fs-5">Ghép đúng <span x-text="matched"></span>/<span x-text="pairsTotal"></span> cặp,
-      lật sai <span x-text="mistakes"></span> lần</p>
-    <div class="d-flex justify-content-center gap-2">
-      <a href="{% url 'games:choose' %}" class="btn btn-outline-primary">Chọn game khác</a>
-      <button class="btn btn-kid" @click="location.reload()">Chơi lại</button>
-    </div>
-  </div>
+  {% include 'games/_play_finished.html' with result_template='games/_result_memory.html' %}
 
   <audio x-ref="player"></audio>
   {# player riêng cho giọng đọc TÊN tiếng Việt của thẻ hình #}
@@ -61,76 +48,29 @@
 {% block extra_js %}
 <script>
   const SUBMIT_URL = "{% url 'games:submit' child.pk game.code topic.slug %}";
-  function getCookie(n){const m=document.cookie.match('(^|;)\\s*'+n+'\\s*=\\s*([^;]+)');return m?m.pop():'';}
-  // Đọc câu hướng dẫn cho bé 1 lần khi vào màn.
-  (function(){ var u = JSON.parse(document.getElementById('hint-url').textContent);
-    window.addEventListener('load', function(){ if(window.kidFx) kidFx.playHint(u); }); })();
+  gameCommon.playHintOnLoad();
 
   function matchImageAudio() {
     return {
-      cards: [], up: [], matched: 0, mistakes: 0, pairsTotal: 0,
-      pairIds: [], matchedIds: [],
-      busy: false, finished: false, starText: '', newBadges: [],
-      init() {
-        const data = JSON.parse(document.getElementById('round-data').textContent);
-        this.cards = (data.cards || []).map(c => ({...c, done: false}));
-        this.pairsTotal = (data.pairs || []).length;
-        this.pairIds = (data.pairs || []).map(p => p.pair_id);
-        if (!this.pairsTotal) { this.finished = true; }
-      },
-      isUp(i){ return this.up.includes(i); },
-      // Lật thẻ LOA → phát audio tiếng Anh; lật thẻ HÌNH → đọc TÊN tiếng Việt
-      // (bé chưa biết chữ, nghe tên hình vừa lật).
-      async playCard(card) {
+      ...gameCommon.memoryState(),
+      init() { this.loadCards(); },
+      /**
+       * Lật thẻ LOA → phát audio tiếng Anh; lật thẻ HÌNH → đọc TÊN tiếng Việt
+       * (bé chưa biết chữ, nghe tên hình vừa lật).
+       */
+      playCard(card) {
         if (card.face === 'audio') {
-          try {
-            const r = await fetch(`/learn/word/${card.word_id}/audio/`);
-            const d = await r.json();
-            if (d.ok) { this.$refs.player.src = d.url; await this.$refs.player.play(); }
-          } catch(e){}
-        } else if (card.face === 'image' && card.vi_name_url) {
-          try { this.$refs.viplayer.src = card.vi_name_url; this.$refs.viplayer.currentTime = 0;
-                this.$refs.viplayer.play().catch(function(){}); } catch(e){}
+          return gameCommon.playWordAudio(card.word_id, this.$refs.player);
+        }
+        if (card.face === 'image') {
+          gameCommon.playViName(card.vi_name_url, this.$refs.viplayer);
         }
       },
       flip(i) {
         if (this.busy || this.cards[i].done || this.isUp(i)) return;
         this.up.push(i);
         this.playCard(this.cards[i]);  // lật thẻ loa thì nghe ngay
-        if (this.up.length === 2) {
-          this.busy = true;
-          const [a, b] = this.up;
-          if (this.cards[a].pair_id === this.cards[b].pair_id) {
-            this.cards[a].done = true; this.cards[b].done = true;
-            this.matched++;
-            this.matchedIds.push(this.cards[a].pair_id);
-            if (window.kidFx) kidFx.correct();  // ghép đúng cặp → khích lệ
-            this.up = []; this.busy = false;
-            if (this.matched === this.pairsTotal) this.submit();
-          } else {
-            this.mistakes++;
-            if (window.kidFx) kidFx.wrong();    // lật sai → nhẹ nhàng, không phạt
-            setTimeout(() => { this.up = []; this.busy = false; }, 900);
-          }
-        }
-      },
-      async submit() {
-        try {
-          const r = await fetch(SUBMIT_URL, {
-            method: 'POST',
-            headers: {'Content-Type':'application/json','X-CSRFToken':getCookie('csrftoken')},
-            body: JSON.stringify({
-              pairs_total: this.pairsTotal, pairs_matched: this.matched,
-              mistakes: this.mistakes, matched_pair_ids: this.matchedIds,
-              pair_ids: this.pairIds,
-            }),
-          });
-          const d = await r.json();
-          this.starText = '⭐'.repeat(d.stars || 0) || '🌱';
-          this.newBadges = d.badges || [];   // huy hiệu vừa mở (hiện sau khi reo)
-        } catch(e){ this.starText = '🌱'; }
-        this.finished = true;
-        if (window.kidFx) { kidFx.cheer(); kidFx.badges(this.newBadges); }
+        if (this.up.length === 2) this.resolvePair(SUBMIT_URL, 900);
       },
     };
   }

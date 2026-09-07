@@ -139,11 +139,6 @@
 {% if not empty %}
 <script>
   const CHILD_ID = {{ child.pk }};
-  // Lấy CSRF token từ cookie để POST bản ghi.
-  function getCookie(name) {
-    const m = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
-    return m ? m.pop() : '';
-  }
 
   function practice() {
     return {
@@ -172,7 +167,7 @@
       async listen() {
         this.busy = true; this.message = '';
         try {
-          const r = await fetch(`/learn/word/${this.current.id}/audio/`);
+          const r = await fetch(gameCommon.wordAudioUrl(this.current.id));
           const d = await r.json();
           if (d.ok) { this.$refs.sample.src = d.url; this.$refs.sample.play(); }
           else { this.show(d.message || 'Chưa nghe được, thử lại nhé.', false); }
@@ -184,7 +179,7 @@
       async listenVi() {
         this.busy = true; this.message = '';
         try {
-          const r = await fetch(`/learn/word/${this.current.id}/audio/`);
+          const r = await fetch(gameCommon.wordAudioUrl(this.current.id));
           const d = await r.json();
           if (d.ok && d.vi_url) { this.$refs.sample.src = d.vi_url; this.$refs.sample.play(); }
           else { this.show('Chưa có giọng hướng dẫn, thử lại nhé.', false); }
@@ -239,7 +234,7 @@
         try {
           const r = await fetch(`/speak/${CHILD_ID}/word/${this.current.id}/save/`, {
             method: 'POST',
-            headers: { 'X-CSRFToken': getCookie('csrftoken') },
+            headers: { 'X-CSRFToken': gameCommon.getCookie('csrftoken') },
             body: fd,
           });
           const d = await r.json();

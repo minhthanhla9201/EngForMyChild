@@ -6,7 +6,7 @@ Dành cho bé CHƯA BIẾT CHỮ — đáp án là hình ảnh, không phải ch
 hiển thị ở template (hình thay vì chữ) nên tái dùng chung logic.
 """
 
-from .base import stars_from_ratio, word_payload
+from .base import score_choice_round
 
 NUM_CHOICES = 4
 
@@ -25,14 +25,5 @@ def build_round(words, count=5):
 
 
 def score_round(payload):
-    """Chấm giống nghe & chọn: mỗi câu picked_id == answer_id là đúng.
-    Trả {'score', 'total', 'stars', 'word_results'}."""
-    answers = payload.get('answers', []) or []
-    total = len(answers)
-    score = sum(1 for a in answers if a.get('picked_id') == a.get('answer_id'))
-    word_results = [
-        {'word_id': a['answer_id'], 'correct': a.get('picked_id') == a.get('answer_id')}
-        for a in answers if a.get('answer_id')
-    ]
-    return {'score': score, 'total': total, 'stars': stars_from_ratio(score, total),
-            'word_results': word_results}
+    """Chấm giống nghe & chọn — luật chung của game trả lời từng câu (xem base)."""
+    return score_choice_round(payload)

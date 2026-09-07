@@ -7,6 +7,7 @@ Test khu trò chơi:
 import json
 
 from django.contrib.auth.models import User
+from django.template.loader import get_template
 from django.test import TestCase
 from django.urls import reverse
 
@@ -39,6 +40,27 @@ class EngineTests(TestCase):
         self.assertEqual(stars_from_ratio(4, 10), 1)
         self.assertEqual(stars_from_ratio(1, 10), 0)
         self.assertEqual(stars_from_ratio(0, 0), 0)  # không chia cho 0
+
+    def test_same_kind_games_share_scoring(self):
+        """
+        Các game cùng KIỂU phải chấm giống hệt nhau (dùng chung hàm ở base).
+
+        Giữ bất biến sau khi gom score_round: nếu ai đó viết lại luật chấm riêng
+        cho một game, test này sẽ đỏ.
+        """
+        quiz_payload = {'answers': [
+            {'answer_id': 1, 'picked_id': 1},
+            {'answer_id': 2, 'picked_id': 9},
+            {'answer_id': 3, 'picked_id': 3},
+        ]}
+        expected = listen_pick.score_round(quiz_payload)
+        self.assertEqual(listen_pick_image.score_round(quiz_payload), expected)
+        self.assertEqual(image_pick_audio.score_round(quiz_payload), expected)
+
+        match_payload = {'pairs_total': 5, 'pairs_matched': 4, 'mistakes': 3,
+                         'matched_pair_ids': [1, 2, 3, 4], 'pair_ids': [1, 2, 3, 4, 5]}
+        self.assertEqual(match_image_audio.score_round(match_payload),
+                         match_pairs.score_round(match_payload))
 
     def test_listen_pick_build_round(self):
         """build_round tạo câu hỏi, mỗi câu 4 lựa chọn và có chứa đáp án."""
@@ -160,6 +182,28 @@ class GamesViewTests(TestCase):
         self.assertIsInstance(data, dict)            # phải là object, KHÔNG phải str
         self.assertIn('questions', data)
         self.assertTrue(all(len(q['choices']) == 4 for q in data['questions']))
+
+    def test_quiz_templates_call_current_as_method(self):
+        """
+        Template game trắc nghiệm phải gọi `current()`, KHÔNG phải `current.`.
+
+        Vì sao: các màn này dựng state bằng `{...gameCommon.quizState()}`, mà spread
+        KHÔNG sao chép getter — nó gọi getter một lần lúc `questions` còn rỗng rồi
+        đóng băng giá trị. Nếu ai đó đổi `current` về getter, màn chơi sẽ TRẮNG
+        (không render lựa chọn) và mọi câu bị chấm sai, nhưng test HTTP vẫn xanh vì
+        server không chạy Alpine. Test này canh đúng chỗ đó.
+        """
+        quiz_templates = [
+            'games/play_listen_pick.html',
+            'games/play_listen_pick_image.html',
+            'games/play_image_pick_audio.html',
+        ]
+        for name in quiz_templates:
+            with self.subTest(template=name):
+                source = get_template(name).template.source
+                self.assertNotRegex(
+                    source, r'current\s*\.',
+                    f'{name}: phải dùng current() thay vì truy cập thuộc tính trực tiếp.')
 
     def test_play_blocked_for_other_child(self):
         self.client.login(username='parent', password='pass12345')

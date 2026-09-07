@@ -10,7 +10,7 @@ Chỉ dùng từ có ảnh (needs_image='Y').
 import random
 
 from catalog.audio import get_vi_name
-from .base import stars_from_ratio, word_payload
+from .base import score_choice_round, word_payload
 
 NUM_CHOICES = 4
 
@@ -48,13 +48,5 @@ def build_round(words, count=5):
 
 
 def score_round(payload):
-    """Chấm: mỗi câu picked_id (id từ có audio bé chọn) == answer_id là đúng."""
-    answers = payload.get('answers', []) or []
-    total = len(answers)
-    score = sum(1 for a in answers if a.get('picked_id') == a.get('answer_id'))
-    word_results = [
-        {'word_id': a['answer_id'], 'correct': a.get('picked_id') == a.get('answer_id')}
-        for a in answers if a.get('answer_id')
-    ]
-    return {'score': score, 'total': total, 'stars': stars_from_ratio(score, total),
-            'word_results': word_results}
+    """Chấm: picked_id (id từ có audio bé chọn) == answer_id là đúng (luật chung, xem base)."""
+    return score_choice_round(payload)
