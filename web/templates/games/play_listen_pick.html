@@ -5,12 +5,7 @@
 {{ round_data|json_script:"round-data" }}
 
 <div x-data="listenPick()" x-init="init()">
-  <div class="d-flex align-items-center justify-content-between mb-3">
-    <h1 class="h5 m-0">👂 {{ child.avatar }} {{ child.name }} — {{ topic.name_vi }}</h1>
-    <a href="{% url 'games:choose' %}" class="btn btn-outline-secondary btn-sm">
-      <i class="bi bi-arrow-left"></i> Thoát
-    </a>
-  </div>
+  {% include 'games/_play_header.html' with icon='👂' %}
 
   {# Đang chơi #}
   <div x-show="!finished">
@@ -24,7 +19,7 @@
     </div>
 
     <div class="row g-3">
-      <template x-for="choice in current.choices" :key="choice.id">
+      <template x-for="choice in current().choices" :key="choice.id">
         <div class="col-6">
           <button class="btn btn-outline-primary w-100 p-2"
                   @click="pick(choice.id)" :disabled="answered">
@@ -46,15 +41,7 @@
     </div>
   </div>
 
-  {# Kết thúc: hiện sao #}
-  <div x-show="finished" x-transition class="card child-card text-center p-5">
-    <div class="display-4 mb-2" x-text="starText"></div>
-    <p class="fs-5">Đúng <span x-text="score"></span> / <span x-text="questions.length"></span> câu</p>
-    <div class="d-flex justify-content-center gap-2">
-      <a href="{% url 'games:choose' %}" class="btn btn-outline-primary">Chọn game khác</a>
-      <button class="btn btn-kid" @click="location.reload()">Chơi lại</button>
-    </div>
-  </div>
+  {% include 'games/_play_finished.html' with result_template='games/_result_quiz.html' %}
 
   <audio x-ref="player"></audio>
 </div>
@@ -63,57 +50,21 @@
 
 {% block extra_js %}
 <script>
-  const CHILD_ID = {{ child.pk }};
   const SUBMIT_URL = "{% url 'games:submit' child.pk game.code topic.slug %}";
-  // Đọc câu hướng dẫn cho bé 1 lần khi vào màn (bé chưa biết chữ → nghe hiểu).
-  (function(){ var u = JSON.parse(document.getElementById('hint-url').textContent);
-    window.addEventListener('load', function(){ if(window.kidFx) kidFx.playHint(u); }); })();
-  function getCookie(n){const m=document.cookie.match('(^|;)\\s*'+n+'\\s*=\\s*([^;]+)');return m?m.pop():'';}
+  gameCommon.playHintOnLoad();
 
   function listenPick() {
     return {
-      questions: [], index: 0, answered: false, lastCorrect: false,
-      score: 0, finished: false, answers: [], starText: '', newBadges: [],
-      init() {
-        const data = JSON.parse(document.getElementById('round-data').textContent);
-        this.questions = data.questions || [];
-        if (!this.questions.length) { this.finished = true; }
-      },
-      get current(){ return this.questions[this.index] || {choices: []}; },
-      // Phát audio mẫu của từ đáp án (API catalog).
-      async playAudio() {
-        try {
-          const r = await fetch(`/learn/word/${this.current.audio_word_id}/audio/`);
-          const d = await r.json();
-          if (d.ok) { this.$refs.player.src = d.url; this.$refs.player.play(); }
-        } catch(e){}
+      ...gameCommon.quizState(),
+      init() { this.loadQuestions(); },
+      /** Phát audio mẫu của từ đáp án. */
+      playAudio() {
+        return gameCommon.playWordAudio(this.current().audio_word_id, this.$refs.player);
       },
       pick(pickedId) {
         if (this.answered) return;
-        this.answered = true;
-        this.lastCorrect = (pickedId === this.current.answer_id);
-        if (this.lastCorrect) this.score++;
-        if (window.kidFx) { this.lastCorrect ? kidFx.correct() : kidFx.wrong(); }
-        this.answers.push({answer_id: this.current.answer_id, picked_id: pickedId});
-        // Sang câu sau (hoặc kết thúc) sau 0.9s để bé thấy phản hồi.
-        setTimeout(() => {
-          if (this.index < this.questions.length - 1) { this.index++; this.answered = false; }
-          else { this.submit(); }
-        }, 900);
-      },
-      async submit() {
-        try {
-          const r = await fetch(SUBMIT_URL, {
-            method: 'POST',
-            headers: {'Content-Type':'application/json','X-CSRFToken':getCookie('csrftoken')},
-            body: JSON.stringify({answers: this.answers}),
-          });
-          const d = await r.json();
-          this.starText = '⭐'.repeat(d.stars || 0) || '🌱';
-          this.newBadges = d.badges || [];   // huy hiệu vừa mở (hiện sau khi reo)
-        } catch(e){ this.starText = '🌱'; }
-        this.finished = true;
-        if (window.kidFx) { kidFx.cheer(); kidFx.badges(this.newBadges); }
+        this.record(pickedId);
+        this.advance(SUBMIT_URL);
       },
     };
   }

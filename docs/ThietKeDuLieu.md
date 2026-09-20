@@ -394,8 +394,8 @@ Colors,red,màu đỏ,https://.../red.png
 
 ---
 
-## 6. Apps Django (dự kiến)
-- `core` — AuditedModel, mixin (vd `ListReturnMixin`), templatetags dùng chung, **decorator `manage_required`** (chặn khu quản lý: cần đăng nhập + passcode còn hạn).
+## 6. Apps Django
+- `core` — `AuditedModel` + `YesNo` (models.py), `CurrentUserMiddleware` (tự điền created_by/updated_by), tiện ích icon (`icons.py`), templatetags dùng chung (`icons`, `pagination`), **decorator `manage_required`** (chặn khu quản lý: cần đăng nhập + passcode còn hạn).
 - `accounts` — phụ huynh (auth) + `ChildProfile` + `ManagePasscode` (passcode khu quản lý, lưu hash) + **trang chủ khu của bé** + **bảng điều khiển khu quản lý** + màn **Tiến độ** + 3 màn passcode (nhập/đặt/đổi).
 - `catalog` — `Topic`, `Word`, `AudioClip`, `Sentence` + **màn quản lý CRUD chủ đề/từ + nhập CSV qua web** (URL khu quản lý tách ở `urls_manage.py`, dưới `/manage/`) + service `imports` (dùng chung với lệnh `import_words`) + dịch vụ TTS/IPA.
 - `games` — `GameType`, các module khuôn game, view chơi chung, chấm điểm + sao.

@@ -30,12 +30,13 @@
         {% block content %}{% endblock %}
     </main>
 
-    {# JS nạp ở cuối từ static/vendor (CHẠY OFFLINE): Bootstrap bundle, HTMX, Alpine (defer) #}
+    {# JS nạp ở cuối từ static/vendor (CHẠY OFFLINE): Bootstrap bundle, Alpine (defer) #}
     <script src="{% static 'vendor/bootstrap/bootstrap.bundle.min.js' %}"></script>
-    <script src="{% static 'vendor/htmx/htmx.min.js' %}"></script>
     <script defer src="{% static 'vendor/alpine/alpine.min.js' %}"></script>
     {# Hiệu ứng khích lệ cho bé (kidFx toàn cục) — dùng chung cho game/phát âm #}
     <script src="{% static 'js/kidfx.js' %}"></script>
+    {# Tiện ích chung cho màn game (CSRF, nộp ván, state quiz/memory) — dùng kidFx #}
+    <script src="{% static 'js/game-common.js' %}"></script>
     {# Script trang phụ thuộc bootstrap PHẢI đặt trong block này (render sau bundle) #}
     {% block extra_js %}{% endblock %}
 </body>

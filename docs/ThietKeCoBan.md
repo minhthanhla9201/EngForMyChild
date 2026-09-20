@@ -15,7 +15,7 @@
 | **Đối tượng** | Bé 6–7 tuổi (khu của bé) + phụ huynh (khu quản lý). |
 | **Kiểu triển khai** | Chạy **local** trên máy nhà (không cần server ngoài). Chạy trực tiếp Python hoặc Docker. |
 | **Backend** | Django (Python) — 5 app nội bộ. |
-| **Frontend** | Bootstrap + Bootstrap Icons + HTMX + Alpine.js (tải sẵn `static/vendor/`, **không CDN** → chạy offline). |
+| **Frontend** | Bootstrap + Bootstrap Icons + Alpine.js (tải sẵn `static/vendor/`, **không CDN** → chạy offline). |
 | **CSDL** | SQLite (mặc định) → có thể đổi MySQL chỉ qua `DATABASE_URL` trong `.env`, **không sửa code**. |
 | **TTS (đọc mẫu)** | edge-tts (cần mạng) → dự phòng pyttsx3 (offline). |
 | **ASR (chấm giọng)** | faster-whisper — **GĐ 3, chưa làm**. |
@@ -80,7 +80,7 @@ EngForMyChild/
    ├─ games/                 # 🎮 Trò chơi
    │  └─ engine/             #   Luật chơi tách theo module (listen_pick, match_pairs...)
    ├─ templates/             # Giao diện (base + base_kid + base_manage + theo app)
-   ├─ static/                # CSS + vendor libs (Bootstrap/HTMX/Alpine — offline)
+   ├─ static/                # CSS + vendor libs (Bootstrap/Alpine — offline)
    ├─ media/                 # File sinh ra: audio/ (TTS), images/ (hình từ), recordings/ (giọng bé)
    └─ logs/                  # Log theo ngày: app-*, error-*, security-*
 ```
@@ -223,8 +223,8 @@ ManagePasscode (singleton pk=1)
 
 - **Kế thừa:** `base.html` (khung chung: nạp vendor CSS/JS) → `base_kid.html` (khu bé, navbar xanh) & `base_manage.html` (khu quản lý, navbar xám).
 - **Offline:** mọi thư viện nạp từ `static/vendor/` — **không** gọi CDN.
-- **Tương tác nhẹ:** HTMX (partial) + Alpine.js (state phía client cho luyện phát âm & game). Dữ liệu từ server → client qua `{{ ...|json_script }}` (an toàn, tránh mã hoá 2 lần).
-- **Wireframe** ([wireframe/](../wireframe/)) — bản HTML tĩnh xem trước 6 màn quản lý, dùng CSS thật, **không cần chạy server**; đồng bộ khi đổi `style.css` theo `wireframe/README.md`.
+- **Tương tác nhẹ:** Alpine.js (state phía client cho luyện phát âm & game) + `fetch()` JSON khi cần gọi server. Dữ liệu từ server → client qua `{{ ...|json_script }}` (an toàn, tránh mã hoá 2 lần).
+- **Wireframe** ([wireframe/](../wireframe/)) — bản HTML tĩnh xem trước 25 màn (khu bé + khu quản lý), dùng CSS thật, **không cần chạy server**; đồng bộ khi đổi `style.css` theo `wireframe/README.md`.
 
 Nhóm template theo app: `templates/accounts/`, `catalog/` (+ `catalog/manage/`), `pronunciation/`, `games/`.
 

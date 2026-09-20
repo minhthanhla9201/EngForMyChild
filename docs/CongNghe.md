@@ -5,7 +5,7 @@
 ## 1. Nguyên tắc chọn công nghệ
 - **Miễn phí & mã nguồn mở** toàn bộ. Không phụ thuộc dịch vụ trả phí.
 - **Chạy local**, một máy là đủ; đóng gói bằng **Docker** để bật/tắt gọn.
-- **Server-rendered, KHÔNG SPA.** Trang do Django render; tương tác động dùng **HTMX** + **Alpine.js** (đủ cho game đơn giản, nhẹ, dễ bảo trì).
+- **Server-rendered, KHÔNG SPA.** Trang do Django render; tương tác động dùng **Alpine.js** + `fetch()` (đủ cho game đơn giản, nhẹ, dễ bảo trì).
 - **Dữ liệu tách rời code:** thêm từ vựng / trò chơi qua dữ liệu + cấu hình, hạn chế sửa code (xem `ThietKeDuLieu.md`).
 - **Offline-first cho lúc học:** audio sinh sẵn và cache vào `media/`; khi bé học không cần internet. Internet chỉ cần lúc *sinh* audio TTS lần đầu.
 
@@ -19,8 +19,7 @@
 | Template | Django Templates | — | Server-rendered |
 | CSS | Bootstrap | 5 | Bố cục nhanh, responsive, miễn phí |
 | Icon | Bootstrap Icons | — | Bé cần nhiều icon to, rõ |
-| Tương tác nhẹ | **HTMX** | 1.x | Cập nhật từng mảnh trang không cần viết nhiều JS |
-| Tương tác client | **Alpine.js** | 3.x | Trạng thái nhỏ phía client cho game (lật thẻ, đếm giờ, kéo–thả) — nhẹ ~15KB, không build tool |
+| Tương tác client | **Alpine.js** | 3.x | Trạng thái nhỏ phía client cho game (lật thẻ, đếm giờ, kéo–thả) — nhẹ ~15KB, không build tool. Gọi server bằng `fetch()` (JSON), tiện ích chung ở `static/js/game-common.js` |
 | Ghi âm | Web Audio API (`MediaRecorder`) | trình duyệt | Thu giọng bé, không cài thêm gì |
 | Hiệu ứng khích lệ | `static/js/kidfx.js` (thuần) | — | Khi bé làm đúng/sai: confetti + emoji nảy (CSS), **âm thanh WAV** (file sinh sẵn `static/sfx/*.wav` — lệnh `gen_sfx`), **giọng động viên tiếng Việt** (mp3 Neural do edge-tts sinh — lệnh `gen_praise`, lấy qua API `praise/manifest/`). Offline sau khi sinh, không thư viện ngoài. Dùng chung: `kidFx.correct()/wrong()/cheer()/badges()` — nạp cuối `base.html`, gọi từ game/phát âm |
 | Giọng theo ngữ cảnh | edge-tts, 2 giọng | — | Lời động viên game dùng giọng **nữ** (`TTS_VOICE_VI`, mặc định `vi-VN-HoaiMyNeural`); lời khen khi mở **huy hiệu** dùng giọng **nam** (`TTS_VOICE_BADGE`, mặc định `vi-VN-NamMinhNeural`) — bé thấy khoảnh khắc mở huy hiệu "đặc biệt" hơn. Cùng câu + giọng khác → file mp3 khác (hash gồm giọng). Cả hai sinh bằng `gen_praise` |
@@ -63,5 +62,5 @@ docker-compose.yml
 
 ## 7. Những gì KHÔNG dùng (giữ đơn giản)
 - Không React/Vue/SPA — thừa với nhu cầu này.
-- Không Node build pipeline — Bootstrap/HTMX/Alpine nạp qua file tĩnh (CDN khi dev, hoặc tải về `static/` để offline).
+- Không Node build pipeline — Bootstrap/Alpine nạp qua file tĩnh (tải sẵn về `static/vendor/` để chạy offline).
 - Không dịch vụ cloud trả phí (TTS/ASR đều chạy local).

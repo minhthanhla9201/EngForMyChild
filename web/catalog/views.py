@@ -100,7 +100,7 @@ def word_list(request, slug):
 def word_audio(request, pk):
     """
     Trả URL audio phát âm của một từ (sinh + cache nếu chưa có).
-    Template gọi qua HTMX/JS rồi phát bằng thẻ <audio>. Trả JSON.
+    Template gọi qua JS (fetch) rồi phát bằng thẻ <audio>. Trả JSON.
     """
     word = get_object_or_404(Word, pk=pk, active='Y')
     clip = audio_service.get_clip(word)

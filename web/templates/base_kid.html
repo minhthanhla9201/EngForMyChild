@@ -14,6 +14,11 @@
     sfxBase: "{% static 'sfx/' %}",
     praiseManifestUrl: "{% url 'catalog:praise_manifest' %}",
   };
+  {# Mẫu URL API audio cho game-common.js — dựng bằng {% url %} rồi thay {id}, #}
+  {# để không hardcode đường dẫn trong JS. #}
+  window.GAME_CFG = {
+    wordAudioUrl: "{% url 'catalog:word_audio' 0 %}".replace('/0/', '/{id}/'),
+  };
 </script>
 {# Chọn theme màu khu bé (đọc/ghi localStorage + nút trên navbar) #}
 <script defer src="{% static 'js/kidtheme.js' %}"></script>

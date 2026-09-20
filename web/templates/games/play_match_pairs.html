@@ -5,12 +5,7 @@
 {{ round_data|json_script:"round-data" }}
 
 <div x-data="matchPairs()" x-init="init()">
-  <div class="d-flex align-items-center justify-content-between mb-3">
-    <h1 class="h5 m-0">🃏 {{ child.avatar }} {{ child.name }} — {{ topic.name_vi }}</h1>
-    <a href="{% url 'games:choose' %}" class="btn btn-outline-secondary btn-sm">
-      <i class="bi bi-arrow-left"></i> Thoát
-    </a>
-  </div>
+  {% include 'games/_play_header.html' with icon='🃏' %}
 
   <div x-show="!finished">
     <div class="text-muted small mb-2">
@@ -33,15 +28,7 @@
     </div>
   </div>
 
-  <div x-show="finished" x-transition class="card child-card text-center p-5">
-    <div class="display-4 mb-2" x-text="starText"></div>
-    <p class="fs-5">Ghép đúng <span x-text="matched"></span>/<span x-text="pairsTotal"></span> cặp,
-      lật sai <span x-text="mistakes"></span> lần</p>
-    <div class="d-flex justify-content-center gap-2">
-      <a href="{% url 'games:choose' %}" class="btn btn-outline-primary">Chọn game khác</a>
-      <button class="btn btn-kid" @click="location.reload()">Chơi lại</button>
-    </div>
-  </div>
+  {% include 'games/_play_finished.html' with result_template='games/_result_memory.html' %}
 </div>
 {{ hint_voice_url|json_script:"hint-url" }}
 {% endblock %}
@@ -49,63 +36,16 @@
 {% block extra_js %}
 <script>
   const SUBMIT_URL = "{% url 'games:submit' child.pk game.code topic.slug %}";
-  function getCookie(n){const m=document.cookie.match('(^|;)\\s*'+n+'\\s*=\\s*([^;]+)');return m?m.pop():'';}
-  // Đọc câu hướng dẫn cho bé 1 lần khi vào màn.
-  (function(){ var u = JSON.parse(document.getElementById('hint-url').textContent);
-    window.addEventListener('load', function(){ if(window.kidFx) kidFx.playHint(u); }); })();
+  gameCommon.playHintOnLoad();
 
   function matchPairs() {
     return {
-      cards: [], up: [], matched: 0, mistakes: 0, pairsTotal: 0,
-      pairIds: [], matchedIds: [],
-      busy: false, finished: false, starText: '', newBadges: [],
-      init() {
-        const data = JSON.parse(document.getElementById('round-data').textContent);
-        this.cards = (data.cards || []).map(c => ({...c, done: false}));
-        this.pairsTotal = (data.pairs || []).length;
-        this.pairIds = (data.pairs || []).map(p => p.pair_id);
-        if (!this.pairsTotal) { this.finished = true; }
-      },
-      isUp(i){ return this.up.includes(i); },
+      ...gameCommon.memoryState(),
+      init() { this.loadCards(); },
       flip(i) {
         if (this.busy || this.cards[i].done || this.isUp(i)) return;
         this.up.push(i);
-        if (this.up.length === 2) {
-          this.busy = true;
-          const [a, b] = this.up;
-          if (this.cards[a].pair_id === this.cards[b].pair_id) {
-            // Đúng cặp → giữ lật.
-            this.cards[a].done = true; this.cards[b].done = true;
-            this.matched++;
-            this.matchedIds.push(this.cards[a].pair_id);
-            if (window.kidFx) kidFx.correct();
-            this.up = []; this.busy = false;
-            if (this.matched === this.pairsTotal) this.submit();
-          } else {
-            // Sai → úp lại sau 0.8s.
-            this.mistakes++;
-            if (window.kidFx) kidFx.wrong();
-            setTimeout(() => { this.up = []; this.busy = false; }, 800);
-          }
-        }
-      },
-      async submit() {
-        try {
-          const r = await fetch(SUBMIT_URL, {
-            method: 'POST',
-            headers: {'Content-Type':'application/json','X-CSRFToken':getCookie('csrftoken')},
-            body: JSON.stringify({
-              pairs_total: this.pairsTotal, pairs_matched: this.matched,
-              mistakes: this.mistakes, matched_pair_ids: this.matchedIds,
-              pair_ids: this.pairIds,
-            }),
-          });
-          const d = await r.json();
-          this.starText = '⭐'.repeat(d.stars || 0) || '🌱';
-          this.newBadges = d.badges || [];   // huy hiệu vừa mở (hiện sau khi reo)
-        } catch(e){ this.starText = '🌱'; }
-        this.finished = true;
-        if (window.kidFx) { kidFx.cheer(); kidFx.badges(this.newBadges); }
+        if (this.up.length === 2) this.resolvePair(SUBMIT_URL, 800);
       },
     };
   }
